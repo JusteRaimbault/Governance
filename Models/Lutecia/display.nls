@@ -1,0 +1,113 @@
+
+;;;;;;;;;;;;;;;;
+;; display.nls
+;;;;;;;;;;;;;;;;
+
+
+
+; plot mean accessibility of external facility
+; if external-facility != 0 [plot (mean [current-accessibility] of patches with [member? number external-facility]) / initial-max-acc]
+; plot externality employments
+; plot externality-employments
+
+
+to display:update-display
+  display:color-patches
+  display:update-nw-display
+end
+
+
+to display:display-target-fit
+  set patches-display "accessibility"
+  display:color-patches
+  ask ghost-transportation-links [set color blue set thickness 0.2 ask both-ends [set color blue]]
+end
+
+
+to display:color-patches
+  ; basic
+  if patches-display = "governance"[
+     ask patches [set pcolor [color] of governing-mayor]
+  ]
+  if patches-display = "accessibility"[
+     color-gradient-patches "(a-to-e-accessibility + e-to-a-accessibility)" "green" "linear"
+  ]
+  ; cor variables
+  if member? patches-display ["actives" "employments" "a-utility" "e-utility" "a-to-e-accessibility" "e-to-a-accessibility"] [
+     ;color-gradient-patches patches-display "green" "linear"
+     run (word "set mi min [" patches-display "] of patches set ma max [" patches-display "] of patches let me (mi + ma)/ 2 ask patches [ ifelse "patches-display " < me [set pcolor gradient:scale [[0 0 0] [0 255 0]] " patches-display " mi ma][set pcolor gradient:scale [[0 255 0][255 0 0]] " patches-display " mi ma]]")
+  ]
+  ; distances
+  if member? patches-display ["mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance"] [
+    let md []
+    if patches-display = "mean-effective-distance" [set md map mean matrix:to-row-list effective-distance-matrix]
+    if patches-display = "lbc-effective-distance" [set md matrix:get-column effective-distance-matrix 0]
+    if patches-display = "center-effective-distance" [set md matrix:get-column effective-distance-matrix (floor (#-patches / 2))]
+    if patches-display = "lbc-network-distance" [if length nw-patches > 0 [let lbcn [number] of one-of (patches with [member? number nw-patches]) with-min [[pxcor] of self + [pycor] of self] set md matrix:get-column network-distance-matrix lbcn ]]
+    if length nw-patches > 0 or patches-display != "lbc-network-distance" [
+    let ma max md let mi min md
+    let p 0 foreach md [ask patch-with-number p [set pcolor scale-color yellow ? mi ma] set p p + 1]
+    ]
+  ]
+  ; transportation
+  if patches-display = "congestion" [
+    ask patches [
+      ifelse member? self nw-patches [
+        color-gradient-patches "item who patches-congestion" "red" "linear"
+      ][
+        set pcolor black
+      ] 
+    ] 
+  ]
+  
+  if patches-display = "network" [
+    ask patches [set pcolor black] ask patches with [member? number nw-patches] [set pcolor pink] 
+  ]
+  
+  ask patches with [sea? = true] [set pcolor blue]
+  
+  
+end
+
+
+
+
+;;
+; Update nw display, with link age coloring
+to display:update-nw-display
+  ask transportation-links [
+    set thickness 0.4
+    ;set color gradient:scale [[255 0 0] [255 255 0]] age 0 (ticks + 1) 
+    set color gradient:scale [[0 0 255] [255 0 255]] age 0 (ticks + 1)
+    ask both-ends [set color [color] of myself]
+  ]
+end
+
+
+
+;;;;
+; Draw boundary between regions
+; it is drawn permanently
+to display:draw-boundaries
+  
+  ;; dirty way : ask each patch to sprout someone drawing its border with neighbors of different area
+  
+  ask patches with [count neighbors4 with [[governing-mayor] of myself != governing-mayor] > 0] [
+    let p self
+    sprout 1 [
+      set color pink set shape "circle" ;set size patch-size / 2
+      foreach to-list [neighbors4 with [[governing-mayor] of p != governing-mayor]] of myself [
+          let xp [pxcor] of p let yp [pycor] of p let xn [pxcor] of ? let yn [pycor] of ?
+          ifelse xp = xn [
+            setxy xp - 0.499 (yp + yn) / 2 pen-down setxy xp + 0.499 (yp + yn) / 2 pen-up
+          ][
+            setxy (xp + xn) / 2  yp - 0.499 pen-down setxy (xp + xn) / 2  yp + 0.499 pen-up
+          ]
+      ]
+      die 
+    ]
+  ]
+  
+end
+
+
