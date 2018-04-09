@@ -1215,41 +1215,28 @@ NIL
 HORIZONTAL
 
 @#$#@#$#@
-## WHAT IS IT?
+## Context
 
-MetropolSim 3.0
+The LUTECIA model is a co-evolution model for land-use and transportation networks.
 
-## HOW IT WORKS
+It is an extended LUTI model which currently implements the following sub-models :
+ - Land-use evolution
+ - Transportation flows (no traffic model yet)
+ - Evaluation of Cooperation and Infrastructure provision
+ - (not implemented : Agglomeration economies)
 
-(what rules the agents use to create the overall behavior of the model)
+## Model description
 
-## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
 
-## THINGS TO NOTICE
+## References
 
-(suggested things for the user to notice while running the model)
+Raimbault, J. (2018). Characterizing and modeling the co-evolution of transportation networks and territories. PhD Thesis, Université Paris 7.
 
-## THINGS TO TRY
+Le Néchet, F., & Raimbault, J. (2015, September). Modeling the emergence of metropolitan transport autorithy in a polycentric urban region. In European Colloqueum on Theoretical and Quantitative Geography.
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Le Néchet, F. (2011, September). Urban dynamics modelling with endogeneous transport infrastructures, in a polycentric region. In 17th European Colloquium on Quantitative and Theoretical Geography.
 
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true
