@@ -15,7 +15,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;
 
-extensions[matrix table context nw shell gradient numanal gis morphology]
+extensions[matrix table  nw shell gradient numanal gis morphology context] ;
 
 __includes [
 
@@ -100,6 +100,7 @@ __includes [
   "utils/math/SpatialKernels.nls"
   "utils/math/Statistics.nls"
   "utils/math/EuclidianDistanceUtilities.nls"
+  "utils/math/Numanal.nls"
   "utils/misc/List.nls"
   "utils/misc/Types.nls"
   "utils/misc/Matrix.nls"
@@ -707,7 +708,7 @@ regional-decision-proba
 regional-decision-proba
 0
 1
-1
+0
 0.05
 1
 NIL
@@ -893,7 +894,7 @@ CHOOSER
 game-type
 game-type
 "random" "simple-nash" "discrete-choices"
-1
+2
 
 TEXTBOX
 183

@@ -266,8 +266,10 @@ to-report governance:game-result [decidors old-config]
         set p2 min (list max (list p2 0) 1)
       ][
         ; discrete-choices
-        set p1 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc1 - D11) (Dc2 - D22) beta-dc-game]) 0 1 0.01)
-        set p2 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc2 - D22) (Dc1 - D11) beta-dc-game]) 0 1 0.01)
+        ;set p1 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc1 - D11) (Dc2 - D22) beta-dc-game]) 0 1 0.01)
+        ;set p2 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc2 - D22) (Dc1 - D11) beta-dc-game]) 0 1 0.01)
+        set p1 (numanal:get-brent-root (word "dc-fun " (Dc1 - D11) " " (Dc2 - D22)) 0 1 0.01)
+        set p2 (numanal:get-brent-root (word "dc-fun " (Dc2 - D22) " " (Dc1 - D11)) 0 1 0.01)
       ]
       
       
@@ -291,6 +293,9 @@ to-report governance:game-result [decidors old-config]
    
 end
 
+to-report dc-fun [p1 p2 x]
+  report governance:to-rootize-dc-game x collaboration-cost p1 p2 beta-dc-game
+end
 
 
 ;;

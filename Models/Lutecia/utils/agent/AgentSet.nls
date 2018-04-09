@@ -16,11 +16,11 @@ end
 ;;
 ; Finds the breeds of an agentset (plural)
 ;  report breed if uniform, turtle otherwise
-to-report agentset-uniform-breed [agentset]
-  let breeds agentset-breed agentset false
-  ;if length breeds = 0 [report "turtle"] ; nobody is turtle
-  ifelse length breeds = 1 [report item 0 breeds][report "TURTLES"]
-end
+;to-report agentset-uniform-breed [agentset]
+;  let breeds agentset-breed agentset false
+;  ;if length breeds = 0 [report "turtle"] ; nobody is turtle
+;  ifelse length breeds = 1 [report item 0 breeds][report "TURTLES"]
+;end
 
 ;;
 ; Finds the breeds of an agentset
