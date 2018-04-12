@@ -1196,7 +1196,7 @@ relocation-rate
 relocation-rate
 0
 1
-0.1
+1
 0.01
 1
 NIL

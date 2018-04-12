@@ -111,7 +111,7 @@ to setup:setup-globals
     "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments"
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "indicators:rel-diff-actives" "indicators:rel-diff-employments" "indicators:mean-accessibility-balance"
+    "rel-diff-actives" "rel-diff-employments" "indicators:mean-accessibility-balance"
     )
   
   
