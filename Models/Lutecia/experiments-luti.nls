@@ -1,0 +1,40 @@
+
+;;
+; Specific experiments for the luti part of the model
+;  (including scenarios for transportation lines, synthetic initial networks)
+
+
+
+to setup-experiment-luti
+  
+  clear-all
+  
+  
+  setup:setup-headless-vars
+  set headless? true
+  
+  
+  ;;
+  ; fixed params for luti
+  
+  set evolve-network? false
+  
+  
+  
+  
+end
+
+
+
+
+to run-experiment-luti
+  
+end
+
+
+
+
+
+
+
+

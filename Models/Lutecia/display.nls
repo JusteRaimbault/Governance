@@ -111,3 +111,18 @@ to display:draw-boundaries
 end
 
 
+
+;;
+; specific setup for some plots
+to display:setup-plots 
+  carefully [
+    set-current-plot "accessibility" set-plot-y-range precision (accessibilities:mean-accessibility patches - 0.001) 3 precision (accessibilities:mean-accessibility patches + 0.001) 3
+    ;set-current-plot "mean-travel-distance" set-plot-y-range (mean-travel-distance - 0.001) (mean-travel-distance + 0.001)
+  ][]
+end
+
+
+
+
+
+

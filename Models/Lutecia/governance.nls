@@ -141,11 +141,11 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   
   ; old mean accessibility
   compute-patches-accessibilities
-  let old-acc mean-accessibility patchset
-  let olds (list mean-accessibility patches)
-  foreach sort-on [who] (mayors with [self != regional-authority]) [set olds lput (mean-accessibility patches with [governing-mayor = ?]) olds] 
+  let old-acc accessibilities:mean-accessibility patchset
+  let olds (list accessibilities:mean-accessibility patches)
+  foreach sort-on [who] (mayors with [self != regional-authority]) [set olds lput (accessibilities:mean-accessibility patches with [governing-mayor = ?]) olds] 
   
-  verbose (word "Mean-travel-distance : " mean-travel-distance)
+  ;verbose (word "Mean-travel-distance : " indicators:mean-travel-distance)
   
   let best-choice [] let delta-acc 0 let deltas rep 0 length olds
   foreach choices [
@@ -158,15 +158,15 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
       update-effective-matrices
       ; recompute new accessibilities
       compute-patches-accessibilities
-      let new-acc mean-accessibility patchset
-      let news (list mean-accessibility patches)
-      foreach sort-on [who] (mayors with [self != regional-authority]) [set news lput (mean-accessibility patches with [governing-mayor = ?]) news]
+      let new-acc accessibilities:mean-accessibility patchset
+      let news (list accessibilities:mean-accessibility patches)
+      foreach sort-on [who] (mayors with [self != regional-authority]) [set news lput (accessibilities:mean-accessibility patches with [governing-mayor = ?]) news]
     
     
       ; check if better delta-acc
     
       verbose (word "∆Z=" (new-acc - old-acc))
-      verbose (word "mean-travel-distance = " mean-travel-distance)
+      ;verbose (word "mean-travel-distance = " indicators:mean-travel-distance)
     
       ;if (new-acc - old-acc) < 0 [user-message ""]
     
@@ -359,7 +359,7 @@ to governance:construct-infrastructure [infras old-config]
   ;
   ;  !!! this architecture is difficult to apprehend from an external point of view (duality nw-patches/nw-links) !!! -> refactorize / precise ?
   ;
-  network-utils:planarize-network transportation-nodes transportation-links
+  utils:network:planarize-network transportation-nodes transportation-links
   ;network:simplify-network
   
   network:update-network-age (last old-config)
@@ -380,7 +380,7 @@ if mouse-down? [
     compute-patches-variables
     display:update-display
     set to-construct []
-    verbose (word "mean-travel-distance : " mean-travel-distance)
+    verbose (word "mean-travel-distance : " indicators:mean-travel-distance)
     stop
   ]
   wait 0.2

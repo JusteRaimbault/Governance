@@ -10,7 +10,7 @@
 ; Planarize a network, by simply "flattening the bridges" == creating intersection for crossing links
 ;
 ;  Necessarily in O(#(edges-agentset)^2) as have to checkall intersections between links.
-to network-utils:planarize-network [vertices-agentset edges-agentset]
+to utils:network:planarize-network [vertices-agentset edges-agentset]
   
   ;; gore way ?
   let links-breed agentset-uniform-singular-breed edges-agentset
@@ -144,7 +144,7 @@ end
 ;
 ;  Note : resulting nw is not necessary planar ! -> planification primitive, better be separated for more flexibility<
 ;;;;;;;;;;;;
-to connexify-network [vertices-agentset edges-agentset]
+to utils:network:connexify-network [vertices-agentset edges-agentset]
   nw:set-context vertices-agentset edges-agentset
   let clusters nw:weak-component-clusters
   
@@ -171,9 +171,53 @@ end
 
 
 
+;;
+;
+to utils:network:connexify-network-link-projection [vertices edges]
+  nw:set-context vertices edges
+  let clusters nw:weak-component-clusters
+  let #-new-links length clusters - 1
+  
+  let links-breed agentset-uniform-singular-breed edges
+  
+  while [length clusters > 1] [
+    ; cluster with most links
+    let c1 first clusters let ma sum [count my-links] of c1 foreach but-first clusters [let cl sum [count my-links] of ? if cl > ma [set c1 ? set ma cl]]
+    ;show c1
+    let c1-links links with [member? end1 c1 or member? end2 c1]
+    ;show c1-links
+    
+    let mi sqrt (world-width ^ 2 + world-height ^ 2)
+    let mc1 nobody let mc2 nobody
+    foreach clusters [
+      let c2 ? ;show c2
+      if c2 != c1 [
+        ask c2 [ask c1-links [let d distance-to-point [xcor] of myself [ycor] of myself if d < mi [set mi d set mc1 myself set mc2 self]]]
+      ]
+    ]
+    ask mc1 [
+       let inter [link:intersection-with [xcor] of myself [ycor] of myself] of mc2
+       ifelse inter = [end1] of mc2 or inter = [end2] of mc2 [create-ghost-transportation-link-with inter][
+          let e1 [end1] of mc2 let e2 [end2] of mc2 ask mc2 [die]
+          if inter != self [create-ghost-transportation-link-with inter ]
+          ask inter [create-ghost-transportation-link-with e1 create-ghost-transportation-link-with e2]
+       ]
+    ]
+    
+    nw:set-context ghost-transportation-nodes ghost-transportation-links
+    set clusters nw:weak-component-clusters
+  ]
+  
+end
 
 
-to network-utils:simplify-network 
+
+
+
+
+
+
+to utils:network:simplify-network 
   
   let n count transportation-nodes with [count transportation-nodes-here > 1]
   while [n > 0] [
@@ -189,6 +233,24 @@ to network-utils:simplify-network
 end
 
 
+
+;;
+; can not have generic procedures in terms of breeds, shitty language
+to utils:network:simplify-ghost-network 
+  
+  let n count ghost-transportation-nodes with [count ghost-transportation-nodes in-radius 2 > 1]
+  while [n > 0] [
+     let current-node one-of ghost-transportation-nodes with [count ghost-transportation-nodes in-radius 2 > 1]
+     let to-connect [] ask current-node [
+       ask other ghost-transportation-nodes in-radius 2 [
+          ;ask my-ghost-transportation-links with [[patch-here] of other-end != [patch-here] of myself] [set to-connect lput other-end to-connect die] die
+          ask my-ghost-transportation-links [if other-end != current-node [set to-connect lput other-end to-connect] die] die
+       ]
+       foreach to-connect [if not ghost-transportation-link-neighbor? ? [create-ghost-transportation-link-with ?]]
+     ]
+    set n count ghost-transportation-nodes with [count ghost-transportation-nodes in-radius 2 > 1]
+  ]
+end
 
 
 

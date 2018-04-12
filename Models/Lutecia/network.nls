@@ -164,6 +164,26 @@ to network:ghost-network-from-gis [file]
 end
 
 
+;;
+; report a ghost network as the coordinates in a infra list
+to-report network:ghost-network-as-infra-list 
+  ifelse count ghost-transportation-nodes > 0 [
+    let res []
+    ask ghost-transportation-links [
+      set res lput (list (list [xcor] of end1 [ycor] of end1) (list [xcor] of end2 [ycor] of end2)) res 
+    ]
+    report res
+  ][report []]
+end
+
+
+;;
+; remove a ghost network
+to network:kill-ghost-network
+  ask ghost-transportation-links [die]
+  ask ghost-transportation-nodes [die]
+end
+
 
 
 

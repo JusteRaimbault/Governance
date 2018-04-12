@@ -76,7 +76,14 @@ __includes [
   ; indicators
   ;;;;;;;;;;
 
+  ; main indics
   "indicators.nls"
+
+  ; morphology
+  "morphology.nls"
+
+  ; network
+  "network-indicators.nls"
 
   ;;;;;;;;;;
   ;; visual exploration
@@ -104,6 +111,7 @@ __includes [
   "utils/misc/List.nls"
   "utils/misc/Types.nls"
   "utils/misc/Matrix.nls"
+  "utils/misc/Table.nls"
   "utils/gui/Display.nls"
   "utils/agent/Link.nls"
   "utils/agent/AgentSet.nls"
@@ -166,6 +174,10 @@ globals[
   ;
   infra-snapping-tolerance ; \in [0,10] - default 1
 
+
+  ; initial network
+  ;initial-nw-random-type
+  initial-nw?
 
   ;;
   ; externality
@@ -234,7 +246,7 @@ globals[
   beta-dc-game
 
   ;evolve-network?
-   initial-nw?
+
 
   ;;;;;;;;;;;;;
   ;; Cached distances matrices
@@ -458,10 +470,10 @@ undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 breed[ghost-transportation-nodes ghost-transportation-node]
 @#$#@#$#@
 GRAPHICS-WINDOW
-371
-10
-846
-506
+449
+18
+924
+514
 6
 6
 35.833333333333336
@@ -500,10 +512,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-402
-516
-468
-549
+385
+579
+451
+612
 setup
 setup:setup\n;luti luti display:color-patches
 NIL
@@ -547,10 +559,10 @@ Runtime parameters
 1
 
 SLIDER
-7
-116
-182
-149
+5
+120
+180
+153
 actives-spatial-dispersion
 actives-spatial-dispersion
 0
@@ -562,10 +574,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-150
-182
-183
+4
+154
+180
+187
 employments-spatial-dispersion
 employments-spatial-dispersion
 0
@@ -577,10 +589,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-183
-116
-292
-149
+181
+120
+290
+153
 actives-max
 actives-max
 0
@@ -592,10 +604,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-182
-150
-292
-183
+180
+154
+290
+187
 employments-max
 employments-max
 0
@@ -637,10 +649,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-529
-516
-584
-549
+512
+579
+567
+612
 go
 main:go
 T
@@ -654,10 +666,10 @@ NIL
 0
 
 PLOT
-986
-155
-1151
-290
+1132
+183
+1355
+338
 convergence
 NIL
 NIL
@@ -673,10 +685,10 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot rel-diff-actives / count patches"
 
 OUTPUT
-877
-383
-1334
-677
+1065
+361
+1522
+655
 10
 
 TEXTBOX
@@ -775,10 +787,10 @@ TEXTBOX
 1
 
 CHOOSER
-678
-523
-816
-568
+332
+713
+470
+758
 log-level
 log-level
 "DEBUG" "VERBOSE" "DEFAULT"
@@ -845,10 +857,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-643
-636
-804
-669
+724
+618
+885
+651
 compute indicators
 indicators:compute-indicators
 NIL
@@ -862,10 +874,10 @@ NIL
 1
 
 SLIDER
-461
-556
-610
-589
+433
+616
+602
+649
 total-time-steps
 total-time-steps
 0
@@ -917,28 +929,28 @@ TEXTBOX
 1
 
 PLOT
-987
-10
-1152
-154
+1132
+16
+1355
+182
 accessibility
 NIL
 NIL
 0.0
 2.0
-0.0
+0.99
 1.0
 true
 false
 "" ""
 PENS
-"default" 1.0 0 -12186836 true "" "plot mean-accessibility patches"
+"default" 1.0 0 -12186836 true "" "plot indicators:overall-mean-accessibility"
 
 TEXTBOX
-407
-631
-594
-675
+347
+674
+556
+702
 __________________
 20
 0.0
@@ -984,13 +996,13 @@ CHOOSER
 setup-type
 setup-type
 "random" "from-file" "gis-synthetic" "gis"
-2
+0
 
 BUTTON
-471
-516
-526
-549
+454
+579
+509
+612
 go
 main:go
 NIL
@@ -1004,10 +1016,10 @@ NIL
 1
 
 BUTTON
-644
-602
-804
-635
+725
+584
+885
+617
 construct infrastructure
 governance:manual-infrastructure-construction
 T
@@ -1076,9 +1088,9 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-204
+205
 10
-365
+413
 70
 conf-file
 setup/conf/synth_unbalanced_close.conf
@@ -1087,10 +1099,10 @@ setup/conf/synth_unbalanced_close.conf
 String
 
 PLOT
-1154
-10
-1322
-154
+1357
+16
+1565
+183
 morphology
 moran
 slope
@@ -1102,7 +1114,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plotxy moran-actives slope-actives"
+"default" 1.0 0 -16777216 true "" "plotxy indicators:morphology:moran-actives indicators:morphology:slope-actives"
 
 SWITCH
 158
@@ -1111,7 +1123,7 @@ SWITCH
 608
 evolve-network?
 evolve-network?
-0
+1
 1
 -1000
 
@@ -1127,10 +1139,10 @@ evolve-landuse?
 -1000
 
 PLOT
-1155
-154
-1326
-292
+1357
+185
+1564
+339
 mean-travel-distance
 NIL
 NIL
@@ -1142,13 +1154,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot mean-effective-distance"
+"default" 1.0 0 -16777216 true "" "plot indicators:mean-effective-distance"
 
 INPUTBOX
-292
-110
-366
-170
+481
+705
+605
+765
 target-network-file
 setup/target/network0.shp
 1
@@ -1156,20 +1168,20 @@ setup/target/network0.shp
 String
 
 TEXTBOX
-404
-503
-433
-521
+393
+556
+422
+574
 Run
 11
 0.0
 1
 
 TEXTBOX
-640
+721
+560
+871
 578
-790
-596
 Interactive
 11
 0.0
@@ -1191,20 +1203,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-366
-560
-458
-605
+325
+628
+430
+673
 stopping-type
 stopping-type
 "time" "infrastructure-stock"
 0
 
 SLIDER
-463
-592
-610
-625
+434
+650
+603
+683
 total-infrastructure-stock
 total-infrastructure-stock
 0
@@ -1214,6 +1226,86 @@ total-infrastructure-stock
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+627
+558
+642
+588
+|
+25
+0.0
+1
+
+TEXTBOX
+627
+582
+642
+612
+|
+25
+0.0
+1
+
+TEXTBOX
+627
+606
+642
+636
+|
+25
+0.0
+1
+
+TEXTBOX
+627
+630
+642
+660
+|
+25
+0.0
+1
+
+TEXTBOX
+183
+360
+198
+390
+|
+25
+0.0
+1
+
+TEXTBOX
+183
+385
+198
+415
+|
+25
+0.0
+1
+
+TEXTBOX
+183
+409
+198
+439
+|
+25
+0.0
+1
+
+CHOOSER
+248
+73
+430
+118
+initial-nw-random-type
+initial-nw-random-type
+"tree-skeleton"
+0
 
 @#$#@#$#@
 ## Context
@@ -1237,7 +1329,6 @@ Raimbault, J. (2018). Characterizing and modeling the co-evolution of transporta
 Le Néchet, F., & Raimbault, J. (2015, September). Modeling the emergence of metropolitan transport autorithy in a polycentric urban region. In European Colloqueum on Theoretical and Quantitative Geography.
 
 Le Néchet, F. (2011, September). Urban dynamics modelling with endogeneous transport infrastructures, in a polycentric region. In 17th European Colloquium on Quantitative and Theoretical Geography.
-
 @#$#@#$#@
 default
 true

@@ -106,12 +106,12 @@ to setup:setup-globals
   set link-distance-function "distance-projection"
   
   ; indicators tracked in time
-  set tracked-indicators (list "overall-mean-accessibility" "mean-travel-distance" 
-    "moran-actives" "entropy-actives" "slope-actives" "slope-rsquared-actives" "mean-distance-actives"
-    "moran-employments" "entropy-employments" "slope-employments" "slope-rsquared-employments" "mean-distance-employments"
-    "mean-distance-to-centre-actives" "mean-distance-to-centre-employments" "center-actives-prop" "center-employments-prop"
-    "max-accessibility" "min-accessibility" "stability" "mean-flow" "min-flow" "max-flow"
-    "rel-diff-actives" "rel-diff-employments" "mean-accessibility-balance"
+  set tracked-indicators (list "indicators:overall-mean-accessibility" "indicators:mean-travel-distance" 
+    "indicators:morphology:moran-actives" "indicators:morphology:entropy-actives" "indicators:morphology:slope-actives" "indicators:morphology:slope-rsquared-actives" "indicators:morphology:mean-distance-actives"
+    "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments"
+    "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
+    "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
+    "indicators:rel-diff-actives" "indicators:rel-diff-employments" "indicators:mean-accessibility-balance"
     )
   
   
@@ -299,8 +299,14 @@ end
 ;;
 ; Setup display
 to setup:setup-display
+  ; patches
   display:color-patches
+  
+  ; administrative boundaries (fixed drawing)
   display:draw-boundaries
+  
+  ; plots
+  display:setup-plots
 end
 
 
@@ -355,8 +361,34 @@ to setup:setup-initial-network
   if initial-nw? != false [
   
     if setup-type = "random" [
-      ;; try a radioconcentric network ? or use slime mould ?
+      ;;
+      ; Possible options :
+      ; try a radioconcentric network ? or use slime mould ?
       ; -> may not be useful in a first time to have synthetic initial networks
+    
+      ; strategy : setup a ghost network ; construct infras then
+    
+      if initial-nw-random-type = "tree-skeleton" [
+         ask mayors with [self != regional-authority] [
+           hatch-ghost-transportation-nodes 1 ;[show self]
+         ]
+         create-ghost-transportation-nodes 6 [setxy random-xcor random-ycor]
+         create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
+   
+         ;ask ghost-transportation-nodes [ask one-of (other ghost-transportation-nodes) with-min [distance myself] [if not link-neighbor? myself [create-ghost-transportation-link-with myself]] ]
+         ask one-of ghost-transportation-nodes with-min [min map [distance ?] to-list (other ghost-transportation-nodes)] [create-ghost-transportation-link-with one-of ((other ghost-transportation-nodes) with-min [distance myself])]
+         
+         ; connexify the nodes
+         ;utils:network:connexify-network ghost-transportation-nodes ghost-transportation-links
+         utils:network:connexify-network-link-projection ghost-transportation-nodes ghost-transportation-links
+         
+         utils:network:simplify-ghost-network
+      ]
+      
+      ;show network:ghost-network-as-infra-list
+      
+      governance:construct-infrastructure network:ghost-network-as-infra-list save-nw-config
+      network:kill-ghost-network
     
     ]
   

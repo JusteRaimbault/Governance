@@ -62,6 +62,20 @@ to compute-patches-utilities
 end
 
 
+
+;;
+; mean accessibility of employments and actives
+;  normalized by total quantities of employment and actives ? YES but not on patchset, all patches !
+;
+;  -- symmetric a-e --
+to-report accessibilities:mean-accessibility [patchset]
+  ifelse sum [actives] of patches > 0 and sum [employments] of patches > 0 and count patchset > 0 [
+    report (sum [a-to-e-accessibility + e-to-a-accessibility] of patchset) / (2 * (sum [actives] of patches) * (sum [employments] of patches))
+  ][report 0]
+end
+
+
+
 ;;
 ; form factor for actives :
 ;  they search to flee from density, both of actives and employments
@@ -77,3 +91,5 @@ end
 to-report employments-form-factor
   report 1
 end
+
+

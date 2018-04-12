@@ -20,40 +20,40 @@ end
 to indicators:compute-indicators
   network:cache-nw-measures
   
-  output-print (word "mean-accessibility : " mean-accessibility patches)
-  output-print (word "mean-accessibility-balance : " mean-accessibility-balance)
-  output-print (word "mean-travel-distance : " mean-travel-distance)
-  output-print (word "actives-entropy : " entropy-actives)
-  output-print (word "moran-actives : " moran-actives)
+  output-print (word "mean-accessibility : " indicators:mean-accessibility patches)
+  output-print (word "mean-accessibility-balance : " indicators:mean-accessibility-balance)
+  output-print (word "mean-travel-distance : " indicators:mean-travel-distance)
+  output-print (word "actives-entropy : " indicators:morphology:entropy-actives)
+  output-print (word "moran-actives : " indicators:morphology:moran-actives)
   output-print (word "collaboration wanted : " wanted-collaboration-rate)
   output-print (word "collaboration realized : " realized-collaboration-rate)
   output-print (word "externality-decrep : " externality-decrepitude)
-  output-print (word "mean-congestion : " mean-congestion)
-  output-print (word "total-nw-length : " total-nw-length)
-  output-print (word "mean-relative-speed : " mean-relative-speed)
-  output-print (word "mean-closeness-centrality : " mean-closeness-centrality)
-  output-print (word "mean-bw-centrality : " mean-bw-centrality)
-  output-print (word "mean-path-length : " mean-path-length)
-  output-print (word "nw-diameter : " nw-diameter)
-  output-print (word "alpha-bw-centrality : " alpha-bw-centrality)
-  output-print (word "alpha-closeness-centrality : " alpha-closeness-centrality)
+  output-print (word "mean-congestion : " indicators:mean-congestion)
+  output-print (word "total-nw-length : " indicators:network:total-nw-length)
+  output-print (word "mean-relative-speed : " indicators:network:mean-relative-speed)
+  output-print (word "mean-closeness-centrality : " indicators:network:mean-closeness-centrality)
+  output-print (word "mean-bw-centrality : " indicators:network:mean-bw-centrality)
+  output-print (word "mean-path-length : " indicators:network:mean-path-length)
+  output-print (word "nw-diameter : " indicators:network:nw-diameter)
+  output-print (word "alpha-bw-centrality : " indicators:network:alpha-bw-centrality)
+  output-print (word "alpha-closeness-centrality : " indicators:network:alpha-closeness-centrality)
 end
 
-to compute-network-indicators
+to indicators:compute-network-indicators
   network:cache-nw-measures
   ; total-nw-length mean-relative-speed mean-closeness-centrality mean-bw-centrality mean-path-length nw-diameter
-  output-print (word "total-nw-length : " total-nw-length)
-  output-print (word "mean-relative-speed : " mean-relative-speed)
-  output-print (word "mean-closeness-centrality : " mean-closeness-centrality)
-  output-print (word "mean-bw-centrality : " mean-bw-centrality)
-  output-print (word "mean-path-length : " mean-path-length)
-  output-print (word "nw-diameter : " nw-diameter)
+  output-print (word "total-nw-length : " indicators:network:total-nw-length)
+  output-print (word "mean-relative-speed : " indicators:network:mean-relative-speed)
+  output-print (word "mean-closeness-centrality : " indicators:network:mean-closeness-centrality)
+  output-print (word "mean-bw-centrality : " indicators:network:mean-bw-centrality)
+  output-print (word "mean-path-length : " indicators:network:mean-path-length)
+  output-print (word "nw-diameter : " indicators:network:nw-diameter)
 end
 
 
 ;;
 ; TS indicators
-to-report ts-indicator [indic]
+to-report indicators:ts-indicator [indic]
   report table:get history-indicators indic
 end
 
@@ -62,7 +62,7 @@ end
 
 ;;
 ; generic rank size hierarchy
-to-report rank-size-hierarchy [x]
+to-report indicators:rank-size-hierarchy [x]
   if length x = 0 [report [0 0]]
   if max x = 0 and min x = 0 [report [0 0]]
   let sol matrix:regress matrix:from-column-list (list (map [log ? 10] sort-by [?1 >= ?2] x) (map [log ? 10] seq 1 length x 1))
@@ -74,7 +74,7 @@ end
 
 ;;
 ; distance to target network
-to-report target-network-distance
+to-report indicators:target-network-distance
   ; kill potential previous target network
   ;ask transportation-links with [status = "ghost"] [ask both-ends [die] die]
   ;report network:network-distances transportation-links with [status = "initial"] transportation-links with [status = "ghost"]
@@ -85,82 +85,90 @@ end
 
 ;;
 ; mean accessibility of employments and actives
-;  normalized by total quantities of employment and actives ? YES but not on patchset, all patches !
-;
-;  -- symmetric a-e --
-to-report mean-accessibility [patchset]
-  ifelse sum [actives] of patches > 0 and sum [employments] of patches > 0 and count patchset > 0 [
-    report (sum [a-to-e-accessibility + e-to-a-accessibility] of patchset) / (2 * (sum [actives] of patches) * (sum [employments] of patches))
+to-report indicators:mean-accessibility [patchset]
+  report accessibilities:mean-accessibility patchset
+end
+
+;;
+; mean accessibility for all patches
+to-report indicators:overall-mean-accessibility
+  report accessibilities:mean-accessibility patches
+end
+
+
+;;
+; mean accessibility for a given mayor
+to-report indicators:mean-accessibility-mayor [i]
+  report accessibilities:mean-accessibility (patches with [governing-mayor = mayor i])
+end
+
+;;
+; Balance in the case of two mayors
+to-report indicators:mean-accessibility-balance
+  ifelse count mayors = 2 [
+    report indicators:mean-accessibility-mayor 0 / indicators:mean-accessibility-mayor 1
   ][report 0]
-end
-
-to-report overall-mean-accessibility
-  report mean-accessibility patches
-end
-
-
-to-report mean-accessibility-mayor [i]
-  report mean-accessibility (patches with [governing-mayor = mayor i])
-end
-
-to-report mean-accessibility-balance
-  report mean-accessibility-mayor 0 / mean-accessibility-mayor 1
 end
 
 
 ; min / max access
-to-report max-accessibility
+to-report indicators:max-accessibility
    report max [max (list a-to-e-accessibility e-to-a-accessibility)] of patches
 end
 
-to-report min-accessibility
+to-report indicators:min-accessibility
    report min [min (list a-to-e-accessibility e-to-a-accessibility)] of patches
 end
 
 
 ; mean travel distance
-to-report mean-travel-distance
+to-report indicators:mean-travel-distance
   if (sum [actives] of patches) * (sum [employments] of patches) = 0 [report 0]
   report sum [a-to-e-distance + e-to-a-distance] of patches / (2 * (sum [actives] of patches) * (sum [employments] of patches))
 end
 
+
+;;
+; TODO
 ; mean nw distance between nw patches
-to-report mean-network-distance
-  
-end
+;to-report mean-network-distance
+;  
+;end
 
 
-to-report mean-effective-distance
+to-report indicators:mean-effective-distance
   if effective-distance-matrix = 0 [report 0]
   report mean map mean matrix:to-row-list effective-distance-matrix
 end
 
 ; mean congestion in network
-to-report mean-congestion
+to-report indicators:mean-congestion
   if count transportation-links > 0 [report mean [congestion] of transportation-links]
   report 1
 end
 
-to-report mean-patch-congestion
+;;
+; congestion on patches
+to-report indicators:mean-patch-congestion
   report mean patches-congestion
 end
 
 
 ;; last variability of relocation process
-to-report stability
+to-report indicators:stability
   report ((diff-employments / sum [employments] of patches) + (diff-actives / sum [actives] of patches) ) / 2
 end
 
 
-to-report mean-flow
+to-report indicators:mean-flow
   report matrix:mean flow-matrix
 end
 
-to-report min-flow
+to-report indicators:min-flow
   report first matrix:min flow-matrix
 end
 
-to-report max-flow
+to-report indicators:max-flow
   report first matrix:max flow-matrix
 end
 
@@ -169,65 +177,65 @@ end
 ;; Morphological indicators
 
 
-to-report moran-actives
-  report morphology:moran 0
+to-report indicators:morphology:moran-actives
+  report morphology:moran-actives
 end
 
-to-report entropy-actives
-  report morphology:entropy 0
+to-report indicators:morphology:entropy-actives
+  report morphology:entropy-actives
 end
 
-to-report slope-actives
-  report first morphology:slope 0
+to-report indicators:morphology:slope-actives
+  report morphology:slope-actives
 end
 
-to-report slope-rsquared-actives
-  report last morphology:slope 0
+to-report indicators:morphology:slope-rsquared-actives
+  report morphology:slope-rsquared-actives
 end
 
-to-report mean-distance-actives
-  report morphology:distance 0
+to-report indicators:morphology:mean-distance-actives
+  report morphology:mean-distance-actives
 end
 
-to-report moran-employments
-  report morphology:moran 1
+to-report indicators:morphology:moran-employments
+  report morphology:moran-employments
 end
 
-to-report entropy-employments
-  report morphology:entropy 1
+to-report indicators:morphology:entropy-employments
+  report morphology:entropy-employments
 end
 
-to-report slope-employments
-  report first morphology:slope 1
+to-report indicators:morphology:slope-employments
+  report morphology:slope-employments
 end
 
-to-report slope-rsquared-employments
-  report last morphology:slope 1
+to-report indicators:morphology:slope-rsquared-employments
+  report morphology:slope-rsquared-employments
 end
 
-to-report mean-distance-employments
-  report morphology:distance 1
+to-report indicators:morphology:mean-distance-employments
+  report morphology:mean-distance-employments
 end
 
 
 ;;
 ; mean distance to centre (to measure sprawl)
-to-report mean-distance-to-centre-actives
+to-report indicators:mean-distance-to-centre-actives
   let atot sum [actives] of patches
   report sum [actives / atot * distance (patch 0 0)] of patches
 end
 
-to-report mean-distance-to-centre-employments
+to-report indicators:mean-distance-to-centre-employments
   let etot sum [employments] of patches
   report sum [employments / etot * distance (patch 0 0)] of patches
 end
 
-to-report center-actives-prop
+to-report indicators:center-actives-prop
   report [actives] of patch 0 0 / sum [actives] of patches
 end
 
 
-to-report center-employments-prop
+to-report indicators:center-employments-prop
   report [employments] of patch 0 0 / sum [employments] of patches
 end
 
@@ -236,48 +244,33 @@ end
 ;;
 ;  Network indicators
 
-
-to-report table-values [t]
-  let res []
-  foreach table:keys t [set res lput table:get t ? res]
-  report res
-end
-
 ;;
 ; nw diameter
-;  Normalized by world diag
-to-report nw-diameter
-  if count transportation-nodes = 0 [report 0]
-  let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report max map [sum map [[transportation-link-length] of ?] ?] (table-values shortest-paths) / diag
+to-report indicators:network:nw-diameter
+  report network-indicators:nw-diameter
 end
-
 
 ;;
 ; mean path length
-;  Normalized by world diagonal
-to-report mean-path-length
-  if count transportation-nodes = 0 [report 0]
-  let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report (mean map [sum map [[transportation-link-length] of ?] ?] (table-values shortest-paths)) / diag
+to-report indicators:network:mean-path-length
+  report network-indicators:mean-path-length
 end
 
 ;;
 ;  bw centrality, normalized by number of paths considered
-to-report mean-bw-centrality
-  let n count transportation-nodes if n = 0 [report 0]
-  report (mean [bw-centrality] of transportation-links) * 2 / (n * (n - 1))
+to-report indicators:network:mean-bw-centrality
+  report network-indicators:mean-bw-centrality
 end
 
 ;;
 ; hierarchy betwenness centrality
-to-report alpha-bw-centrality
-  report first rank-size-hierarchy ([bw-centrality] of transportation-links)
+to-report indicators:network:alpha-bw-centrality
+  report first indicators:rank-size-hierarchy ([bw-centrality] of transportation-links)
 end
 
 ;;
 ; average closeness centrality
-to-report mean-closeness-centrality
+to-report indicators:network:mean-closeness-centrality
   let n count transportation-nodes if n = 0 [report 0]
   report (mean [transportation-node-closeness-centrality] of transportation-nodes) / n
 end
@@ -285,24 +278,25 @@ end
 
 ;;
 ; hierarchy closeness
-to-report alpha-closeness-centrality
-  report first rank-size-hierarchy ([transportation-node-closeness-centrality] of transportation-nodes)
+to-report indicators:network:alpha-closeness-centrality
+  report first indicators:rank-size-hierarchy ([transportation-node-closeness-centrality] of transportation-nodes)
 end
 
 
 ;;
-; mean relative speed, already normalized
-to-report mean-relative-speed
-  if count transportation-nodes = 0 [report 0]
-  report mean table-values nw-relative-speeds
+; mean relative speed
+to-report indicators:network:mean-relative-speed
+  report network-indicators:mean-relative-speed
 end
 
 ;;
-; nw length -> not normalized
-to-report total-nw-length
-  if count transportation-nodes = 0 [report 0]
-  report sum [link-length] of transportation-links
+; nw length
+to-report indicators:network:total-nw-length
+  report network-indicators:total-nw-length
 end
+
+
+
 
 
 

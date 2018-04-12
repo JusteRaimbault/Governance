@@ -1,0 +1,70 @@
+
+;;
+; Network indicators
+
+
+
+
+
+
+;;
+; nw diameter
+;  Normalized by world diag
+to-report network-indicators:nw-diameter
+  if count transportation-nodes = 0 [report 0]
+  let diag sqrt (world-width ^ 2 + world-height ^ 2)
+  report max map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values shortest-paths) / diag
+end
+
+
+;;
+; mean path length
+;  Normalized by world diagonal
+to-report network-indicators:mean-path-length
+  if count transportation-nodes = 0 [report 0]
+  let diag sqrt (world-width ^ 2 + world-height ^ 2)
+  report (mean map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values shortest-paths)) / diag
+end
+
+;;
+;  bw centrality, normalized by number of paths considered
+to-report network-indicators:mean-bw-centrality
+  let n count transportation-nodes if n = 0 [report 0]
+  report (mean [bw-centrality] of transportation-links) * 2 / (n * (n - 1))
+end
+
+;;
+; hierarchy betwenness centrality
+to-report network-indicators:alpha-bw-centrality
+  report first indicators:rank-size-hierarchy ([bw-centrality] of transportation-links)
+end
+
+;;
+; average closeness centrality
+to-report network-indicators:mean-closeness-centrality
+  let n count transportation-nodes if n = 0 [report 0]
+  report (mean [transportation-node-closeness-centrality] of transportation-nodes) / n
+end
+
+
+;;
+; hierarchy closeness
+to-report network-indicators:alpha-closeness-centrality
+  report first indicators:rank-size-hierarchy ([transportation-node-closeness-centrality] of transportation-nodes)
+end
+
+
+;;
+; mean relative speed, already normalized
+to-report network-indicators:mean-relative-speed
+  if count transportation-nodes = 0 [report 0]
+  report mean utils:table:table-values nw-relative-speeds
+end
+
+;;
+; nw length -> not normalized
+to-report network-indicators:total-nw-length
+  if count transportation-nodes = 0 [report 0]
+  report sum [link-length] of transportation-links
+end
+
