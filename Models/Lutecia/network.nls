@@ -7,9 +7,12 @@
 
 
 
-
-;; report the link corresponding to coordinates
-to-report network:new-infra [coords construct?]
+;;
+; report the link corresponding to coordinates
+;   @param coords coordinates list
+;   @param construct? should the link be constructed ? different behavior with existing network
+;   @param validate? strict validation of infrastructure (if true, remove infras with footprint fully in network. for complex initial network setup, desactivate) TODO : no bug if always desactivate ? not good, gives not consistent infras
+to-report network:new-infra [coords construct? validate?]
   let e1 nobody let e2 nobody let new-link nobody
   ifelse length first coords = 2 and length last coords = 2 [
     let x1 first first coords let y1 last first coords let x2 first last coords let y2 last last coords
@@ -29,10 +32,13 @@ to-report network:new-infra [coords construct?]
   
       ; check if link is valid
       let valid? false
+      if validate? = false [set valid? true]
+        
       ask new-link [
-        foreach link:footprint [ask ? [set valid? (valid? or not member? number nw-patches)]]
+        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? number nw-patches)]]]
         set valid? (valid? and length link:footprint > 1)
       ]
+ 
       ifelse valid? [
         report new-link
       ][
@@ -135,53 +141,6 @@ to-report network:link-distance [l1 l2]
   
   
   
-end
-
-
-;;
-;  create a virtual network for comparison
-to network:ghost-network-from-gis [file]
-  foreach gis:feature-list-of gis:load-dataset file [   
-        foreach gis:vertex-lists-of ? [
-          let i 0 let l ?
-          foreach but-first ? [
-            let p1 gis:location-of item i l let p2 gis:location-of ?
-            ;output-print p1 output-print p2
-            if p1 != [] and p2 != [] [
-              set p1 ([list pxcor pycor] of patch first p1 last p1) set p2 ([list pxcor pycor] of patch first p2 last p2)
-              if p1 != p2 [
-                create-ghost-transportation-nodes 1 [
-                  network:new-transportation-node setxy first p1 last p1
-                  hatch 1 [setxy first p2 last p2 create-ghost-transportation-link-with myself]
-                ]
-              ]
-            ]
-            set i i + 1
-          ]
-        
-        ]    
-      ]
-end
-
-
-;;
-; report a ghost network as the coordinates in a infra list
-to-report network:ghost-network-as-infra-list 
-  ifelse count ghost-transportation-nodes > 0 [
-    let res []
-    ask ghost-transportation-links [
-      set res lput (list (list [xcor] of end1 [ycor] of end1) (list [xcor] of end2 [ycor] of end2)) res 
-    ]
-    report res
-  ][report []]
-end
-
-
-;;
-; remove a ghost network
-to network:kill-ghost-network
-  ask ghost-transportation-links [die]
-  ask ghost-transportation-nodes [die]
 end
 
 

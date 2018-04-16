@@ -3,15 +3,7 @@
 ;;
 ;; LUTECIA Model
 ;;
-;; (MetropolSim v3.0)
-;; Major changes since v2
-;;   - matrix dynamic shortest path (euclidian and nw) computation
-;;   - simplified population structure (one csp)
-;;   - game-theoretical governance management
-;;
-;; Possible extensions (v4) :
-;;    * add different transportation modes ?
-;;    * add csp ? not prioritary.
+;; --  Endogenous transportation governance in a model of co-evolution of transport and land-use --
 ;;
 ;;;;;;;;;;;;;;;;;;;;;
 
@@ -24,6 +16,8 @@ __includes [
 
   ; setup
   "setup.nls"
+
+
 
   ;;;;;;;;;
   ;; main modules
@@ -54,6 +48,12 @@ __includes [
 
   ; network
   "network.nls"
+
+  ; ghost network
+  "network-ghost.nls"
+
+  ; biological network generation
+  "network-biological.nls"
 
   ;;;;;;;;;
   ; functions
@@ -151,16 +151,16 @@ globals[
   ;employments-spatial-distribution
 
   ;; global employments and actives list
-  patches-employments
-  patches-actives
+  global:patches-employments-list
+  global:patches-actives-list
 
   ;; convergence variables
-  diff-actives
-  diff-employments
-  rel-diff-actives
-  rel-diff-employments
+  global:diff-actives
+  global:diff-employments
+  global:rel-diff-actives
+  global:rel-diff-employments
 
-  initial-max-acc
+  global:initial-max-acc
 
   ; utility : cobb-douglas parameter
   ;gamma-cobb-douglas
@@ -178,6 +178,23 @@ globals[
   ; initial network
   ;initial-nw-random-type
   initial-nw?
+
+  ;;
+  ; slime mould initial network
+  network-biological-steps
+  network-biological-threshold
+  network-biological-new-links-number
+  network-biological-initial-diameter
+  network-biological-diameter-max
+  network-biological-total-diameter-variation
+  network-biological-o
+  network-biological-d
+  network-biological-nodes-number
+  network-biological-input-flow
+  ;network-biological-gamma
+  bio-ticks
+
+
 
   ;;
   ; externality
@@ -468,6 +485,50 @@ transportation-nodes-own[
 undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 
 breed[ghost-transportation-nodes ghost-transportation-node]
+
+
+
+;;
+; biological network generation
+
+breed [biological-network-nodes biological-network-node]
+breed [biological-network-poles biological-network-pole]
+
+undirected-link-breed [biological-network-links biological-network-link]
+undirected-link-breed [biological-network-real-links biological-network-real-link]
+
+biological-network-nodes-own [
+  ;; pressure
+  pressure
+  ;; total capacity
+  total-capacity
+  ;; number
+  biological-network-node-number
+
+  ;; population
+  population
+]
+
+;; not needed : use ghost-transportation-nodes
+;biological-network-poles-own [
+;  real-pressure
+;]
+
+
+biological-network-links-own [
+  ;; diameter
+  diameter
+  ;; flow
+  flow
+  ;; length
+  bio-link-length
+]
+
+;; not needed : use ghost-transportation-links
+;biological-network-real-links-own [
+;  real-link-length
+;]
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 449
@@ -505,7 +566,7 @@ SLIDER
 #-initial-territories
 0
 5
-2
+5
 1
 1
 NIL
@@ -536,7 +597,7 @@ CHOOSER
 patches-display
 patches-display
 "governance" "actives" "employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
-1
+2
 
 TEXTBOX
 11
@@ -681,8 +742,8 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -5298144 true "" "plot rel-diff-employments / count patches"
-"pen-1" 1.0 0 -12087248 true "" "plot rel-diff-actives / count patches"
+"default" 1.0 0 -5298144 true "" "plot global:rel-diff-employments / count patches"
+"pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
 1065
@@ -882,7 +943,7 @@ total-time-steps
 total-time-steps
 0
 10000
-7164
+20
 1
 1
 NIL
@@ -1196,7 +1257,7 @@ relocation-rate
 relocation-rate
 0
 1
-1
+0.5
 0.01
 1
 NIL
@@ -1304,8 +1365,34 @@ CHOOSER
 118
 initial-nw-random-type
 initial-nw-random-type
-"tree-skeleton"
+"tree-skeleton" "slime-mould"
+1
+
+MONITOR
+1070
+670
+1137
+715
+NIL
+bio-ticks
+17
+1
+11
+
+SLIDER
+300
+124
+427
+157
+network-biological-gamma
+network-biological-gamma
 0
+10
+1.2
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## Context
@@ -1322,6 +1409,7 @@ It is an extended LUTI model which currently implements the following sub-models
 
 
 
+
 ## References
 
 Raimbault, J. (2018). Characterizing and modeling the co-evolution of transportation networks and territories. PhD Thesis, Université Paris 7.
@@ -1329,6 +1417,20 @@ Raimbault, J. (2018). Characterizing and modeling the co-evolution of transporta
 Le Néchet, F., & Raimbault, J. (2015, September). Modeling the emergence of metropolitan transport autorithy in a polycentric urban region. In European Colloqueum on Theoretical and Quantitative Geography.
 
 Le Néchet, F. (2011, September). Urban dynamics modelling with endogeneous transport infrastructures, in a polycentric region. In 17th European Colloquium on Quantitative and Theoretical Geography.
+
+
+## Versions
+
+
+(MetropolSim v3.0)
+Major changes since v2
+   - matrix dynamic shortest path (euclidian and nw) computation
+   - simplified population structure (one csp)
+   - game-theoretical governance management
+
+Possible extensions (v4) :
+    * add different transportation modes ?
+    * add csp ? not prioritary.
 @#$#@#$#@
 default
 true

@@ -1,7 +1,9 @@
 
-# Exploration of a Luti model
+# Methods for the exploration of Luti models
 
 ## Typical stylized facts
+
+Luti models must reproduce several empirical stylized facts.
 
 For most "classical" Luti models, empirical stylized facts include : (see (Wegener and Furst, 2004))
   - impact of LU on Transport :
@@ -19,6 +21,17 @@ For most "classical" Luti models, empirical stylized facts include : (see (Wegen
       - travel time improvement => more and longer trips (Zahavi law)
 
 Literature review on Luti: see [(Raimbault, 2018) - ch2](Raimbault_Memoire_v3.5.3_p107-p162.pdf)
+
+
+## Specific stylized facts
+
+We will consider in particular models with the following structure :
+  - aggregated population and employments temporal trajectories are fixed (with data or as synthetic inputs)
+  - location choices are estimated on initial data
+  - local pop and employments, and urban growth (densities) are simulated, and put in correspondence with disaggregated macro data (unclear what is the role of disaggregation)
+
+
+TODO: ontological correspondence between targeted models and toy model.
 
 
 ## Toy Luti example

@@ -10,18 +10,20 @@
 ;  (different implementation possible)
 to mayor:initial-position-mayor
   if setup-type = "random" [
-    let m other mayors with [self != regional-authority]
-    show m
-    let p nobody let potp patches with [pxcor < max-pxcor - 1 and pxcor > min-pxcor + 1 and pycor < max-pycor - 1 and pycor > min-pycor + 1]
-    ifelse count m > 0 [
-      set p one-of potp with [distance one-of m > 5]
-    ][
+    ;let m other mayors with [self != regional-authority]
+    let current-mayor self
+    ;show m
+    let p nobody let potp patches with [pxcor < max-pxcor - 1 and pxcor > min-pxcor + 1 and pycor < max-pycor - 1 and pycor > min-pycor + 1 and count (mayors in-radius 3) with [self != regional-authority and self != current-mayor] = 0]
+    ;show potp
+    ;ifelse count m > 0 [
+      ;set p one-of potp with [distance one-of m > 5]
+    ;][
       ifelse #-initial-territories > 1 [
         set p one-of potp
       ][
         set p patch 0 0
       ]
-    ]
+    ;]
     setxy [pxcor] of p [pycor] of p
   ]
   if setup-type = "from-file" or setup-type = "gis" or setup-type = "gis-synthetic" [

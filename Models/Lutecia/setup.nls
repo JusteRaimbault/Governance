@@ -69,6 +69,13 @@ to setup:setup-globals
   set infra-snapping-tolerance 1
   set initial-nw? true
   
+  set network-biological-steps 1000
+  ;set network-biological-threshold 0.95
+  set network-biological-threshold 0.05
+  set network-biological-initial-diameter 1
+  set network-biological-input-flow 1
+  ;set network-biological-gamma 10
+  
   ;;;;;
   ;; transportation
   set network-min-pace 1
@@ -111,7 +118,7 @@ to setup:setup-globals
     "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments"
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "rel-diff-actives" "rel-diff-employments" "indicators:mean-accessibility-balance"
+    "global:rel-diff-actives" "global:rel-diff-employments" "indicators:mean-accessibility-balance"
     )
   
   
@@ -233,11 +240,11 @@ to setup:setup-initial-distributions
   setup:setup-employment-distribution
   
   ; setup global lists
-  set patches-employments rep 0 count patches
-  set patches-actives rep 0 count patches
+  set global:patches-employments-list rep 0 count patches
+  set global:patches-actives-list rep 0 count patches
   ask patches [
-    set patches-employments replace-item number patches-employments employments
-    set patches-actives replace-item number patches-actives actives
+    set global:patches-employments-list replace-item number global:patches-employments-list employments
+    set global:patches-actives-list replace-item number global:patches-actives-list actives
   ]
   
 end
@@ -372,6 +379,11 @@ to setup:setup-initial-network
          ask mayors with [self != regional-authority] [
            hatch-ghost-transportation-nodes 1 ;[show self]
          ]
+         
+         ; create a direct link between mayors
+         ask ghost-transportation-nodes [let p one-of ((other ghost-transportation-nodes) with [count my-ghost-transportation-links = 0]) if p != nobody [create-ghost-transportation-link-with p]]
+         
+         ; add supplementary nodes
          create-ghost-transportation-nodes 6 [setxy random-xcor random-ycor]
          create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
    
@@ -385,10 +397,17 @@ to setup:setup-initial-network
          utils:network:simplify-ghost-network
       ]
       
+      
+      if initial-nw-random-type = "slime-mould" [
+          network-biological:grow-network
+      ]
+      
+      
+      
       ;show network:ghost-network-as-infra-list
       
-      governance:construct-infrastructure network:ghost-network-as-infra-list save-nw-config
-      network:kill-ghost-network
+      governance:construct-infrastructure network-ghost:ghost-network-as-infra-list save-nw-config
+      network-ghost:kill-ghost-network
     
     ]
   
@@ -426,7 +445,7 @@ to setup:setup-initial-network
   ask transportation-links [set status "initial"]
   
   ; ghost nw at setup
-  if setup-type = "gis" [network:ghost-network-from-gis target-network-file]
+  if setup-type = "gis" [network-ghost:ghost-network-from-gis target-network-file]
   
   
 end
@@ -516,7 +535,7 @@ end
 ;; initial utilities and accessibilities
 to setup:setup-patch-variables
   compute-patches-variables
-  set initial-max-acc max [current-accessibility] of patches
+  set global:initial-max-acc max [current-accessibility] of patches
 end
 
 

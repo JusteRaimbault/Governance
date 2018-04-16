@@ -151,7 +151,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   foreach choices [
     recall-nw-config old-nw-config
     verbose (word "Infra : " ? )
-    let potential-infra network:new-infra ? false
+    let potential-infra network:new-infra ? false true
     verbose (word " ; " potential-infra)
     if potential-infra != nobody [
       distances:update-network potential-infra
@@ -340,7 +340,7 @@ to governance:construct-infrastructure [infras old-config]
       
       verbose (word "constructing : " infra)
       
-      let constructed-link network:new-infra infra true
+      let constructed-link network:new-infra infra true false
     
       ; update matrices
       if constructed-link != nobody [

@@ -156,7 +156,7 @@ end
 
 ;; last variability of relocation process
 to-report indicators:stability
-  report ((diff-employments / sum [employments] of patches) + (diff-actives / sum [actives] of patches) ) / 2
+  report ((global:diff-employments / sum [employments] of patches) + (global:diff-actives / sum [actives] of patches) ) / 2
 end
 
 
