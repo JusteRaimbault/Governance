@@ -35,7 +35,7 @@ to-report network:new-infra [coords construct? validate?]
       if validate? = false [set valid? true]
         
       ask new-link [
-        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? number nw-patches)]]]
+        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? number global:nw-patches)]]]
         set valid? (valid? and length link:footprint > 1)
       ]
  
@@ -72,12 +72,12 @@ to-report network:random-infra [patchset infra-length]
     set c1 (list [pxcor] of p1 [pycor] of p1) set c2 (list [pxcor] of p2 [pycor] of p2)
     ask transportation-links [
        ask p1 [
-         if distance-to-link myself < infra-snapping-tolerance [
+         if distance-to-link myself < global:infra-snapping-tolerance [
            ask myself [set c1 coord-of-projection-of ([pxcor] of p1) ([pycor] of p1)]
          ]
        ]
        ask p2 [
-         if distance-to-link myself < infra-snapping-tolerance [
+         if distance-to-link myself < global:infra-snapping-tolerance [
            ask myself [set c2 coord-of-projection-of ([pxcor] of p2) ([pycor] of p2)]
          ]
        ]
@@ -117,7 +117,7 @@ end
 ; distance between two links
 to-report network:link-distance [l1 l2]
   
-  if link-distance-function = "distance-closest-ends" [
+  if global:link-distance-function = "distance-closest-ends" [
     ; rough heuristic : mse between extremities ?
     let res 0 let oend nobody
     ask l1 [
@@ -133,7 +133,7 @@ to-report network:link-distance [l1 l2]
     report res
   ]
   
-  if link-distance-function = "distance-projection" [
+  if global:link-distance-function = "distance-projection" [
     ; projection of l1 on l2 (-> non-symmetric)
     let res 0 ask l1 [ask both-ends [set res res + distance-to-link l2]]
     report res
@@ -214,7 +214,7 @@ to network:cache-nw-measures
   ; caching shortest paths and measures
   nw:set-context transportation-nodes transportation-links
   ask transportation-links [set transportation-link-length link-length set bw-centrality 0]
-  set shortest-paths table:make set nw-relative-speeds table:make set nw-distances table:make
+  set global:shortest-paths table:make set global:nw-relative-speeds table:make set global:nw-distances table:make
   let clist to-list transportation-nodes let i 0 let j 1
   repeat (length clist - 1) [
     let c1 item i clist
@@ -227,12 +227,12 @@ to network:cache-nw-measures
       ; if the network is not connected, some kind of infinite value
       if l = 0 [set l 100 * sqrt (world-width ^ 2 + world-height ^ 2)]
       ; update shortest path table
-      table:put shortest-paths (list [who] of c1 [who] of c2) path table:put shortest-paths (list [who] of c2 [who] of c1) (rev path)
+      table:put global:shortest-paths (list [who] of c1 [who] of c2) path table:put global:shortest-paths (list [who] of c2 [who] of c1) (rev path)
       ; update nw distance table
-      table:put nw-distances (list [who] of c1 [who] of c2) l table:put nw-distances (list [who] of c2 [who] of c1) l
+      table:put global:nw-distances (list [who] of c1 [who] of c2) l table:put global:nw-distances (list [who] of c2 [who] of c1) l
       ; update relative speed table
       let deucl 0 ask c1 [set deucl distance c2]
-      table:put nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
+      table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
 
       set j j + 1
     ]
@@ -243,7 +243,7 @@ to network:cache-nw-measures
   ask transportation-nodes [
     let n1 who let s 0
     ask other transportation-nodes [
-      let n2 who set s s + table:get nw-distances (list n1 n2)
+      let n2 who set s s + table:get global:nw-distances (list n1 n2)
     ]
     set transportation-node-closeness-centrality s
   ]

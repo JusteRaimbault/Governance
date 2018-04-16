@@ -94,7 +94,12 @@ __includes [
   ;;;;;;;;
   ;; experiments
   ;;;;;;;;
+
+  ;; full experiments
   "experiments.nls"
+
+  ;; specific luti experiments
+  "experiments-luti.nls"
 
 
 
@@ -169,65 +174,65 @@ globals[
   ;beta-discrete-choices
 
   ; governor of the region : particular mayor
-  regional-authority
+  global:regional-authority
 
   ;
-  infra-snapping-tolerance ; \in [0,10] - default 1
+  global:infra-snapping-tolerance ; \in [0,10] - default 1
 
 
   ; initial network
   ;initial-nw-random-type
-  initial-nw?
+  global:initial-nw?
 
   ;;
   ; slime mould initial network
-  network-biological-steps
-  network-biological-threshold
-  network-biological-new-links-number
-  network-biological-initial-diameter
-  network-biological-diameter-max
-  network-biological-total-diameter-variation
-  network-biological-o
-  network-biological-d
-  network-biological-nodes-number
-  network-biological-input-flow
-  ;network-biological-gamma
-  bio-ticks
+  global:network-biological-steps
+  global:network-biological-threshold
+  global:network-biological-new-links-number
+  global:network-biological-initial-diameter
+  global:network-biological-diameter-max
+  global:network-biological-total-diameter-variation
+  global:network-biological-o
+  global:network-biological-d
+  global:network-biological-nodes-number
+  global:network-biological-input-flow
+  ;global:network-biological-gamma
+  global:bio-ticks
 
 
 
   ;;
   ; externality
 
-  with-externalities?
+  global:with-externalities?
   ;; list of patches for the external facility
-  external-facility
+  global:external-facility
   ; endogenous growth of employments within the externality
-  ext-growth-factor
+  global:ext-growth-factor
   ; initial size of externality in employments
-  ext-employments-proportion-of-max
+  global:ext-employments-proportion-of-max
 
   ;; coordinates of mayors, taken from setup file
-  mayors-coordinates
-  mayors-populations
-  mayors-employments
-  mayors-names
+  global:mayors-coordinates
+  global:mayors-populations
+  global:mayors-employments
+  global:mayors-names
 
   ;; position of ext patch
-  ext-position
+  global:ext-position
 
   ;; path to the setup files
-  positions-file
-  ext-file
+  global:positions-file
+  global:ext-file
 
   ;; GIS setup
-  gis-network-file
-  gis-extent-file
-  gis-centers-file
-  gis-population-raster-file
-  gis-sea-file
-  gis-economic-areas-file
-  gis-governed-patches-file
+  global:gis-network-file
+  global:gis-extent-file
+  global:gis-centers-file
+  global:gis-population-raster-file
+  global:gis-sea-file
+  global:gis-economic-areas-file
+  global:gis-governed-patches-file
 
   ;conf-file
 
@@ -235,20 +240,20 @@ globals[
   ;; Transportation
   ;;;;;;;;;;;;;
 
-  congestion-price
-  lambda-flows
+  global:congestion-price
+  global:lambda-flows
 
   ;; transportation flows \phi_ij between patches
-  flow-matrix
+  global:flow-matrix
 
   ;; congestion in patches
   ; list ordered by patch number
-  patches-congestion
+  global:patches-congestion
 
   ;; maximal pace (inverse of speed) in the transportation network
   ;network-max-pace
-  euclidian-min-pace
-  network-min-pace
+  global:euclidian-min-pace
+  global:network-min-pace
 
 
 
@@ -256,11 +261,11 @@ globals[
   ;; governance
   ;;;;;;;;;;;;;
 
-  collaborations-wanted
-  collaborations-realized
-  collaborations-expected
+  global:collaborations-wanted
+  global:collaborations-realized
+  global:collaborations-expected
 
-  beta-dc-game
+  global:beta-dc-game
 
   ;evolve-network?
 
@@ -273,66 +278,66 @@ globals[
 
   ;; Matrix of euclidian distances between patches
   ; remains unchanged
-  euclidian-distance-matrix
+  global:euclidian-distance-matrix
 
   ;; network distance (without congestion)
-  network-distance-matrix
+  global:network-distance-matrix
 
   ;; effective distance
   ;  - with congestion in network -
-  effective-distance-matrix
+  global:effective-distance-matrix
 
   ;;
   ; Cached access patches to network, i.e. closest patch belonging to nw
   ;  @type table
   ;   number -> number of access
-  nw-access-table
+  global:nw-access-table
 
   ;; cached shortest paths -> updated same time as distance
   ; stored as table (num_patch_1,num_patch_2) -> [path-as-list]
   ;
   ; in network
-  network-shortest-paths
+  global:network-shortest-paths
 
   ;; list of nw patches
   ;  @type list
   ;  List of network patches number
-  nw-patches
+  global:nw-patches
 
   ;; number of patches
-  #-patches
+  global:#-patches
 
   ;; for patches in nw, table caching closest nw inters (i.e. [end1,end2] of my-link )
-  closest-nw-inters
+  global:closest-nw-inters
 
   ;; network intersections
   ;  @type list
   ;  List of intersection patches numbers
-  nw-inters
+  global:nw-inters
 
   ;; network clusters
-  network-clusters
+  global:network-clusters
 
   ;; connexion between clusters
-  network-clusters-connectors
+  global:network-clusters-connectors
 
   ; overall
   ; stored as table (num_patch_1,num_patch_2) -> [[i,i1],[i1,i2],...,[in,j]] where couples are either (void-nw) or (nw-nw)
   ; then effective path is [ik->i_k+1] or [ik->_nw i_k+1]
-  effective-shortest-paths
+  global:effective-shortest-paths
 
   ;;
   ; maximal distance in the world
-  dmax
+  global:dmax
 
 
   ;target-network-file
 
   ;;;
   ; network measures
-  shortest-paths
-  nw-relative-speeds
-  nw-distances
+  global:shortest-paths
+  global:nw-relative-speeds
+  global:nw-distances
 
 
 
@@ -348,23 +353,23 @@ globals[
   ;; Tests
   ;;;;;;;;;;;;;
 
-  gridor
+  global:gridor
 
   ;; infra constructed by hand
-  to-construct
+  global:to-construct
 
   ;; HEADLESS
-  headless?
+  global:headless?
 
-  failed
+  global:failed
 
 
-  link-distance-function
+  global:link-distance-function
 
-  tracked-indicators
-  history-indicators
+  global:tracked-indicators
+  global:history-indicators
 
-  setup-from-world-file? ; only in experiments
+  global:setup-from-world-file? ; only in experiments
 
 ]
 
@@ -528,16 +533,15 @@ biological-network-links-own [
 ;biological-network-real-links-own [
 ;  real-link-length
 ;]
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-449
+572
 18
-924
-514
-6
-6
-35.833333333333336
+1012
+479
+7
+7
+28.666666666666668
 1
 10
 1
@@ -547,10 +551,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--6
-6
--6
-6
+-7
+7
+-7
+7
 0
 0
 1
@@ -558,12 +562,12 @@ ticks
 30.0
 
 SLIDER
-4
-77
-135
-110
-#-initial-territories
-#-initial-territories
+3
+73
+186
+106
+global:#-initial-territories
+global:#-initial-territories
 0
 5
 5
@@ -590,12 +594,12 @@ NIL
 1
 
 CHOOSER
-14
-635
-133
-680
-patches-display
-patches-display
+13
+660
+165
+705
+global:patches-display
+global:patches-display
 "governance" "actives" "employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
 2
 
@@ -610,22 +614,22 @@ Setup parameters
 1
 
 TEXTBOX
-9
-193
-159
-211
+15
+248
+165
+266
 Runtime parameters
 11
 0.0
 1
 
 SLIDER
-5
+3
 120
-180
+284
 153
-actives-spatial-dispersion
-actives-spatial-dispersion
+global:actives-spatial-dispersion
+global:actives-spatial-dispersion
 0
 10
 1
@@ -635,12 +639,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-154
-180
-187
-employments-spatial-dispersion
-employments-spatial-dispersion
+2
+155
+282
+188
+global:employments-spatial-dispersion
+global:employments-spatial-dispersion
 0
 10
 0.8
@@ -650,12 +654,27 @@ NIL
 HORIZONTAL
 
 SLIDER
-181
+285
+155
+483
+188
+global:actives-max
+global:actives-max
+0
+1000
+500
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+286
 120
-290
+486
 153
-actives-max
-actives-max
+global:employments-max
+global:employments-max
 0
 1000
 500
@@ -665,27 +684,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-180
-154
+7
 290
-187
-employments-max
-employments-max
-0
-1000
-500
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1
-235
-179
-268
-gamma-cobb-douglas-a
-gamma-cobb-douglas-a
+250
+323
+global:gamma-cobb-douglas-a
+global:gamma-cobb-douglas-a
 0
 1
 0.9
@@ -695,12 +699,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-1
-303
-179
-336
-beta-discrete-choices
-beta-discrete-choices
+7
+358
+251
+391
+global:beta-discrete-choices
+global:beta-discrete-choices
 0
 5
 1.8
@@ -746,39 +750,39 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
-1065
-361
-1522
-655
+1141
+363
+1598
+657
 10
 
 TEXTBOX
-6
-218
-156
-236
+12
+273
+162
+291
 LUTI
 11
 0.0
 1
 
 TEXTBOX
-192
-219
-342
-237
+336
+261
+486
+279
 Governance
 11
 0.0
 1
 
 SLIDER
-195
-236
-344
-269
-regional-decision-proba
-regional-decision-proba
+285
+278
+530
+311
+global:regional-decision-proba
+global:regional-decision-proba
 0
 1
 0
@@ -788,29 +792,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-183
-230
-198
-261
-|
-25
-0.0
-1
-
-TEXTBOX
-183
-251
-198
-282
-|
-25
-0.0
-1
-
-TEXTBOX
-183
-274
-198
+263
+272
+278
 303
 |
 25
@@ -818,30 +802,50 @@ TEXTBOX
 1
 
 TEXTBOX
-7
-392
-210
-419
+263
+293
+278
+324
+|
+25
+0.0
+1
+
+TEXTBOX
+263
+315
+278
+333
+|
+25
+0.0
+1
+
+TEXTBOX
+13
+447
+216
+474
 _________________
 20
 0.0
 1
 
 TEXTBOX
-8
-418
-158
-436
+14
+473
+164
+491
 Transportation
 11
 0.0
 1
 
 TEXTBOX
-183
-296
-198
-327
+263
+326
+278
+357
 |
 25
 0.0
@@ -852,18 +856,18 @@ CHOOSER
 713
 470
 758
-log-level
-log-level
+global:log-level
+global:log-level
 "DEBUG" "VERBOSE" "DEFAULT"
 1
 
 SLIDER
-8
-439
-172
-472
-network-speed
-network-speed
+14
+494
+181
+527
+global:network-speed
+global:network-speed
 1
 50
 5
@@ -873,12 +877,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-195
-274
-344
-307
-road-length
-road-length
+285
+312
+530
+345
+global:road-length
+global:road-length
 1.0
 20
 1
@@ -888,12 +892,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-195
-309
-343
-342
-#-explorations
-#-explorations
+285
+344
+530
+377
+global:#-explorations
+global:#-explorations
 0
 200
 50
@@ -903,12 +907,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-1
-337
-177
-370
-lambda-accessibility
-lambda-accessibility
+7
+392
+251
+425
+global:lambda-accessibility
+global:lambda-accessibility
 0
 0.01
 0.001
@@ -937,10 +941,10 @@ NIL
 SLIDER
 433
 616
-602
+667
 649
-total-time-steps
-total-time-steps
+global:total-time-steps
+global:total-time-steps
 0
 10000
 20
@@ -950,40 +954,40 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-10
-465
-176
-501
+16
+520
+182
+556
 __________________
 20
 0.0
 1
 
 CHOOSER
-195
-344
-347
-389
-game-type
-game-type
+283
+414
+435
+459
+global:game-type
+global:game-type
 "random" "simple-nash" "discrete-choices"
 2
 
 TEXTBOX
-183
-318
-198
-350
+263
+348
+278
+380
 |
 25
 0.0
 1
 
 TEXTBOX
-183
-340
-201
+263
 370
+281
+400
 |
 25
 0.0
@@ -1018,10 +1022,10 @@ __________________
 1
 
 BUTTON
-139
-639
-214
-672
+170
+670
+245
+703
 update
 compute-patches-variables\ndisplay:color-patches
 NIL
@@ -1035,12 +1039,12 @@ NIL
 1
 
 SLIDER
-194
-391
-342
-424
-collaboration-cost
-collaboration-cost
+284
+377
+530
+410
+global:collaboration-cost
+global:collaboration-cost
 0
 0.005
 5.0E-4
@@ -1050,12 +1054,12 @@ NIL
 HORIZONTAL
 
 CHOOSER
-139
-69
-243
-114
-setup-type
-setup-type
+206
+72
+332
+117
+global:setup-type
+global:setup-type
 "random" "from-file" "gis-synthetic" "gis"
 0
 
@@ -1094,12 +1098,12 @@ NIL
 1
 
 SLIDER
-1
-269
-178
-302
-gamma-cobb-douglas-e
-gamma-cobb-douglas-e
+7
+324
+250
+357
+global:gamma-cobb-douglas-e
+global:gamma-cobb-douglas-e
 0
 1
 0.8
@@ -1109,22 +1113,22 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-16
-615
-166
-633
+11
+639
+58
+657
 Display
 11
 0.0
 1
 
 SLIDER
-6
+0
 33
-98
+101
 66
-seed
-seed
+global:seed
+global:seed
 -100000
 100000
 0
@@ -1138,11 +1142,11 @@ SLIDER
 34
 203
 67
-world-size
-world-size
+global:world-size
+global:world-size
 0
 50
-12
+15
 1
 1
 NIL
@@ -1151,9 +1155,9 @@ HORIZONTAL
 INPUTBOX
 205
 10
-413
+522
 70
-conf-file
+global:conf-file
 setup/conf/synth_unbalanced_close.conf
 1
 0
@@ -1178,23 +1182,23 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy indicators:morphology:moran-actives indicators:morphology:slope-actives"
 
 SWITCH
-158
-575
-300
-608
-evolve-network?
-evolve-network?
+14
+583
+209
+616
+global:evolve-network?
+global:evolve-network?
 1
 1
 -1000
 
 SWITCH
-8
-575
-152
-608
-evolve-landuse?
-evolve-landuse?
+14
+550
+210
+583
+global:evolve-landuse?
+global:evolve-landuse?
 0
 1
 -1000
@@ -1222,7 +1226,7 @@ INPUTBOX
 705
 605
 765
-target-network-file
+global:target-network-file
 setup/target/network0.shp
 1
 0
@@ -1249,12 +1253,12 @@ Interactive
 1
 
 SLIDER
-1
-370
-176
-403
-relocation-rate
-relocation-rate
+7
+425
+251
+458
+global:relocation-rate
+global:relocation-rate
 0
 1
 0.5
@@ -1264,22 +1268,22 @@ NIL
 HORIZONTAL
 
 CHOOSER
-325
+291
 628
-430
+427
 673
-stopping-type
-stopping-type
+global:stopping-type
+global:stopping-type
 "time" "infrastructure-stock"
 0
 
 SLIDER
-434
-650
-603
-683
-total-infrastructure-stock
-total-infrastructure-stock
+432
+651
+668
+684
+global:total-infrastructure-stock
+global:total-infrastructure-stock
 0
 100
 50
@@ -1289,106 +1293,106 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-627
-558
-642
-588
+700
+583
+715
+613
 |
 25
 0.0
 1
 
 TEXTBOX
-627
-582
-642
-612
+700
+607
+715
+637
 |
 25
 0.0
 1
 
 TEXTBOX
-627
-606
-642
-636
+700
+625
+734
+653
 |
 25
 0.0
 1
 
 TEXTBOX
-627
-630
-642
-660
+700
+647
+715
+677
 |
 25
 0.0
 1
 
 TEXTBOX
-183
-360
-198
+263
 390
+278
+420
 |
 25
 0.0
 1
 
 TEXTBOX
-183
-385
-198
-415
+263
+413
+278
+443
 |
 25
 0.0
 1
 
 TEXTBOX
-183
-409
-198
-439
+263
+435
+278
+465
 |
 25
 0.0
 1
 
 CHOOSER
-248
+333
 73
-430
+521
 118
-initial-nw-random-type
-initial-nw-random-type
+global:initial-nw-random-type
+global:initial-nw-random-type
 "tree-skeleton" "slime-mould"
 1
 
 MONITOR
-1070
-670
-1137
-715
-NIL
-bio-ticks
+1146
+664
+1213
+709
+bio ticks
+global:bio-ticks
 17
 1
 11
 
 SLIDER
-300
-124
-427
-157
-network-biological-gamma
-network-biological-gamma
+3
+190
+256
+223
+global:network-biological-gamma
+global:network-biological-gamma
 0
 10
-1.2
+1.4
 0.1
 1
 NIL

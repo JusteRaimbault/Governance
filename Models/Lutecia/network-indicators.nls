@@ -13,7 +13,7 @@
 to-report network-indicators:nw-diameter
   if count transportation-nodes = 0 [report 0]
   let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report max map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values shortest-paths) / diag
+  report max map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values global:shortest-paths) / diag
 end
 
 
@@ -23,7 +23,7 @@ end
 to-report network-indicators:mean-path-length
   if count transportation-nodes = 0 [report 0]
   let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report (mean map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values shortest-paths)) / diag
+  report (mean map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values global:shortest-paths)) / diag
 end
 
 ;;
@@ -58,7 +58,7 @@ end
 ; mean relative speed, already normalized
 to-report network-indicators:mean-relative-speed
   if count transportation-nodes = 0 [report 0]
-  report mean utils:table:table-values nw-relative-speeds
+  report mean utils:table:table-values global:nw-relative-speeds
 end
 
 ;;

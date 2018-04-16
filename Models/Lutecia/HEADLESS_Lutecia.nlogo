@@ -53,6 +53,12 @@ __includes [
   ; network
   "network.nls"
 
+  ; ghost network
+  "network-ghost.nls"
+
+  ; biological network
+  "network-biological.nls"
+
   ;;;;;;;;;
   ; functions
   ;;;;;;;;;
@@ -75,6 +81,9 @@ __includes [
   ;;;;;;;;;;
 
   "indicators.nls"
+
+  "morphology.nls"
+  "network-indicators.nls"
 
 
   ;;;;;;;;;;
@@ -104,7 +113,9 @@ __includes [
   "utils/io/File.nls"
   "utils/misc/String.nls"
   "utils/math/Statistics.nls"
+  "utils/misc/Table.nls"
   "utils/math/EuclidianDistanceUtilities.nls"
+  "utils/math/Numanal.nls"
 
   ;;;;;;;;;;;
   ;; Tests
@@ -132,14 +143,14 @@ globals[
   ;employments-spatial-distribution
 
   ;; global employments and actives list
-  patches-employments
-  patches-actives
+  global:patches-employments-list
+  global:patches-actives-list
 
   ;; convergence variables
-  diff-actives
-  diff-employments
-  rel-diff-actives
-  rel-diff-employments
+  global:diff-actives
+  global:diff-employments
+  global:rel-diff-actives
+  global:rel-diff-employments
 
   ; utility : cobb-douglas parameter
   ;gamma-cobb-douglas
@@ -148,39 +159,39 @@ globals[
   ;beta-discrete-choices
 
   ; governor of the region : particular mayor
-  regional-authority
+  global:regional-authority
 
 
 
-  positions-file
-  ext-file
-  setup-type
-
-  external-facility
-
-  mayors-coordinates
-  ext-position
+  global:positions-file
+  global:ext-file
 
 
-  with-externalities?
+  global:external-facility
 
-  ext-growth-factor
+  global:mayors-coordinates
+  global:ext-position
+
+
+  global:with-externalities?
+
+  global:ext-growth-factor
 
   ;;;;;;;;;;;;;
   ;; Transportation
   ;;;;;;;;;;;;;
 
   ;; transportation flows \phi_ij between patches
-  flow-matrix
+  global:flow-matrix
 
   ;; congestion in patches
   ; list ordered by patch number
-  patches-congestion
+  global:patches-congestion
 
   ;; maximal pace (inverse of speed) in the transportation network
   ;network-max-pace
 
-  lambda-flows
+  global:lambda-flows
 
 
 
@@ -188,9 +199,9 @@ globals[
   ;; governance
   ;;;;;;;;;;;;;
 
-  collaborations-wanted
-  collaborations-realized
-  collaborations-expected
+  global:collaborations-wanted
+  global:collaborations-realized
+  global:collaborations-expected
 
 
 
@@ -202,46 +213,46 @@ globals[
 
   ;; Matrix of euclidian distances between patches
   ; remains unchanged
-  euclidian-distance-matrix
+  global:euclidian-distance-matrix
 
   ;; network distance (without congestion)
-  network-distance-matrix
+  global:network-distance-matrix
 
   ;; effective distance
   ;  - with congestion in network -
-  effective-distance-matrix
+  global:effective-distance-matrix
 
-  nw-access-table
+  global:nw-access-table
 
   ;; cached shortest paths -> updated same time as distance
   ; stored as table (num_patch_1,num_patch_2) -> [path-as-list]
   ;
   ; in network
-  network-shortest-paths
+  global:network-shortest-paths
 
   ;; list of nw patches
-  nw-patches
+  global:nw-patches
 
   ;; number of patches
-  #-patches
+  global:#-patches
 
   ;; for patches in nw, table caching closest nw inters (i.e. [end1,end2] of my-link )
-  closest-nw-inters
+  global:closest-nw-inters
 
   ;; network intersections
-  nw-inters
+  global:nw-inters
 
   ; overall
   ; stored as table (num_patch_1,num_patch_2) -> [[i,i1],[i1,i2],...,[in,j]] where couples are either (void-nw) or (nw-nw)
   ; then effective path is [ik->i_k+1] or [ik->_nw i_k+1]
-  effective-shortest-paths
+  global:effective-shortest-paths
 
   ;;
   ; maximal distance in the world
-  dmax
+  global:dmax
 
-  network-clusters
-  network-clusters-connectors
+  global:network-clusters
+  global:network-clusters-connectors
 
 
 
@@ -257,85 +268,104 @@ globals[
   ;; Tests
   ;;;;;;;;;;;;;
 
-  gridor
+  global:gridor
 
 
 
   ;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;
   ;; HEADLESS
-  actives-max
-  employments-max
-  #-initial-territories
-  actives-spatial-dispersion
-  employments-spatial-dispersion
-  gamma-cobb-douglas
-  beta-discrete-choices
-  lambda-accessibility
-  regional-decision-proba
-  road-length
-  #-explorations
-  log-level
-  patches-display ; no init in headless
-  network-min-pace
-  euclidian-min-pace
-  network-speed
-  congestion-price
-  game-type
-  collaboration-cost
-  ext-employments-proportion-of-max
-  gamma-cobb-douglas-a
-  gamma-cobb-douglas-e
-  infra-snapping-tolerance
-  construction-cost
-  beta-dc-game
-  relocation-rate
 
-  initial-max-acc
+  global:setup-type
 
-  total-time-steps
-  headless?
-  failed
+  global:actives-max
+  global:employments-max
+  global:#-initial-territories
+  global:actives-spatial-dispersion
+  global:employments-spatial-dispersion
+  global:gamma-cobb-douglas
+  global:beta-discrete-choices
+  global:lambda-accessibility
+  global:regional-decision-proba
+  global:road-length
+  global:#-explorations
+  global:log-level
+  global:patches-display ; no init in headless
+  global:network-min-pace
+  global:euclidian-min-pace
+  global:network-speed
+  global:congestion-price
+  global:game-type
+  global:collaboration-cost
+  global:ext-employments-proportion-of-max
+  global:gamma-cobb-douglas-a
+  global:gamma-cobb-douglas-e
+  global:infra-snapping-tolerance
+  global:construction-cost
+  global:beta-dc-game
+  global:relocation-rate
 
-  to-construct
+  global:initial-max-acc
+
+  global:total-time-steps
+  global:headless?
+  global:failed
+
+  global:to-construct
 
 
-  gis-network-file
-  gis-extent-file
-  gis-centers-file
-  gis-sea-file
-  gis-economic-areas-file
-  gis-governed-patches-file
-  gis-population-raster-file
+  global:gis-network-file
+  global:gis-extent-file
+  global:gis-centers-file
+  global:gis-sea-file
+  global:gis-economic-areas-file
+  global:gis-governed-patches-file
+  global:gis-population-raster-file
 
-  world-size
+  global:world-size
 
-  seed
+  global:seed
 
-  initial-nw?
+  global:initial-nw?
+  global:initial-nw-random-type
 
-  mayors-populations
-  mayors-employments
-  mayors-names
+  global:mayors-populations
+  global:mayors-employments
+  global:mayors-names
 
-  target-network-file
+  global:target-network-file
 
-  setup-from-world-file?
+  global:setup-from-world-file?
 
-  link-distance-function
+  global:link-distance-function
 
-  conf-file
-  tracked-indicators
-  history-indicators
-  evolve-network?
-  evolve-landuse?
+  global:conf-file
+  global:tracked-indicators
+  global:history-indicators
+  global:evolve-network?
+  global:evolve-landuse?
 
-  shortest-paths
-  nw-relative-speeds
-  nw-distances
+  global:shortest-paths
+  global:nw-relative-speeds
+  global:nw-distances
 
-  stopping-type
-  total-infrastructure-stock
+  global:stopping-type
+  global:total-infrastructure-stock
+
+  ;;
+  ; biological network
+  global:network-biological-steps
+  global:network-biological-threshold
+  global:network-biological-initial-diameter
+  global:network-biological-input-flow
+  global:network-biological-new-links-number
+  global:network-biological-diameter-max
+  global:network-biological-total-diameter-variation
+  global:network-biological-o
+  global:network-biological-d
+  global:network-biological-nodes-number
+  global:network-biological-gamma
+  global:bio-ticks
 
 ]
 
@@ -451,6 +481,43 @@ transportation-nodes-own[
 ; needs ghost breeds to not perturbate shortest paths update
 undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 breed[ghost-transportation-nodes ghost-transportation-node]
+
+
+
+
+
+
+;;
+; biological network generation
+
+breed [biological-network-nodes biological-network-node]
+breed [biological-network-poles biological-network-pole]
+
+undirected-link-breed [biological-network-links biological-network-link]
+undirected-link-breed [biological-network-real-links biological-network-real-link]
+
+biological-network-nodes-own [
+  ;; pressure
+  pressure
+  ;; total capacity
+  total-capacity
+  ;; number
+  biological-network-node-number
+
+  ;; population
+  population
+]
+
+
+biological-network-links-own [
+  ;; diameter
+  diameter
+  ;; flow
+  flow
+  ;; length
+  bio-link-length
+]
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 833

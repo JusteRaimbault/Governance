@@ -24,14 +24,14 @@ to compute-patches-accessibilities
   ask patches [
      set prev-accessibility a-to-e-accessibility + e-to-a-accessibility
      ; only one csp for now
-     set a-to-e-accessibility actives * scalar-product (global:patches-employments-list) map [exp (- lambda-accessibility * ?)] (matrix:get-row effective-distance-matrix number)
-     set e-to-a-accessibility employments * scalar-product (global:patches-actives-list) map [exp (- lambda-accessibility * ?)] (matrix:get-row effective-distance-matrix number)
+     set a-to-e-accessibility actives * scalar-product (global:patches-employments-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix number)
+     set e-to-a-accessibility employments * scalar-product (global:patches-actives-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix number)
      
      set current-accessibility a-to-e-accessibility + e-to-a-accessibility
      
      ; update also travel distances
-     set a-to-e-distance actives * scalar-product (global:patches-employments-list) (matrix:get-row effective-distance-matrix number)
-     set e-to-a-distance employments * scalar-product (global:patches-actives-list) (matrix:get-row effective-distance-matrix number)
+     set a-to-e-distance actives * scalar-product (global:patches-employments-list) (matrix:get-row global:effective-distance-matrix number)
+     set e-to-a-distance employments * scalar-product (global:patches-actives-list) (matrix:get-row global:effective-distance-matrix number)
   ]
 end
 
@@ -51,8 +51,8 @@ end
 ;  note : could be in same loop as accessibilities ? more flexibility.
 to compute-patches-utilities
   ask patches [
-    set a-utility (a-to-e-accessibility ^ gamma-cobb-douglas-a) * ((first form-factor) ^ (1 - gamma-cobb-douglas-a))
-    set e-utility (e-to-a-accessibility ^ gamma-cobb-douglas-e) * ((last form-factor) ^ (1 - gamma-cobb-douglas-e))
+    set a-utility (a-to-e-accessibility ^ global:gamma-cobb-douglas-a) * ((first form-factor) ^ (1 - global:gamma-cobb-douglas-a))
+    set e-utility (e-to-a-accessibility ^ global:gamma-cobb-douglas-e) * ((last form-factor) ^ (1 - global:gamma-cobb-douglas-e))
   ]
   
   ; renormalize utilities

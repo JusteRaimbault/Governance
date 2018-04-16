@@ -17,8 +17,8 @@
 to test-closest-inter
   ask patches [set pcolor black]
   ;foreach nw-patches [ask patch-with-number ? [set pcolor green]]
-  let p one-of nw-patches ask patch-with-number p [set pcolor yellow]
-  let i table:get closest-nw-inters p
+  let p one-of global:nw-patches ask patch-with-number p [set pcolor yellow]
+  let i table:get global:closest-nw-inters p
   output-print (word "patch " p " : inters ")
   foreach i [
      ask patch-with-number first ? [set pcolor pink]
@@ -35,7 +35,7 @@ to test-distances:setup-test-nw-mat
   setup:setup-patches
   setup:setup-transportation
   setup:setup-cached-distances
-  set gridor true
+  set global:gridor true
 end
 
 to test-distances:test-nw-mat-grid-nw
@@ -47,7 +47,7 @@ to test-distances:test-nw-mat-grid-nw
     network:new-transportation-node set hidden? true
     ;setxy random-xcor random-ycor 
     ;test a random grid
-    ifelse gridor [ 
+    ifelse global:gridor [ 
     move-to one-of patches with [(pxcor = max-pxcor or pxcor = min-pxcor) and count transportation-nodes in-radius 1.5  = 0]
     ][move-to one-of patches with [(pycor = min-pycor or pycor = max-pycor) and count transportation-nodes in-radius 1.5  = 0]]
     hatch 1 [
@@ -63,14 +63,14 @@ to test-distances:test-nw-mat-grid-nw
   
   distances:update-network new-link
   
-  foreach nw-patches [
+  foreach global:nw-patches [
     ask patch-with-number ? [
       set pcolor green
       ;set plabel number
       ] 
   ]
   
-  foreach nw-inters [
+  foreach global:nw-inters [
     ask patch-with-number ? [
       set plabel number
       ] 
@@ -79,7 +79,7 @@ to test-distances:test-nw-mat-grid-nw
   ask transportation-links [set hidden? true]
   
   toc
-  set gridor not gridor
+  set global:gridor not global:gridor
 end
 
 
@@ -104,7 +104,7 @@ to test-nw-mat-random-nw
   
   distances:update-network new-link
   
-  foreach nw-patches [
+  foreach global:nw-patches [
     ask patch-with-number ? [
       ;set pcolor green
       ;set plabel number
@@ -120,17 +120,17 @@ end
 to test-shortest-path
   ask patches [set pcolor black set plabel ""]
   
-  foreach nw-patches [
+  foreach global:nw-patches [
     ask patch-with-number ? [
       set pcolor green
       ; set plabel number
       ] 
   ]
   
-  let k  (one-of table:keys network-shortest-paths)
-  output-print (word k " : " table:get network-shortest-paths k )
+  let k  (one-of table:keys global:network-shortest-paths)
+  output-print (word k " : " table:get global:network-shortest-paths k )
   
-  foreach table:get network-shortest-paths k [    
+  foreach table:get global:network-shortest-paths k [    
     ask patch-with-number ? [set pcolor pink set plabel number] 
   ]
   

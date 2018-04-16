@@ -5,22 +5,35 @@
 
 
 
-to setup-experiment-luti
+to setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed finalTime rnd-seed]
   
   clear-all
   
+  show (word "Luti experiments with : relocation-rate = " relocationRate " ; gammaA = " gammaA " ; gammaE = " gammaE " ; betaDC = " betaDC " ; lamddaacc = " lambdaacc " ; nwspeed = " nwspeed " ; finalTime = " finalTime " ; seed = " rnd-seed)
   
   setup:setup-headless-vars
-  set headless? true
+  set global:headless? true
   
+ 
   
   ;;
   ; fixed params for luti
   
-  set evolve-network? false
+  set global:setup-type "random"
+  set global:#-initial-territories 5
+  
+  set global:evolve-network? false
+  
+  
+  ;;
+  ; run parameters
+  set global:relocation-rate relocationRate
+  set global:seed rnd-seed
   
   
   
+  set global:world-size 15
+  setup:setup
   
 end
 

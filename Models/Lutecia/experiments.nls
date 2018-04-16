@@ -11,15 +11,15 @@ to setup-experiment [regionalproba lambdaacc nwspeed game coll-cost roadLength g
   
   ; conf file
   ;if conf-file = 0 [set conf-file "setup/conf/synth_nonw.conf"] if conf-file = 1 [set conf-file "setup/conf/synth_cross.conf"] if conf-file = 2 [set conf-file "setup/conf/synth_spider.conf"]  
-  set conf-file conffile
-  let conf file:read-conf-file conf-file
-  set setup-from-world-file? false
-  if table:has-key? conf "world-file" [set setup-from-world-file? true]
+  set global:conf-file conffile
+  let conf file:read-conf-file global:conf-file
+  set global:setup-from-world-file? false
+  if table:has-key? conf "world-file" [set global:setup-from-world-file? true]
     
   ;; cache setup for performance in case of gis real situation
-  if setup-from-world-file? [
+  if global:setup-from-world-file? [
     import-world (table:get conf "world-file")
-    set setup-from-world-file? true
+    set global:setup-from-world-file? true
     random-seed rnd-seed
   ]
   
@@ -27,51 +27,51 @@ to setup-experiment [regionalproba lambdaacc nwspeed game coll-cost roadLength g
   
   setup:setup-headless-vars
   
-  set headless? true
-  set failed 0
+  set global:headless? true
+  set global:failed 0
   
-  set seed rnd-seed
+  set global:seed rnd-seed
   
   
-  set regional-decision-proba regionalproba
+  set global:regional-decision-proba regionalproba
   ;ifelse regionalproba > 0.5 [set regional-decision-proba 1][set regional-decision-proba 0]
   
-  set lambda-accessibility lambdaacc 
-  set network-speed nwspeed
-  if floor game = 0 [set game-type "random"] if floor game = 1 [set game-type "simple-nash"] if floor game = 2 [set game-type "discrete-choices"]
-  set collaboration-cost coll-cost
-  set road-length roadLength
+  set global:lambda-accessibility lambdaacc 
+  set global:network-speed nwspeed
+  if floor game = 0 [set global:game-type "random"] if floor game = 1 [set global:game-type "simple-nash"] if floor game = 2 [set global:game-type "discrete-choices"]
+  set global:collaboration-cost coll-cost
+  set global:road-length roadLength
   
-  set gamma-cobb-douglas-e gammaCDE ;0.9
-  set gamma-cobb-douglas-a gammaCDA ;0.65
-  set beta-discrete-choices betaDC ; 1.8
-  set relocation-rate relocationRate ;0.1
+  set global:gamma-cobb-douglas-e gammaCDE ;0.9
+  set global:gamma-cobb-douglas-a gammaCDA ;0.65
+  set global:beta-discrete-choices betaDC ; 1.8
+  set global:relocation-rate relocationRate ;0.1
   
   
   ; dirty boolean conversion
-  if evolveNetwork = 0 [set evolve-network? false] if evolveNetwork = 1 [set evolve-network? true]
-  if evolveLanduse = 0 [set evolve-landuse? false] if evolveLanduse = 1 [set evolve-landuse? true]
+  if evolveNetwork = 0 [set global:evolve-network? false] if evolveNetwork = 1 [set global:evolve-network? true]
+  if evolveLanduse = 0 [set global:evolve-landuse? false] if evolveLanduse = 1 [set global:evolve-landuse? true]
   
-  set with-externalities? false
+  set global:with-externalities? false
   ;ifelse with-ext = 1 [set with-externalities? true][set with-externalities? false]
   ;set ext-growth-factor ext-growth
   
   ; target network file
   ; network0 : planned ; network1 : real
-  set target-network-file (word "setup/target/network" target-network ".shp")
+  set global:target-network-file (word "setup/target/network" target-network ".shp")
   
   ; setup type
-  if setuptype = 0 [set setup-type "random"]
-  if setuptype = 1 [set setup-type "gis-synthetic"]
-  if setuptype = 2 [set setup-type "gis"]
+  if setuptype = 0 [set global:setup-type "random"]
+  if setuptype = 1 [set global:setup-type "gis-synthetic"]
+  if setuptype = 2 [set global:setup-type "gis"]
   
-  set stopping-type stoptype
+  set global:stopping-type stoptype
 
-  if stopping-type = "time" [set total-time-steps finalValue]
-  if stopping-type = "infrastructure-stock" [set total-infrastructure-stock finalValue]
+  if global:stopping-type = "time" [set global:total-time-steps finalValue]
+  if global:stopping-type = "infrastructure-stock" [set global:total-infrastructure-stock finalValue]
   
-  if setup-from-world-file? = false [
-    set world-size 15
+  if global:setup-from-world-file? = false [
+    set global:world-size 15
     setup:setup
   ]
 
@@ -86,7 +86,7 @@ to run-experiment
       main:go
     ]
   ]
-  [show error-message set failed 1]
+  [show error-message set global:failed 1]
   ; indicators then called from openmole
   
   ; cache network measures first

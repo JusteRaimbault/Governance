@@ -32,21 +32,21 @@ end
 ;   given a DC model 
 to luti:relocate
 
-  if evolve-landuse? [
+  if global:evolve-landuse? [
 
     output-print "... relocalization"
   
     ; discrete choice model following utilities for employments and actives
     let actives-number sum [actives] of patches let employments-number sum [employments] of patches
-    let a-dc-norm-factor sum [exp (beta-discrete-choices * a-utility)] of patches
-    let e-dc-norm-factor sum [exp (beta-discrete-choices * e-utility)] of patches
+    let a-dc-norm-factor sum [exp (global:beta-discrete-choices * a-utility)] of patches
+    let e-dc-norm-factor sum [exp (global:beta-discrete-choices * e-utility)] of patches
   
     set global:diff-actives 0 set global:diff-employments 0 set global:rel-diff-actives 0 set global:rel-diff-employments 0
   
     ask patches [
       let prev-a actives let prev-e employments
-      set actives ((1 - relocation-rate)* actives) + (relocation-rate * actives-number * exp (beta-discrete-choices * a-utility) / a-dc-norm-factor)
-      set employments ((1 - relocation-rate)* employments) + (relocation-rate * employments-number * exp (beta-discrete-choices * e-utility) / e-dc-norm-factor)
+      set actives ((1 - global:relocation-rate)* actives) + (global:relocation-rate * actives-number * exp (global:beta-discrete-choices * a-utility) / a-dc-norm-factor)
+      set employments ((1 - global:relocation-rate)* employments) + (global:relocation-rate * employments-number * exp (global:beta-discrete-choices * e-utility) / e-dc-norm-factor)
       set global:diff-actives global:diff-actives + abs (prev-a - actives) set global:diff-employments global:diff-employments + abs (prev-e - employments)
       set global:rel-diff-actives global:rel-diff-actives + ((abs (prev-a - actives)) / actives) set global:rel-diff-employments global:rel-diff-employments + ((abs (prev-e - employments))/ employments)
       ; update global lists
@@ -66,7 +66,7 @@ to luti:update-wealth
   ask mayors [set wealth 0]
   ask patches [
     ask governing-mayor [set wealth wealth + [employments] of myself]
-    ask regional-authority [set wealth wealth + [employments] of myself]
+    ask global:regional-authority [set wealth wealth + [employments] of myself]
   ]
   
 end
@@ -77,11 +77,11 @@ end
 ; 
 to luti:update-externalities
   
-  if with-externalities? [
+  if global:with-externalities? [
     
-    foreach external-facility [
+    foreach global:external-facility [
        ask patch-with-number ? [
-         set employments ext-growth-factor * employments * current-accessibility / global:initial-max-acc
+         set employments global:ext-growth-factor * employments * current-accessibility / global:initial-max-acc
        ]
     ]
     

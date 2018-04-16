@@ -33,6 +33,6 @@ end
 
 
 to-report main:stopping-condition?
-   if stopping-type = "time" [let cond (ticks >= total-time-steps) if cond = true [output-print (word "Stopping : reached " total-time-steps " time steps" )] report cond]
-   if stopping-type = "infrastructure-stock" [let cond ((sum [link-length] of transportation-links) > total-infrastructure-stock) if cond = true [output-print (word "Stopping : reached " total-infrastructure-stock " infra length built" )] report cond]
+   if global:stopping-type = "time" [let cond (ticks >= global:total-time-steps) if cond = true [output-print (word "Stopping : reached " global:total-time-steps " time steps" )] report cond]
+   if global:stopping-type = "infrastructure-stock" [let cond ((sum [link-length] of transportation-links) > global:total-infrastructure-stock) if cond = true [output-print (word "Stopping : reached " global:total-infrastructure-stock " infra length built" )] report cond]
 end

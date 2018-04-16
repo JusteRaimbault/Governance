@@ -10,9 +10,9 @@
 
 
 to indicators:update-indicators
-  foreach tracked-indicators [
+  foreach global:tracked-indicators [
     let val run-result ?
-    table:put history-indicators ? (lput val (table:get history-indicators ?))
+    table:put global:history-indicators ? (lput val (table:get global:history-indicators ?))
   ]
 end
 
@@ -54,7 +54,7 @@ end
 ;;
 ; TS indicators
 to-report indicators:ts-indicator [indic]
-  report table:get history-indicators indic
+  report table:get global:history-indicators indic
 end
 
 
@@ -137,8 +137,8 @@ end
 
 
 to-report indicators:mean-effective-distance
-  if effective-distance-matrix = 0 [report 0]
-  report mean map mean matrix:to-row-list effective-distance-matrix
+  if global:effective-distance-matrix = 0 [report 0]
+  report mean map mean matrix:to-row-list global:effective-distance-matrix
 end
 
 ; mean congestion in network
@@ -150,7 +150,7 @@ end
 ;;
 ; congestion on patches
 to-report indicators:mean-patch-congestion
-  report mean patches-congestion
+  report mean global:patches-congestion
 end
 
 
@@ -161,15 +161,15 @@ end
 
 
 to-report indicators:mean-flow
-  report matrix:mean flow-matrix
+  report matrix:mean global:flow-matrix
 end
 
 to-report indicators:min-flow
-  report first matrix:min flow-matrix
+  report first matrix:min global:flow-matrix
 end
 
 to-report indicators:max-flow
-  report first matrix:max flow-matrix
+  report first matrix:max global:flow-matrix
 end
 
 
@@ -307,43 +307,43 @@ end
 ;;
 ; Sum of employments in the external facility
 to-report externality-employments
-  ifelse external-facility = 0 or length external-facility = 0 [
+  ifelse global:external-facility = 0 or length global:external-facility = 0 [
     report 0 
   ][
-    report sum [employments] of patches with [member? number external-facility]
+    report sum [employments] of patches with [member? number global:external-facility]
   ]
 end
 
 
 
 to-report wanted-collaboration-rate
-  ifelse length collaborations-wanted = 0 [
+  ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
-    report sum collaborations-wanted / length collaborations-wanted
+    report sum global:collaborations-wanted / length global:collaborations-wanted
   ]
 end
 
 
 to-report realized-collaboration-rate
-  ifelse length collaborations-wanted = 0 [
+  ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
-    report sum collaborations-realized / length collaborations-realized
+    report sum global:collaborations-realized / length global:collaborations-realized
   ]
 end
 
 to-report expected-collaboration-rate
-  ifelse length collaborations-wanted = 0 [
+  ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
-    report mean collaborations-expected
+    report mean global:collaborations-expected
   ]
 end
 
 
 to-report externality-decrepitude
-  report externality-employments / (employments-max * ext-employments-proportion-of-max)
+  report externality-employments / (global:employments-max * global:ext-employments-proportion-of-max)
 end
   
 
