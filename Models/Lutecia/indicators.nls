@@ -30,6 +30,7 @@ to indicators:compute-indicators
   output-print (word "externality-decrep : " externality-decrepitude)
   output-print (word "mean-congestion : " indicators:mean-congestion)
   output-print (word "total-nw-length : " indicators:network:total-nw-length)
+  output-print (word "relative-nw-length : " network-indicators:relative-nw-length)
   output-print (word "mean-relative-speed : " indicators:network:mean-relative-speed)
   output-print (word "mean-closeness-centrality : " indicators:network:mean-closeness-centrality)
   output-print (word "mean-bw-centrality : " indicators:network:mean-bw-centrality)
@@ -37,6 +38,7 @@ to indicators:compute-indicators
   output-print (word "nw-diameter : " indicators:network:nw-diameter)
   output-print (word "alpha-bw-centrality : " indicators:network:alpha-bw-centrality)
   output-print (word "alpha-closeness-centrality : " indicators:network:alpha-closeness-centrality)
+  output-print (word "indicators:relative-accessibility : " indicators:relative-accessibility)
 end
 
 to indicators:compute-network-indicators
@@ -97,9 +99,19 @@ end
 
 
 ;;
+; evolution of accessibility
+to-report indicators:relative-accessibility
+  ;carefully[
+    let ts-access indicators:ts-indicator "indicators:overall-mean-accessibility"
+    report item (length ts-access - 1) ts-access / item 0 ts-access 
+  ;][report 0]
+end
+
+
+;;
 ; mean accessibility for a given mayor
 to-report indicators:mean-accessibility-mayor [i]
-  report accessibilities:mean-accessibility (patches with [governing-mayor = mayor i])
+  report accessibilities:mean-accessibility (patches with [patch:governing-mayor = mayor i])
 end
 
 ;;
@@ -113,18 +125,18 @@ end
 
 ; min / max access
 to-report indicators:max-accessibility
-   report max [max (list a-to-e-accessibility e-to-a-accessibility)] of patches
+   report max [max (list patch:a-to-e-accessibility patch:e-to-a-accessibility)] of patches
 end
 
 to-report indicators:min-accessibility
-   report min [min (list a-to-e-accessibility e-to-a-accessibility)] of patches
+   report min [min (list patch:a-to-e-accessibility patch:e-to-a-accessibility)] of patches
 end
 
 
 ; mean travel distance
 to-report indicators:mean-travel-distance
-  if (sum [actives] of patches) * (sum [employments] of patches) = 0 [report 0]
-  report sum [a-to-e-distance + e-to-a-distance] of patches / (2 * (sum [actives] of patches) * (sum [employments] of patches))
+  if (sum [patch:actives] of patches) * (sum [patch:employments] of patches) = 0 [report 0]
+  report sum [patch:a-to-e-distance + patch:e-to-a-distance] of patches / (2 * (sum [patch:actives] of patches) * (sum [patch:employments] of patches))
 end
 
 
@@ -143,7 +155,7 @@ end
 
 ; mean congestion in network
 to-report indicators:mean-congestion
-  if count transportation-links > 0 [report mean [congestion] of transportation-links]
+  if count transportation-links > 0 [report mean [transportation-link:congestion] of transportation-links]
   report 1
 end
 
@@ -156,7 +168,7 @@ end
 
 ;; last variability of relocation process
 to-report indicators:stability
-  report ((global:diff-employments / sum [employments] of patches) + (global:diff-actives / sum [actives] of patches) ) / 2
+  report ((global:diff-employments / sum [patch:employments] of patches) + (global:diff-actives / sum [patch:actives] of patches) ) / 2
 end
 
 
@@ -221,22 +233,22 @@ end
 ;;
 ; mean distance to centre (to measure sprawl)
 to-report indicators:mean-distance-to-centre-actives
-  let atot sum [actives] of patches
-  report sum [actives / atot * distance (patch 0 0)] of patches
+  let atot sum [patch:actives] of patches
+  report sum [patch:actives / atot * distance (patch 0 0)] of patches
 end
 
 to-report indicators:mean-distance-to-centre-employments
-  let etot sum [employments] of patches
-  report sum [employments / etot * distance (patch 0 0)] of patches
+  let etot sum [patch:employments] of patches
+  report sum [patch:employments / etot * distance (patch 0 0)] of patches
 end
 
 to-report indicators:center-actives-prop
-  report [actives] of patch 0 0 / sum [actives] of patches
+  report [patch:actives] of patch 0 0 / sum [patch:actives] of patches
 end
 
 
 to-report indicators:center-employments-prop
-  report [employments] of patch 0 0 / sum [employments] of patches
+  report [patch:employments] of patch 0 0 / sum [patch:employments] of patches
 end
 
 
@@ -262,24 +274,34 @@ to-report indicators:network:mean-bw-centrality
   report network-indicators:mean-bw-centrality
 end
 
+
+;
+; TODO -- network indicators are not tracked --
+;to-report indicators:relative-mean-betweenness
+;  let ts-access indicators:ts-indicator "indicators:network:mean-bw-centrality"
+;    report item (length ts-access - 1) ts-access / item 0 ts-access 
+;end
+;
+
+
 ;;
 ; hierarchy betwenness centrality
 to-report indicators:network:alpha-bw-centrality
-  report first indicators:rank-size-hierarchy ([bw-centrality] of transportation-links)
+  report first indicators:rank-size-hierarchy ([transportation-link:bw-centrality] of transportation-links)
 end
 
 ;;
 ; average closeness centrality
 to-report indicators:network:mean-closeness-centrality
   let n count transportation-nodes if n = 0 [report 0]
-  report (mean [transportation-node-closeness-centrality] of transportation-nodes) / n
+  report (mean [transportation-node:closeness-centrality] of transportation-nodes) / n
 end
 
 
 ;;
 ; hierarchy closeness
 to-report indicators:network:alpha-closeness-centrality
-  report first indicators:rank-size-hierarchy ([transportation-node-closeness-centrality] of transportation-nodes)
+  report first indicators:rank-size-hierarchy ([transportation-node:closeness-centrality] of transportation-nodes)
 end
 
 
@@ -310,7 +332,7 @@ to-report externality-employments
   ifelse global:external-facility = 0 or length global:external-facility = 0 [
     report 0 
   ][
-    report sum [employments] of patches with [member? number global:external-facility]
+    report sum [patch:employments] of patches with [member? patch:number global:external-facility]
   ]
 end
 

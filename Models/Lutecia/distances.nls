@@ -158,7 +158,7 @@ to-report get-new-inters [new-link]
   ;ask patches [set pcolor black]
   let new-nw-patches [] ask new-link [foreach link:footprint[ask ? [
         ;set pcolor blue
-        set new-nw-patches lput number new-nw-patches]]]
+        set new-nw-patches lput patch:number new-nw-patches]]]
   
   ; find intersections : as footprint is ordered, new intersections are orderered too -> get extremities
   let new-inters (list (first new-nw-patches) (last new-nw-patches))
@@ -167,7 +167,7 @@ to-report get-new-inters [new-link]
   ask transportation-links with [self != new-link] [
      let inter intersection-with-link self new-link
      if inter != [] [
-       set new-inters lput [number] of (patch (first inter) (last inter)) new-inters 
+       set new-inters lput [patch:number] of (patch (first inter) (last inter)) new-inters 
      ] 
   ]
   
@@ -205,7 +205,7 @@ end
 to update-inters-recompute [new-inters new-nw-patches]
   foreach new-inters [set global:nw-inters lput ? global:nw-inters]
   let footprints []
-  ask transportation-links [let f [] foreach link:footprint[ask ? [set f lput number f]] set footprints lput f footprints]
+  ask transportation-links [let f [] foreach link:footprint[ask ? [set f lput patch:number f]] set footprints lput f footprints]
   set global:closest-nw-inters table:make
   foreach footprints [
     let current-fp ? let current-inters []

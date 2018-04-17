@@ -92,6 +92,10 @@ __includes [
 
   "experiments.nls"
 
+  ;;
+  ; specific experiments for Luti
+  "experiments-luti.nls"
+
 
   ;;;;;;;;;;
   ;; utils
@@ -276,6 +280,8 @@ globals[
   ;;;;;;;;;;;;;
   ;; HEADLESS
 
+  ;;
+  ; setup
   global:setup-type
 
   global:actives-max
@@ -373,16 +379,16 @@ globals[
 patches-own [
 
    ; number of actives on the patch
-  actives
+  patch:actives
 
   ; number of jobs on the patch
-  employments
+  patch:employments
 
   ; number of the patch (used as index in distance matrices)
-  number
+  patch:number
 
   ; pointer to governing mayor
-  governing-mayor
+  patch:governing-mayor
 
   ; actives and employment
   ; do not need mobile agents as deterministic evolution, considering at this time scale that random effect is averaged
@@ -397,29 +403,29 @@ patches-own [
   ;;;;;
 
   ; accessibility of jobs to actives
-  a-to-e-accessibility
+  patch:a-to-e-accessibility
 
   ; accessibility of actives to employments
-  e-to-a-accessibility
+  patch:e-to-a-accessibility
 
-  prev-accessibility
-  current-accessibility
+  patch:prev-accessibility
+  patch:current-accessibility
 
   ; travel distances
-  a-to-e-distance
-  e-to-a-distance
+  patch:a-to-e-distance
+  patch:e-to-a-distance
 
   ; utilities
   ; for actives
-  a-utility
+  patch:a-utility
   ; for employments
-  e-utility
+  patch:e-utility
 
   ; form factor
-  form-factor
+  patch:form-factor
 
 
-  sea?
+  patch:sea?
 
 
 ]
@@ -435,10 +441,10 @@ mayors-own[
   ;governed-patches
 
   ; wealth of the area
-  wealth
+  mayor:wealth
 
-  mayor-population
-  mayor-employment
+  mayor:population
+  mayor:employment
 
 ]
 
@@ -452,22 +458,22 @@ undirected-link-breed[transportation-links transportation-link]
 
 transportation-links-own [
 
-  transportation-link-length
+  transportation-link:length
 
   ; capacity of the link ; expressed as max trip per length unit
-  capacity
+  transportation-link:capacity
 
   ; congestion : travels in the link
-  congestion
+  transportation-link:congestion
 
   ; speed in the link, deduced from capacity and congestion
-  speed
+  transportation-link:speed
 
-  age
+  transportation-link:age
 
-  status
+  transportation-link:status
 
-  bw-centrality
+  transportation-link:bw-centrality
 
 ]
 
@@ -475,7 +481,7 @@ transportation-links-own [
 breed[transportation-nodes transportation-node]
 
 transportation-nodes-own[
-  transportation-node-closeness-centrality
+  transportation-node:closeness-centrality
 ]
 
 ; needs ghost breeds to not perturbate shortest paths update
@@ -498,26 +504,25 @@ undirected-link-breed [biological-network-real-links biological-network-real-lin
 
 biological-network-nodes-own [
   ;; pressure
-  pressure
+  biological-network-node:pressure
   ;; total capacity
-  total-capacity
+  biological-network-node:total-capacity
   ;; number
-  biological-network-node-number
+  biological-network-node:number
 
   ;; population
-  population
+  biological-network-node:population
 ]
 
 
 biological-network-links-own [
   ;; diameter
-  diameter
+  biological-network-link:diameter
   ;; flow
-  flow
+  biological-network-link:flow
   ;; length
-  bio-link-length
+  biological-network-link:bio-link-length
 ]
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 833
@@ -588,6 +593,40 @@ BUTTON
 281
 NIL
 display:display-target-fit
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+264
+190
+351
+223
+test luti
+experiments-luti:test-experiment-luti
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+278
+239
+401
+272
+all scenarios
+experiments-luti:all-scenarios
 NIL
 1
 T

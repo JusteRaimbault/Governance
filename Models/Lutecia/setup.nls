@@ -99,13 +99,15 @@ to setup:setup-globals
   set global:collaborations-wanted [] set global:collaborations-realized [] set global:collaborations-expected []
   
   ;
-  let conf file:read-conf-file global:conf-file
-  set global:gis-network-file table:get conf "gis-network-file"
-  set global:gis-extent-file table:get conf "gis-extent-file"
-  set global:gis-centers-file table:get conf "gis-centers-file"
-  set global:gis-sea-file table:get conf "gis-sea-file"
-  set global:gis-economic-areas-file table:get conf "gis-economic-areas-file"
-  set global:gis-governed-patches-file table:get conf "gis-governed-patches-file"
+  if is-string? global:conf-file [
+    let conf file:read-conf-file global:conf-file
+    set global:gis-network-file table:get conf "gis-network-file"
+    set global:gis-extent-file table:get conf "gis-extent-file"
+    set global:gis-centers-file table:get conf "gis-centers-file"
+    set global:gis-sea-file table:get conf "gis-sea-file"
+    set global:gis-economic-areas-file table:get conf "gis-economic-areas-file"
+    set global:gis-governed-patches-file table:get conf "gis-governed-patches-file"
+  ]
   
   ; population raster
   set global:gis-population-raster-file "setup/gis/guangdong/pop2010_wgs84_georef.asc"
@@ -158,7 +160,7 @@ to setup:setup-patches
     
     ; sea patches
     foreach gis:feature-list-of gis:load-dataset global:gis-sea-file [
-      ask patches with [gis:contains? ? self] [set sea? true]
+      ask patches with [gis:contains? ? self] [set patch:sea? true]
     ]
     
   ]
@@ -168,7 +170,7 @@ to setup:setup-patches
   let p 0
   repeat count patches [
     let x (floor (p / world-width)) + min-pxcor let y (p - world-width * floor (p / world-width)) + min-pycor
-    ask (patch x y) [set number p] set p p + 1
+    ask (patch x y) [set patch:number p] set p p + 1
   ]
 end
 
@@ -206,19 +208,19 @@ end
 to setup:setup-governance-areas
  
   if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
-    ask patches [set governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of governing-mayor]
+    ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
   ]
   
   if global:setup-type = "gis" [
     foreach gis:feature-list-of gis:load-dataset global:gis-governed-patches-file [
       let area-name gis:property-value ? "NAME"
       ask patches with [gis:contains? ? self or gis:intersects? ? self] [
-        set governing-mayor one-of mayors with [label = area-name]
+        set patch:governing-mayor one-of mayors with [label = area-name]
       ]
     ]
     
     ; patches with no governing -> central authority
-    ask patches with [governing-mayor = 0] [set governing-mayor global:regional-authority]
+    ask patches with [patch:governing-mayor = 0] [set patch:governing-mayor global:regional-authority]
     
   ] 
   
@@ -243,8 +245,8 @@ to setup:setup-initial-distributions
   set global:patches-employments-list rep 0 count patches
   set global:patches-actives-list rep 0 count patches
   ask patches [
-    set global:patches-employments-list replace-item number global:patches-employments-list employments
-    set global:patches-actives-list replace-item number global:patches-actives-list actives
+    set global:patches-employments-list replace-item patch:number global:patches-employments-list patch:employments
+    set global:patches-actives-list replace-item patch:number global:patches-actives-list patch:actives
   ]
   
 end
@@ -257,17 +259,17 @@ to setup:setup-population-distribution
      let centers [patch-here] of mayors with [self != global:regional-authority]
      foreach centers [
        let current-mayor one-of [mayors-here] of ? let current-pop 0
-       ifelse [mayor-population] of current-mayor = 0 [set current-pop global:actives-max][set current-pop [mayor-population] of current-mayor]
-       apply-monocentric-kernel "poisson" global:actives-spatial-dispersion current-pop "actives" ?
+       ifelse [mayor:population] of current-mayor = 0 [set current-pop global:actives-max][set current-pop [mayor:population] of current-mayor]
+       apply-monocentric-kernel "poisson" global:actives-spatial-dispersion current-pop "patch:actives" ?
      ]
    ]
    
    if global:setup-type = "gis" [
       let gis-population-raster gis:load-dataset global:gis-population-raster-file
-      gis:apply-raster gis-population-raster actives
+      gis:apply-raster gis-population-raster patch:actives
       ; replace Nans
       ask patches [
-        if not (actives < 0 or actives > 0)[set actives 0]
+        if not (patch:actives < 0 or patch:actives > 0)[set patch:actives 0]
       ]
    ]
    
@@ -281,8 +283,8 @@ to setup:setup-employment-distribution
     let centers [patch-here] of mayors with [self != global:regional-authority]
     foreach centers [
       let current-mayor one-of [mayors-here] of ? let current-emp 0
-      ifelse [mayor-employment] of current-mayor = 0 [set current-emp global:employments-max][set current-emp [mayor-employment] of current-mayor]
-      apply-monocentric-kernel "poisson" global:employments-spatial-dispersion current-emp "employments" ?
+      ifelse [mayor:employment] of current-mayor = 0 [set current-emp global:employments-max][set current-emp [mayor:employment] of current-mayor]
+      apply-monocentric-kernel "poisson" global:employments-spatial-dispersion current-emp "patch:employments" ?
     ]
   ]
   
@@ -296,7 +298,7 @@ to setup:setup-employment-distribution
        let current-employment current-employment-cat0 + current-employment-cat1
        let eco-area-patches patches with [gis:contains? ? self or gis:intersects? ? self]
        if count eco-area-patches > 0 [
-         repeat 1000 [ask one-of eco-area-patches [set employments employments + current-employment / 1000]]
+         repeat 1000 [ask one-of eco-area-patches [set patch:employments patch:employments + current-employment / 1000]]
        ] 
     ]
   ]
@@ -339,17 +341,17 @@ to setup:setup-externalities
     
   set global:external-facility []
   ask ext-patch [
-    set global:external-facility lput number global:external-facility
+    set global:external-facility lput patch:number global:external-facility
     sprout 1 [
        set shape "airplane" set size 2 set color red set heading 0
        
     ]
     
     let by-patch-employment-number global:employments-max * global:ext-employments-proportion-of-max / 9   
-    set employments by-patch-employment-number
+    set patch:employments by-patch-employment-number
     ask neighbors [
-      set employments by-patch-employment-number
-      set global:external-facility lput number global:external-facility
+      set patch:employments by-patch-employment-number
+      set global:external-facility lput patch:number global:external-facility
     ]
   ] 
   
@@ -384,8 +386,10 @@ to setup:setup-initial-network
          ask ghost-transportation-nodes [let p one-of ((other ghost-transportation-nodes) with [count my-ghost-transportation-links = 0]) if p != nobody [create-ghost-transportation-link-with p]]
          
          ; add supplementary nodes
-         create-ghost-transportation-nodes 6 [setxy random-xcor random-ycor]
-         create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
+         ;; TODO : for comparison with slime mould, deactivated
+         ; -> add similar border nodes in slime mould ?
+         ;create-ghost-transportation-nodes 6 [setxy random-xcor random-ycor]
+         ;create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
    
          ;ask ghost-transportation-nodes [ask one-of (other ghost-transportation-nodes) with-min [distance myself] [if not link-neighbor? myself [create-ghost-transportation-link-with myself]] ]
          ask one-of ghost-transportation-nodes with-min [min map [distance ?] to-list (other ghost-transportation-nodes)] [create-ghost-transportation-link-with one-of ((other ghost-transportation-nodes) with-min [distance myself])]
@@ -442,7 +446,7 @@ to setup:setup-initial-network
   
   ]
   
-  ask transportation-links [set status "initial"]
+  ask transportation-links [set transportation-link:status "initial"]
   
   ; ghost nw at setup
   if global:setup-type = "gis" [network-ghost:ghost-network-from-gis global:target-network-file]
@@ -535,7 +539,7 @@ end
 ;; initial utilities and accessibilities
 to setup:setup-patch-variables
   compute-patches-variables
-  set global:initial-max-acc max [current-accessibility] of patches
+  set global:initial-max-acc max [patch:current-accessibility] of patches
 end
 
 

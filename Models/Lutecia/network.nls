@@ -35,7 +35,7 @@ to-report network:new-infra [coords construct? validate?]
       if validate? = false [set valid? true]
         
       ask new-link [
-        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? number global:nw-patches)]]]
+        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? patch:number global:nw-patches)]]]
         set valid? (valid? and length link:footprint > 1)
       ]
  
@@ -170,7 +170,7 @@ to-report network:network-age
   ask transportation-links [
     foreach link:footprint [
       ask ? [
-        table:put res number ([age] of myself)
+        table:put res patch:number ([transportation-link:age] of myself)
       ]
     ] 
   ]
@@ -186,8 +186,8 @@ to network:update-network-age [old-nw-age]
     let new-age 0 let ages rep 0 (ticks + 1); ages memorized in a list
     foreach link:footprint [
       ask ? [
-         ifelse table:has-key? old-nw-age number [
-           let a table:get old-nw-age number
+         ifelse table:has-key? old-nw-age patch:number [
+           let a table:get old-nw-age patch:number
            set ages replace-item a ages ((item a ages) + 1)
          ][
            set ages replace-item ticks ages ((item ticks ages) + 1)
@@ -195,7 +195,7 @@ to network:update-network-age [old-nw-age]
       ]
     ]
     ; age is element with max value
-    set age max-index ages
+    set transportation-link:age max-index ages
   ]
   
   display:update-nw-display
@@ -213,7 +213,7 @@ to network:cache-nw-measures
   
   ; caching shortest paths and measures
   nw:set-context transportation-nodes transportation-links
-  ask transportation-links [set transportation-link-length link-length set bw-centrality 0]
+  ask transportation-links [set transportation-link:length link-length set transportation-link:bw-centrality 0]
   set global:shortest-paths table:make set global:nw-relative-speeds table:make set global:nw-distances table:make
   let clist to-list transportation-nodes let i 0 let j 1
   repeat (length clist - 1) [
@@ -221,9 +221,9 @@ to network:cache-nw-measures
     set j i + 1
     repeat (length clist - i - 1) [
       ; compute shortest path
-      let c2 item j clist let path [] ask c1 [set path nw:weighted-path-to c2 "transportation-link-length"]
+      let c2 item j clist let path [] ask c1 [set path nw:weighted-path-to c2 "transportation-link:length"]
       ; update link betweeness
-      let l 0 foreach path [ask ? [set l l + transportation-link-length set bw-centrality bw-centrality + 1]]
+      let l 0 foreach path [ask ? [set l l + transportation-link:length set transportation-link:bw-centrality transportation-link:bw-centrality + 1]]
       ; if the network is not connected, some kind of infinite value
       if l = 0 [set l 100 * sqrt (world-width ^ 2 + world-height ^ 2)]
       ; update shortest path table
@@ -232,7 +232,8 @@ to network:cache-nw-measures
       table:put global:nw-distances (list [who] of c1 [who] of c2) l table:put global:nw-distances (list [who] of c2 [who] of c1) l
       ; update relative speed table
       let deucl 0 ask c1 [set deucl distance c2]
-      table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
+      ;table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
+      table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (l / deucl)
 
       set j j + 1
     ]
@@ -245,7 +246,7 @@ to network:cache-nw-measures
     ask other transportation-nodes [
       let n2 who set s s + table:get global:nw-distances (list n1 n2)
     ]
-    set transportation-node-closeness-centrality s
+    set transportation-node:closeness-centrality s
   ]
   
   
@@ -262,9 +263,9 @@ to network:simplify-network
      let current-node one-of transportation-nodes with [count transportation-nodes-here > 1]
      let to-connect [] let ages [] ask current-node [
        ask other transportation-nodes-here [
-          ask my-transportation-links with [[patch-here] of other-end != [patch-here] of myself] [set to-connect lput other-end to-connect set ages lput age ages die] die
+          ask my-transportation-links with [[patch-here] of other-end != [patch-here] of myself] [set to-connect lput other-end to-connect set ages lput transportation-link:age ages die] die
        ]
-       let i 0 foreach to-connect [if not transportation-link-neighbor? ? [create-transportation-link-with ? [set age item i ages]] set i i + 1]
+       let i 0 foreach to-connect [if not transportation-link-neighbor? ? [create-transportation-link-with ? [set transportation-link:age item i ages]] set i i + 1]
      ]
      set n count transportation-nodes with [count transportation-nodes-here > 1]
   ]

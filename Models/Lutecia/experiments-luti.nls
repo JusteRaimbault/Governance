@@ -5,31 +5,51 @@
 
 
 
-to setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed finalTime rnd-seed]
+to experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
   
   clear-all
   
-  show (word "Luti experiments with : relocation-rate = " relocationRate " ; gammaA = " gammaA " ; gammaE = " gammaE " ; betaDC = " betaDC " ; lamddaacc = " lambdaacc " ; nwspeed = " nwspeed " ; finalTime = " finalTime " ; seed = " rnd-seed)
+  show (word "Luti experiments with : relocation-rate = " relocationRate " ; gammaA = " gammaA " ; gammaE = " gammaE " ; betaDC = " betaDC " ; lamddaacc = " lambdaacc " ; nwspeed = " nwspeed " ; scenario = " scenario " ; finalTime = " finalTime " ; seed = " rnd-seed)
   
   setup:setup-headless-vars
-  set global:headless? true
   
+  set global:headless? true
+  set global:failed 0
  
   
   ;;
   ; fixed params for luti
   
   set global:setup-type "random"
-  set global:#-initial-territories 5
   
   set global:evolve-network? false
+  set global:evolve-landuse? true
   
+  set global:stopping-type "time"
+  
+  set global:initial-nw? true
+  
+  ; dirty scenarios selection
+  if scenario = 0 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 3]
+  if scenario = 1 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 5]
+  if scenario = 2 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.2]
+  if scenario = 3 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.1]
+  if scenario = 4 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.8]
+  if scenario = 5 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.8]
   
   ;;
   ; run parameters
-  set global:relocation-rate relocationRate
-  set global:seed rnd-seed
+ ; set global:#-initial-territories 3
+ ; set global:network-biological-gamma 1.2
   
+  set global:relocation-rate relocationRate
+  set global:gamma-cobb-douglas-a gammaA
+  set global:gamma-cobb-douglas-e gammaE
+  set global:beta-discrete-choices betaDC
+  set global:lambda-accessibility lambdaacc
+  set global:network-speed nwspeed
+  set global:total-time-steps finalTime
+  set global:seed rnd-seed
   
   
   set global:world-size 15
@@ -39,10 +59,42 @@ end
 
 
 
+;;
+;  luti experiment
+;
+;  Indicators :
+;  - urban form actives/employments
+;  - relative access gain
+;  - relative
+to experiments-luti:run-experiment-luti
+  experiments:run-experiment
+end
 
-to run-experiment-luti
+
+
+to experiments-luti:test-experiment-luti
+  
+  experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 1 20 0
+  
+  experiments-luti:run-experiment-luti
+  
+  indicators:compute-indicators
   
 end
+
+to experiments-luti:all-scenarios
+  foreach seq 0 5 1 [
+    
+     experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 ? 20 0
+  
+    show ?
+  
+    experiments-luti:run-experiment-luti
+  
+    indicators:compute-indicators
+  ]
+end
+
 
 
 

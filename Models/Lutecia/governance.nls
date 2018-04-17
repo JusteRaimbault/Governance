@@ -57,9 +57,9 @@ to-report governance:decision-makers
      ; uniform drawing proportionnal to wealth of each
      ;  -> could test pair drawing
      let local-mayors mayors with [self != global:regional-authority]
-     let etot sum [employments] of local-mayors
+     let etot sum [patch:employments] of local-mayors
      let firstbuilder nobody let r random-float 1 let s 0
-     ask local-mayors [set s s + (employments / etot) if s > r and firstbuilder = nobody [set firstbuilder self]]
+     ask local-mayors [set s s + (patch:employments / etot) if s > r and firstbuilder = nobody [set firstbuilder self]]
      ; draw the second
      
      ;;;;;;;;
@@ -67,9 +67,9 @@ to-report governance:decision-makers
      ;;;;;;;;
      
      let remaining-mayors mayors with [self != global:regional-authority and self != firstbuilder]
-     set etot sum [employments] of remaining-mayors
+     set etot sum [patch:employments] of remaining-mayors
      let secondbuilder nobody set r random-float 1 set s 0
-     ask remaining-mayors [set s s + (employments / etot) if s > r and secondbuilder = nobody [set secondbuilder self]]
+     ask remaining-mayors [set s s + (patch:employments / etot) if s > r and secondbuilder = nobody [set secondbuilder self]]
      
      report (list firstbuilder secondbuilder)
   ]
@@ -114,8 +114,8 @@ to-report governance:best-infrastructure [decidors old-config]
   
   ifelse decidors = global:regional-authority [
     ; no game, find the best among the choices
-    let min-acc quantile ([a-to-e-accessibility + e-to-a-accessibility] of patches) 0.5
-    let patchset (patches with [a-to-e-accessibility + e-to-a-accessibility > min-acc])
+    let min-acc quantile ([patch:a-to-e-accessibility + patch:e-to-a-accessibility] of patches) 0.5
+    let patchset (patches with [patch:a-to-e-accessibility + patch:e-to-a-accessibility > min-acc])
     let croadlength 0 ifelse global:game-type = "random" [set croadlength global:road-length][set croadlength (2 * global:road-length)]
     report (list first governance:compare-infrastructures old-config (governance:potential-infrastructures global:regional-authority croadlength patchset) global:regional-authority patchset)
   ][
@@ -143,7 +143,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   compute-patches-accessibilities
   let old-acc accessibilities:mean-accessibility patchset
   let olds (list accessibilities:mean-accessibility patches)
-  foreach sort-on [who] (mayors with [self != global:regional-authority]) [set olds lput (accessibilities:mean-accessibility patches with [governing-mayor = ?]) olds] 
+  foreach sort-on [who] (mayors with [self != global:regional-authority]) [set olds lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) olds] 
   
   ;verbose (word "Mean-travel-distance : " indicators:mean-travel-distance)
   
@@ -160,7 +160,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
       compute-patches-accessibilities
       let new-acc accessibilities:mean-accessibility patchset
       let news (list accessibilities:mean-accessibility patches)
-      foreach sort-on [who] (mayors with [self != global:regional-authority]) [set news lput (accessibilities:mean-accessibility patches with [governing-mayor = ?]) news]
+      foreach sort-on [who] (mayors with [self != global:regional-authority]) [set news lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) news]
     
     
       ; check if better delta-acc
@@ -209,16 +209,16 @@ to-report governance:game-result [decidors old-config]
       ; any number of decidors
       let r random-float 1
       let dec nobody
-      let wtot sum map [[wealth] of ?] decidors
+      let wtot sum map [[mayor:wealth] of ?] decidors
       let s 0
-      foreach decidors [set s s + ([wealth] of ?) / wtot if r < s and dec = nobody [set dec ?]]
+      foreach decidors [set s s + ([mayor:wealth] of ?) / wtot if r < s and dec = nobody [set dec ?]]
       
       ;let patchset (patches with [governing-mayor = dec])
       let patchset patches
       
       ;let best compare-infrastructures old-config (potential-infrastructures (list dec) road-length patchset) (list dec) patchset
       ; ! change domain where infras explored, adapt patchset on which access is evaluated
-      let best governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec) global:road-length patchset) (list dec) (patches with [governing-mayor = dec])
+      let best governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec) global:road-length patchset) (list dec) (patches with [patch:governing-mayor = dec])
       
       report (list first best)
     ]
@@ -231,8 +231,8 @@ to-report governance:game-result [decidors old-config]
      
       let dec1 first decidors let dec2 last decidors
      
-      let patchset1 (patches with [governing-mayor = dec1])
-      let patchset2 (patches with [governing-mayor = dec2])
+      let patchset1 (patches with [patch:governing-mayor = dec1])
+      let patchset2 (patches with [patch:governing-mayor = dec2])
       let patchset patches
      
       ;let best1 compare-infrastructures old-config (potential-infrastructures (list dec1) road-length patchset1) (list dec1) patchset1

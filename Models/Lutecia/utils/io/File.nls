@@ -1,5 +1,11 @@
 ;;read and write file utilities
 
+
+;to-report file:is-file? [filename]
+;  carefully [file-open filename report true][report false]
+;end
+
+
 to-report file:read-file [filename]
   let res []
   file-open filename

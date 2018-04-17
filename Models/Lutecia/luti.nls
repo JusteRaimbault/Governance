@@ -37,21 +37,21 @@ to luti:relocate
     output-print "... relocalization"
   
     ; discrete choice model following utilities for employments and actives
-    let actives-number sum [actives] of patches let employments-number sum [employments] of patches
-    let a-dc-norm-factor sum [exp (global:beta-discrete-choices * a-utility)] of patches
-    let e-dc-norm-factor sum [exp (global:beta-discrete-choices * e-utility)] of patches
+    let actives-number sum [patch:actives] of patches let employments-number sum [patch:employments] of patches
+    let a-dc-norm-factor sum [exp (global:beta-discrete-choices * patch:a-utility)] of patches
+    let e-dc-norm-factor sum [exp (global:beta-discrete-choices * patch:e-utility)] of patches
   
     set global:diff-actives 0 set global:diff-employments 0 set global:rel-diff-actives 0 set global:rel-diff-employments 0
   
     ask patches [
-      let prev-a actives let prev-e employments
-      set actives ((1 - global:relocation-rate)* actives) + (global:relocation-rate * actives-number * exp (global:beta-discrete-choices * a-utility) / a-dc-norm-factor)
-      set employments ((1 - global:relocation-rate)* employments) + (global:relocation-rate * employments-number * exp (global:beta-discrete-choices * e-utility) / e-dc-norm-factor)
-      set global:diff-actives global:diff-actives + abs (prev-a - actives) set global:diff-employments global:diff-employments + abs (prev-e - employments)
-      set global:rel-diff-actives global:rel-diff-actives + ((abs (prev-a - actives)) / actives) set global:rel-diff-employments global:rel-diff-employments + ((abs (prev-e - employments))/ employments)
+      let prev-a patch:actives let prev-e patch:employments
+      set patch:actives ((1 - global:relocation-rate)* patch:actives) + (global:relocation-rate * actives-number * exp (global:beta-discrete-choices * patch:a-utility) / a-dc-norm-factor)
+      set patch:employments ((1 - global:relocation-rate)* patch:employments) + (global:relocation-rate * employments-number * exp (global:beta-discrete-choices * patch:e-utility) / e-dc-norm-factor)
+      set global:diff-actives global:diff-actives + abs (prev-a - patch:actives) set global:diff-employments global:diff-employments + abs (prev-e - patch:employments)
+      set global:rel-diff-actives global:rel-diff-actives + ((abs (prev-a - patch:actives)) / patch:actives) set global:rel-diff-employments global:rel-diff-employments + ((abs (prev-e - patch:employments))/ patch:employments)
       ; update global lists
-      set global:patches-employments-list replace-item number global:patches-employments-list employments
-      set global:patches-actives-list replace-item number global:patches-actives-list actives
+      set global:patches-employments-list replace-item patch:number global:patches-employments-list patch:employments
+      set global:patches-actives-list replace-item patch:number global:patches-actives-list patch:actives
     ]
   
   ]
@@ -63,10 +63,10 @@ end
 ;;
 ; Aggregate wealth at mayor level : sum of employments (?)
 to luti:update-wealth
-  ask mayors [set wealth 0]
+  ask mayors [set mayor:wealth 0]
   ask patches [
-    ask governing-mayor [set wealth wealth + [employments] of myself]
-    ask global:regional-authority [set wealth wealth + [employments] of myself]
+    ask patch:governing-mayor [set mayor:wealth mayor:wealth + [patch:employments] of myself]
+    ask global:regional-authority [set mayor:wealth mayor:wealth + [patch:employments] of myself]
   ]
   
 end
@@ -81,7 +81,7 @@ to luti:update-externalities
     
     foreach global:external-facility [
        ask patch-with-number ? [
-         set employments global:ext-growth-factor * employments * current-accessibility / global:initial-max-acc
+         set patch:employments global:ext-growth-factor * patch:employments * patch:current-accessibility / global:initial-max-acc
        ]
     ]
     

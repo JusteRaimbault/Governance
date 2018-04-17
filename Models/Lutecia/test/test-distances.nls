@@ -72,7 +72,7 @@ to test-distances:test-nw-mat-grid-nw
   
   foreach global:nw-inters [
     ask patch-with-number ? [
-      set plabel number
+      set plabel patch:number
       ] 
   ]
   
@@ -131,7 +131,7 @@ to test-shortest-path
   output-print (word k " : " table:get global:network-shortest-paths k )
   
   foreach table:get global:network-shortest-paths k [    
-    ask patch-with-number ? [set pcolor pink set plabel number] 
+    ask patch-with-number ? [set pcolor pink set plabel patch:number] 
   ]
   
   ask patch-with-number first k [set pcolor blue]

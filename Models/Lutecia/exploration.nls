@@ -27,7 +27,7 @@ to explore-network-shapes [#-repets dir]
     vis-network-shape resdir r
     set r r + 1
     set nwpos lput global:nw-patches nwpos
-    set meanacc lput ([(list number (a-to-e-accessibility + e-to-a-accessibility))] of patches) meanacc
+    set meanacc lput ([(list patch:number (patch:a-to-e-accessibility + patch:e-to-a-accessibility))] of patches) meanacc
   ]
   
   ; vis mean nw and mean acc and export csv

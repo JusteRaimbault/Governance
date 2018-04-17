@@ -13,7 +13,7 @@
 to-report network-indicators:nw-diameter
   if count transportation-nodes = 0 [report 0]
   let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report max map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values global:shortest-paths) / diag
+  report max map [sum map [[transportation-link:length] of ?] ?] (utils:table:table-values global:shortest-paths) / diag
 end
 
 
@@ -23,34 +23,34 @@ end
 to-report network-indicators:mean-path-length
   if count transportation-nodes = 0 [report 0]
   let diag sqrt (world-width ^ 2 + world-height ^ 2)
-  report (mean map [sum map [[transportation-link-length] of ?] ?] (utils:table:table-values global:shortest-paths)) / diag
+  report (mean map [sum map [[transportation-link:length] of ?] ?] (utils:table:table-values global:shortest-paths)) / diag
 end
 
 ;;
 ;  bw centrality, normalized by number of paths considered
 to-report network-indicators:mean-bw-centrality
   let n count transportation-nodes if n = 0 [report 0]
-  report (mean [bw-centrality] of transportation-links) * 2 / (n * (n - 1))
+  report (mean [transportation-link:bw-centrality] of transportation-links) * 2 / (n * (n - 1))
 end
 
 ;;
 ; hierarchy betwenness centrality
 to-report network-indicators:alpha-bw-centrality
-  report first indicators:rank-size-hierarchy ([bw-centrality] of transportation-links)
+  report first indicators:rank-size-hierarchy ([transportation-link:bw-centrality] of transportation-links)
 end
 
 ;;
 ; average closeness centrality
 to-report network-indicators:mean-closeness-centrality
   let n count transportation-nodes if n = 0 [report 0]
-  report (mean [transportation-node-closeness-centrality] of transportation-nodes) / n
+  report (mean [transportation-node:closeness-centrality] of transportation-nodes) / n
 end
 
 
 ;;
 ; hierarchy closeness
 to-report network-indicators:alpha-closeness-centrality
-  report first indicators:rank-size-hierarchy ([transportation-node-closeness-centrality] of transportation-nodes)
+  report first indicators:rank-size-hierarchy ([transportation-node:closeness-centrality] of transportation-nodes)
 end
 
 
@@ -68,3 +68,13 @@ to-report network-indicators:total-nw-length
   report sum [link-length] of transportation-links
 end
 
+
+
+;;
+; nw length normalized by length of complete network between mayors
+;   (indicator of relative cost)
+to-report network-indicators:relative-nw-length
+  if count transportation-nodes = 0 [report 0]
+  let norm sum [sum map [distance ?] (to-list other (mayors with [self != global:regional-authority]))] of (mayors with [self != global:regional-authority]) / 2
+  report sum [link-length] of transportation-links / norm
+end

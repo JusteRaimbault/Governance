@@ -46,6 +46,6 @@ to mayor:new-mayor
   let i position who sort [who] of mayors
   ; name
   set label item i global:mayors-names
-  set mayor-population item i global:mayors-populations
-  set mayor-employment item i global:mayors-employments
+  set mayor:population item i global:mayors-populations
+  set mayor:employment item i global:mayors-employments
 end
