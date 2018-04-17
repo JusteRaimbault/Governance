@@ -27,11 +27,13 @@
 
 
 
+
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Experience plan}
 
 The free Luti parameters are :
 \begin{itemize}
+	\item $\alpha$ relocation rate
 	\item $\lambda$ cost of energy
 	\item $\beta$ discrete choice parameter
 	\item $\gamma_A$ Cobb-Douglas exponent actives
@@ -40,9 +42,37 @@ The free Luti parameters are :
 \end{itemize}
 
 
+We use the following indicators :
+\begin{itemize}
+	\item Network indicators (fixed by the scenario and the replication), both contradictory objective for which the network generation heuristic finds a compromise :
+	\begin{itemize}
+		\item network relative cost : length of the network relative to the length of the full euclidian network between all centers
+		\item network performance : \cite{banos2012towards}
+	\end{itemize}
+	\item Sustainability indicators (should be the objective of PSE / OSE / calibrations). Can be contradictory but not clear :
+	\begin{itemize}
+		\item Evolution of the average accessibility between initial and final state
+		\item Average congestion, approximated by the average betweenness centrality
+	\end{itemize}
+	\item Urban form indicators : four dimensions (moran, average distance, entropy, hierarchy) \cite{2017arXiv170806743R} for population and employments
+\end{itemize}
+
 
 %%%%%%%%%%%%%%%%%%%%
 \section{Results}
+
+
+\subsection{Sensitivity to the spatial configuration}
+
+\textit{First direct sampling to check the relative sensitivity to parameters, to see if we should fix spatial configurations}
+
+Basic experience plan (\href{https://github.com/JusteRaimbault/Governance/commit/8f848a20abca8c51b927e18c1aaf1ad3434af2cb}{commit}) :
+LHS for parameters (400) x 6 scenarios x Random spatial configurations (100 repetitions)
+
+
+\paragraph{Results}
+
+
 
 
 
