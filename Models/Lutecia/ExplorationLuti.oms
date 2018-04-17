@@ -47,7 +47,7 @@ val entropyEmployments=Val[Double]
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
   "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
-  "experiments-luti:test-experiment-luti"
+  "experiments-luti:run-experiment-luti"
 )
 
 val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
@@ -69,8 +69,8 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
 
 
 
-val purpose = "TEST"
-//val purpose = "SPACEMATTERS"
+//val purpose = "TEST"
+val purpose = "SPACEMATTERS"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
@@ -79,15 +79,15 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
 
 
 
-val env = LocalEnvironment(6)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(36)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (ants on env hook indics_hook),
+   evaluation = (model on env by 20 hook indics_hook),
    seed = replication,
-   replications = 1
+   replications = 400
 )
 
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
@@ -104,7 +104,7 @@ val exploration =
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
   ((LHS (
-    1
+    400
     ,lambdaAcc in Range(0.001,0.01)
     ,networkSpeed in Range(2.5,10.0)
     ,gammaCDA in Range(0.5,1.0)
