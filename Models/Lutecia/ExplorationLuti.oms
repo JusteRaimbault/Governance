@@ -18,8 +18,6 @@ val gammaCDE=Val[Double]
 val betaDC=Val[Double]
 val relocationRate=Val[Double]
 
-val scenario=Val[Int]
-
 val id = Val[Int]
 val replication = Val[Int]
 
@@ -27,7 +25,7 @@ val replication = Val[Int]
 
 // sustainibility
 val relativeAccessibility = Val[Double]
-val nwBetweenness = Val[Double]
+val nwCongestion = Val[Double]
 
 // network shape
 val nwRelativeLength = Val[Double]
@@ -43,6 +41,11 @@ val meanDistanceEmployments=Val[Double]
 val slopeEmployments=Val[Double]
 val entropyEmployments=Val[Double]
 
+// scenarios variables
+val scenario=Val[Int]
+val nwType=Val[String]
+val centerNumber=Val[Int]
+val gammaSlimeMould=Val[Double]
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
@@ -54,7 +57,7 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
   netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
-  netLogoOutputs += ("network-indicators:mean-bw-centrality",nwBetweenness),
+  netLogoOutputs += ("indicators:mean-congestion",nwCongestion),
   netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
   netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
   netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
@@ -64,13 +67,19 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
   netLogoOutputs += ("indicators:morphology:moran-employments",moranEmployments),
   netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmployments),
   netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmployments),
-  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments)
+  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments),
+  netLogoOutputs += ("global:initial-nw-random-type",nwType),
+  netLogoOutputs += ("global:#-initial-territories",centerNumber),
+  netLogoOutputs += ("global:network-biological-gamma",gammaSlimeMould)
 )
 
+
+/*
 val dummy = ScalaTask("println(id+\" - \"+replication+\" - \"+scenario)") set (
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id)
 )
+*/
 
 val purpose = "TEST_SAMPLING"
 //val purpose = "SPACEMATTERS"
@@ -82,16 +91,16 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
 
 
 
-val env = LocalEnvironment(60)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(60)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   //evaluation = (model on env by 20 hook indics_hook),
-   evaluation = (dummy on env hook indics_hook),
+   evaluation = (model on env by 20 hook indics_hook),
+   //evaluation = (dummy on env hook indics_hook),
    seed = replication,
-   replications = 400
+   replications = 200
 )
 
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
@@ -107,15 +116,15 @@ val exploration =
     (relocationRate in (0.1 to 1.0 by 0.1))x
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
-  ((LHS (
-    400
-    ,lambdaAcc in Range(0.001,0.01)
-    ,networkSpeed in Range(2.5,10.0)
-    ,gammaCDA in Range(0.5,1.0)
-    ,gammaCDE in Range(0.5,1.0)
-    ,betaDC in Range(0.5,2.0)
-    ,relocationRate in Range(0.0,1.0)
-  ) x (scenario in (0 to 5 by 1)) ) withIndex id)
+   ((LHS (
+      500
+      //,lambdaAcc in Range(0.001,0.01)
+      //,networkSpeed in Range(2.5,10.0)
+      ,gammaCDA in Range(0.5,1.0)
+      ,gammaCDE in Range(0.5,1.0)
+      ,betaDC in Range(0.5,2.0)
+      ,relocationRate in Range(0.0,1.0)
+    ) withIndex id) x (scenario in (0 to 7 by 1)) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) )
   )
 
 

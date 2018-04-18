@@ -250,6 +250,9 @@ to network:cache-nw-measures
   ]
   
   
+  ; compute congestions
+  transportation:affectation true
+  
   
 end
 

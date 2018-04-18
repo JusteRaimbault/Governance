@@ -9,7 +9,7 @@
 ;  Given euclidian and network distance matrices, computes effective distance matrix and corresponding effective paths
 ;
 ;  uses the fact that network distance matrix is sparse ? NO, uses heuristic to consider best network access as closest (not exact)
-to update-effective-matrices
+to distances:update-effective-matrices
   
   verbose "Updating effective distances"
   

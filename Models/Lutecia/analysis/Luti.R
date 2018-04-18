@@ -67,6 +67,10 @@ for(indic in c("relativeAccessibility","nwBetweenness","nwRelativeLength","nwRel
   show(anova(m))
 }
 
+#  -> relativeAccessibility is the relevant variable with comparable variance for params / scenario / repetitions 
+
+ss = anova(m2)$`Sum Sq`;names(ss)<-rownames(anova(m2))
+100*ss / sum(ss)
 
 
 

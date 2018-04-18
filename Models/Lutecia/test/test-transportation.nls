@@ -15,7 +15,7 @@
 ;
 to check-flows [q]
   setup:setup
-  transportation
+  transportation:transportation
   
   let ma max map [max ?] matrix:to-row-list global:flow-matrix
   let quant quantile (concatenate matrix:to-row-list global:flow-matrix) q

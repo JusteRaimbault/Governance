@@ -34,18 +34,17 @@ to setup:setup
   ; setup externalities
   setup:setup-externalities
   
-  ; setup transportation
-  setup:setup-transportation
-  
   ; cached distances
   setup:setup-cached-distances
   
   ; setup initial network
   setup:setup-initial-network
   
-  
   ; initial accessibilities
   setup:setup-patch-variables
+  
+  ; setup transportation
+  setup:setup-transportation
   
   ; setup indicators
   setup:setup-indicators
@@ -392,7 +391,7 @@ to setup:setup-initial-network
          ;create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
    
          ;ask ghost-transportation-nodes [ask one-of (other ghost-transportation-nodes) with-min [distance myself] [if not link-neighbor? myself [create-ghost-transportation-link-with myself]] ]
-         ask one-of ghost-transportation-nodes with-min [min map [distance ?] to-list (other ghost-transportation-nodes)] [create-ghost-transportation-link-with one-of ((other ghost-transportation-nodes) with-min [distance myself])]
+         ;ask one-of ghost-transportation-nodes with-min [min map [distance ?] to-list (other ghost-transportation-nodes)] [create-ghost-transportation-link-with one-of ((other ghost-transportation-nodes) with-min [distance myself])]
          
          ; connexify the nodes
          ;utils:network:connexify-network ghost-transportation-nodes ghost-transportation-links
@@ -406,6 +405,10 @@ to setup:setup-initial-network
           network-biological:grow-network
       ]
       
+      if global:initial-nw-random-type = "full" [
+         ask mayors with [self != global:regional-authority] [hatch-ghost-transportation-nodes 1]
+         ask ghost-transportation-nodes [ask ((other ghost-transportation-nodes) with [not link-neighbor? myself]) [create-ghost-transportation-link-with myself]]
+      ]
       
       
       ;show network:ghost-network-as-infra-list
@@ -462,6 +465,9 @@ to setup:setup-cached-distances
   
   output-print "Caching distances"
   
+  ; setup congestion (from transportation setup - split in two)
+  set global:patches-congestion rep 1 (count patches)
+  
   set global:#-patches count patches
   set global:dmax sqrt ((world-width ^ 2) + (world-height ^ 2))  
   
@@ -486,8 +492,8 @@ to setup:setup-cached-distances
   ; setup nw matrices, needed in particular if initial nw
   setup:setup-nw-matrices
   
-  ; use generic function
-  update-effective-matrices
+  ; update effective distances with generic function
+  distances:update-effective-matrices
  
   
 end
@@ -532,7 +538,8 @@ end
 ;;
 ; transportation
 to setup:setup-transportation
-  set global:patches-congestion rep 1 (count patches)
+  ;set global:patches-congestion rep 1 (count patches) ; -> done BEFORE network construction
+  transportation:compute-flows
 end
 
 

@@ -538,7 +538,6 @@ biological-network-links-own [
   ;; length
   biological-network-link:bio-link-length
 ]
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 572
@@ -606,8 +605,8 @@ CHOOSER
 705
 global:patches-display
 global:patches-display
-"governance" "actives" "employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
-2
+"governance" "patch:actives" "patch:employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
+1
 
 TEXTBOX
 11
@@ -1375,7 +1374,7 @@ CHOOSER
 118
 global:initial-nw-random-type
 global:initial-nw-random-type
-"tree-skeleton" "slime-mould"
+"tree-skeleton" "slime-mould" "full"
 1
 
 MONITOR

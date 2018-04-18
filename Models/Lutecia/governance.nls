@@ -137,7 +137,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   verbose (word "comparing " length choices " infras")
   
   recall-nw-config old-nw-config
-  update-effective-matrices
+  distances:update-effective-matrices
   
   ; old mean accessibility
   compute-patches-accessibilities
@@ -155,7 +155,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
     verbose (word " ; " potential-infra)
     if potential-infra != nobody [
       distances:update-network potential-infra
-      update-effective-matrices
+      distances:update-effective-matrices
       ; recompute new accessibilities
       compute-patches-accessibilities
       let new-acc accessibilities:mean-accessibility patchset
@@ -328,7 +328,7 @@ end
 to governance:construct-infrastructure [infras old-config]
   
   recall-nw-config old-config
-  update-effective-matrices
+  distances:update-effective-matrices
   
   
   
@@ -347,7 +347,7 @@ to governance:construct-infrastructure [infras old-config]
         distances:update-network constructed-link
       ]
     
-      update-effective-matrices
+      distances:update-effective-matrices
     
     ]
   ]

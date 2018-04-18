@@ -33,7 +33,7 @@ to display:color-patches
      color-gradient-patches "(a-to-e-accessibility + e-to-a-accessibility)" "green" "linear"
   ]
   ; cor variables
-  if member? global:patches-display ["actives" "employments" "a-utility" "e-utility" "a-to-e-accessibility" "e-to-a-accessibility"] [
+  if member? global:patches-display ["patch:actives" "patch:employments" "a-utility" "e-utility" "a-to-e-accessibility" "e-to-a-accessibility"] [
      ;color-gradient-patches patches-display "green" "linear"
      run (word "set mi min [" global:patches-display "] of patches set ma max [" global:patches-display "] of patches let me (mi + ma)/ 2 ask patches [ ifelse " global:patches-display " < me [set pcolor gradient:scale [[0 0 0] [0 255 0]] " global:patches-display " mi ma][set pcolor gradient:scale [[0 255 0][255 0 0]] " global:patches-display " mi ma]]")
   ]

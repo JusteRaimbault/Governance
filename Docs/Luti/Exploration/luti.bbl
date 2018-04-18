@@ -7,9 +7,35 @@ Banos, A. and Genre-Grandpierre, C. (2012).
 \newblock In {\em Agent-based models of geographical systems}, pages 627--641.
   Springer.
 
+\bibitem[Le~N{\'e}chet and Raimbault, 2015]{lenechet:halshs-01272236}
+Le~N{\'e}chet, F. and Raimbault, J. (2015).
+\newblock {Modeling the emergence of metropolitan transport autorithy in a
+  polycentric urban region}.
+\newblock In {\em {European Colloqueum on Theoretical and Quantitative
+  Geography}}, Bari, Italy.
+
 \bibitem[{Raimbault}, 2017]{2017arXiv170806743R}
 {Raimbault}, J. (2017).
 \newblock {Calibration of a Density-based Model of Urban Morphogenesis}.
 \newblock {\em ArXiv e-prints}.
+
+\bibitem[Raimbault, 2017]{raimbault:halshs-01584894}
+Raimbault, J. (2017).
+\newblock {Invisible Bridges ? Scientific landscapes around similar objects
+  studied from Economics and Geography perspectives}.
+\newblock In {\em {European Colloquium in Theoretical and Quantitative
+  Geography 2017}}, York, United Kingdom.
+
+\bibitem[Raimbault, 2018]{raimbault2018phdthesis}
+Raimbault, J. (2018).
+\newblock {\em Characterizing and modeling the co-evolution of transportation
+  networks and territories}.
+\newblock PhD thesis, Universit{\'e} Paris 7.
+
+\bibitem[Raimbault and Gonzalez, 2015]{raimbault2015labex}
+Raimbault, J. and Gonzalez, J. (May 2015).
+\newblock Application de la morphog{\'e}n{\`e}se de r{\'e}seaux biologiques
+  {\`a} la conception optimale d'infrastructures de transport.
+\newblock In {\em Rencontres du Labex Dynamites}.
 
 \end{thebibliography}

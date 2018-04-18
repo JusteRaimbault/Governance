@@ -19,17 +19,30 @@
 %%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-
+\begin{itemize}
+	\item Luti model are a very diffuse class of models, dealing mainly with interactions between a land-use system and a transport system, at mesoscopic spatial scales (metropolitan areas) and medium time scales (decades) \cite{raimbault2018phdthesis}. They are developed and used by various scientific fields, from urban economics, network economics to planning and transportation \cite{raimbault:halshs-01584894}.
+	\item Despite this sparsity, properties such as the spatial structure of population or the transportation network, or output indicators, can be put in correspondence between most Luti models.
+	\item We aim here to illustrate generic methods that could be applied to the exploration of Luti models. 
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%
 \section{Model}
 
+We use a toy model to illustrate the application of exploration methods. The model Lutecia \cite{lenechet:halshs-01272236} is an extended LUTI with an evolving network following endogenous rules for transportation governance. Blocking the network evolution yields a simplified LUTI (Lowry-type).
+
+\subsection{Model description}
+
+We describe the main features of the simplified LUTI. The metropolitan region is divided into cells, which are characterized by their number of actives $A_i$ and number of employments $E_i$. The total number of actives and employments are fixed during the time period (no growth). At each time step, a proportion $\alpha$ of both relocate following a discrete choice model with parameter $\beta$, following a utility expressed as $X_i^{\gamma_A} \cdot \left(\frac{1}{A_i E_i}\right)^{1 - \gamma_A}$ for actives and $X_i^{\gamma_E}$ for employments, where $\gamma_A,\gamma_E$ are Cobb-Douglas parameters and $X_i$ is the generalized accessibility, computed with an exponential decay of parameter $\lambda$ and with the network distance within a network of uniform speed $v_0$. The evolution is stopped at a fixed final time $t_f$. See \cite{raimbault2018phdthesis} for a more thorough description of the full model.
+
+The model is implemented in NetLogo (\href{https://github.com/JusteRaimbault/Governance}{git repository}) and explored with OpenMOLE.
 
 
 
 %%%%%%%%%%%%%%%%%%%%
-\subsection{Experience plan}
+\subsection{Model evaluation}
+
+\subsubsection{Parameters}
 
 The free Luti parameters are :
 \begin{itemize}
@@ -42,7 +55,9 @@ The free Luti parameters are :
 \end{itemize}
 
 
-We use the following indicators :
+\subsubsection{Indicators}
+
+We use the following output indicators :
 \begin{itemize}
 	\item Network indicators (fixed by the scenario and the replication), both contradictory objective for which the network generation heuristic finds a compromise :
 	\begin{itemize}
@@ -52,17 +67,42 @@ We use the following indicators :
 	\item Sustainability indicators (should be the objective of PSE / OSE / calibrations). Can be contradictory but not clear :
 	\begin{itemize}
 		\item Evolution of the average accessibility between initial and final state
-		\item Average congestion, approximated by the average betweenness centrality
+		\item Average congestion, approximated by the average weighted betweenness centrality (using stationary commuting flows between actives and employments)
 	\end{itemize}
 	\item Urban form indicators : four dimensions (moran, average distance, entropy, hierarchy) \cite{2017arXiv170806743R} for population and employments
 \end{itemize}
 
 
+\subsubsection{Setup scenarios}
+
+To be relevant with classical application of LUTI models, we generate typical scenarios for the initial configuration of the model. The initial setup for actives and employments is done in a synthetic way to mimic a polycentric metropolitan are, i.e. with exponential mixtures spatial distributions with common centers, and a slightly higher concentration for employments. We play on the number of centers $N_c$.
+
+Furthermore, a network must be generated, which will be interpreted as the application of the Luti to the design of a new infrastructure. We use the following options to generate a network:
+\begin{enumerate}
+	\item Random tree-like network: each center connects with an other random center which has no links if there are some. This yield a costly and inefficient network.
+	\item Full network: all centers are directly connected. Extreme on the Pareto front: most efficient network, but costly.
+	\item Slime-mould biological network generator : applying the results of \cite{raimbault2015labex}, a network reinforcement model mimicking an organism self-organizes into Pareto-efficient networks (in the sense of cost/efficiency and cost/robustness). A single parameter $\gamma$ allows to switch between redundant but costly networks to cheaper but less robust networks.
+\end{enumerate}
+
+\textit{We do not add bord nodes and consider the transportation network within the metropolitan area only.}
+
+We currently implement 8 scenarios : (3/5 centers) x (tree/full/cheap slime-mould/robust slime-mould).
+
+
+\subsubsection{Stylized facts}
+
+Question to answer through the study of sustainability indicators :
+\begin{itemize}
+  \item compromise between congestion and accessibility across scenarios/parameters ? (attraction-repulsion urban narrative)
+  \item Parameters/scenarios to maximize accessibility ?
+  \item \textit{less interesting regarding luti : classification of output urban forms ?}
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%
 \section{Results}
 
 
-\subsection{Sensitivity to the spatial configuration}
+\subsection{Sensitivity to indicators and convergence}
 
 \textit{First direct sampling to check the relative sensitivity to parameters, to see if we should fix spatial configurations}
 
@@ -70,11 +110,56 @@ Basic experience plan (\href{https://github.com/JusteRaimbault/Governance/commit
 LHS for parameters (400) x 6 scenarios x Random spatial configurations (100 repetitions)
 
 
-\paragraph{Results}
+\paragraph{Results: anova}
+
+We fit indicators using linear models as a function of parameters and scenario number. An Analysis of Variance shows a comparable sensitivity to scenarios, parameters, and repetitions. Network indicators are as expected mostly sensitive to scenarios.
+
+% anova results
+%            betaDC            gammaCDA            gammaCDE           lambdaAcc      relocationRate         
+%          0.3450713           0.5668607           0.4788092          44.2444789           2.2583533          
+%networkSpeed     as.factor(scenario)           Residuals 
+%  23.2901668         7.2698536              21.5464062 
+
+\begin{table}
+\caption{ANOVA of the direct sampling experiment}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+Parameter & $\beta$ & $\gamma_A$ & $\gamma_E$ & $\lambda$ & $\alpha$ & $v_0$ & scenario & residuals \\
+\% variance & 0.35 & 0.57 & 0.48 & 44.24 & 2.26 & 23.29 & 7.27 & 21.55 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Since the most influent parameters for relative accessibility are the cost of energy $\lambda$ and the network speed $v_0$, and since these are relatively exogenous factors (compared to the governable parameters within the region e.g.), we fix them in following experiments to standard values of $\lambda = 0.005$ and $v_0 = 5$.
+
+
+%\paragraph{Results: repetitions}
+
+%To have a rough ideas of the number of repetitions needed to reach a given confidence interval on averages
 
 
 
+\paragraph{Behavior in comparison to reference}
 
+\textit{TODO : compare tree and full network scenarios to the slime mould}
+
+
+\subsection{PSE}
+
+\textit{PSE to launch separately on sustainability/urban form - decide if across scenarios or if scenario as discrete genome}
+
+
+\subsection{OSE}
+
+\textit{experiment Romain}
+
+
+
+\subsection{Space matters}
+
+\textit{Experiments testing various urban structure - similar to scenarios in the first sensitivity experiment but broader.}
 
 
 

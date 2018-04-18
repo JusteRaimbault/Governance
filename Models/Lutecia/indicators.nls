@@ -153,11 +153,22 @@ to-report indicators:mean-effective-distance
   report mean map mean matrix:to-row-list global:effective-distance-matrix
 end
 
+;;
 ; mean congestion in network
+;  TODO : link congestion is not affected ; use patch congestion instead, for network intersections
+;
+;  -- the current indicators must be called after transportation affectation -- (affectation at each step is not yet supported as we do not take congestion into account in effective distances)
+;to-report indicators:mean-congestion
+;  if count transportation-links > 0 [report mean [transportation-link:congestion] of transportation-links]
+;  report 1
+;end
 to-report indicators:mean-congestion
-  if count transportation-links > 0 [report mean [transportation-link:congestion] of transportation-links]
-  report 1
+  let nonzerocong remove 0 (remove-duplicates global:patches-congestion)
+  ifelse length nonzerocong = 0 [report 0][
+     let norm sum map sum matrix:to-row-list global:flow-matrix report sum nonzerocong / (length nonzerocong * norm)
+  ]
 end
+
 
 ;;
 ; congestion on patches
