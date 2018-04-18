@@ -67,10 +67,13 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
   netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments)
 )
 
+val dummy = ScalaTask("println(id+\" - \"+replication+\" - \"+scenario)") set (
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id)
+)
 
-
-//val purpose = "TEST"
-val purpose = "SPACEMATTERS"
+val purpose = "TEST_SAMPLING"
+//val purpose = "SPACEMATTERS"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
@@ -79,13 +82,14 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
 
 
 
-//val env = LocalEnvironment(36)
-val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(60)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (model on env by 20 hook indics_hook),
+   //evaluation = (model on env by 20 hook indics_hook),
+   evaluation = (dummy on env hook indics_hook),
    seed = replication,
    replications = 400
 )
