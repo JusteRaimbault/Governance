@@ -32,7 +32,7 @@ to explore-network-shapes [#-repets dir]
   
   ; vis mean nw and mean acc and export csv
   setup:setup
-  let nwfreq rep 0 global:#-patches
+  let nwfreq list:rep 0 global:#-patches
   foreach nwpos [
      foreach ? [
        set nwfreq replace-item ? nwfreq ((item ? nwfreq) + 1)
@@ -44,7 +44,7 @@ to explore-network-shapes [#-repets dir]
   export-view (word resdir "/_NW_FREQ.png")
   
   setup:setup
-  let macc rep 0 global:#-patches
+  let macc list:rep 0 global:#-patches
   foreach meanacc [
      foreach ? [
        set macc replace-item (first ?) macc ((item (first ?) macc) + (last ?))

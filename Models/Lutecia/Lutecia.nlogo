@@ -85,6 +85,10 @@ __includes [
   ; network
   "network-indicators.nls"
 
+  ; stylized facts
+  "indicators-stylized.nls"
+
+
   ;;;;;;;;;;
   ;; visual exploration
   ;;;;;;;;;;
@@ -383,6 +387,11 @@ patches-own [
   ; number of jobs on the patch
   patch:employments
 
+  ; variation of actives
+  patch:delta-actives
+
+  ; variation of employments
+  patch:delta-employments
 
 
   ; number of the patch (used as index in distance matrices)
@@ -395,6 +404,8 @@ patches-own [
   ; do not need mobile agents as deterministic evolution, considering at this time scale that random effect is averaged
   ;  on the contrary to transportation infrastructure evolution, that evolves at a greater scale.
   ;  -> patch variables and not agents
+
+
 
 
 
@@ -755,10 +766,10 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
-1141
-363
-1598
-657
+1071
+567
+1528
+861
 10
 
 TEXTBOX
@@ -952,7 +963,7 @@ global:total-time-steps
 global:total-time-steps
 0
 10000
-20
+228
 1
 1
 NIL
@@ -1266,7 +1277,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.5
+0.1
 0.01
 1
 NIL
@@ -1378,10 +1389,10 @@ global:initial-nw-random-type
 1
 
 MONITOR
-1146
-664
-1213
-709
+1542
+583
+1609
+628
 bio ticks
 global:bio-ticks
 17
@@ -1402,6 +1413,46 @@ global:network-biological-gamma
 1
 NIL
 HORIZONTAL
+
+PLOT
+1132
+342
+1354
+492
+cor-access-dev
+NIL
+NIL
+0.0
+1.0
+-0.1
+0.1
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-dev"
+"pen-1" 1.0 0 -2674135 true "" "plot 0"
+"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-dev-mw"
+
+PLOT
+1357
+341
+1569
+491
+corr-access-employments
+NIL
+NIL
+0.0
+1.0
+-0.1
+0.1
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-employments"
+"pen-1" 1.0 0 -2674135 true "" "plot 0"
+"pen-2" 1.0 0 -13791810 true "" "plot indicators:causal-moving-average \"indicators-stylized:cor-access-employments\" 15"
 
 @#$#@#$#@
 ## Context

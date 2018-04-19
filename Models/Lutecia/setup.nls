@@ -119,7 +119,7 @@ to setup:setup-globals
     "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments"
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "global:rel-diff-actives" "global:rel-diff-employments" "indicators:mean-accessibility-balance"
+    "global:rel-diff-actives" "global:rel-diff-employments" "indicators:mean-accessibility-balance" "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments"
     )
   
   
@@ -241,8 +241,8 @@ to setup:setup-initial-distributions
   setup:setup-employment-distribution
   
   ; setup global lists
-  set global:patches-employments-list rep 0 count patches
-  set global:patches-actives-list rep 0 count patches
+  set global:patches-employments-list list:rep 0 count patches
+  set global:patches-actives-list list:rep 0 count patches
   ask patches [
     set global:patches-employments-list replace-item patch:number global:patches-employments-list patch:employments
     set global:patches-actives-list replace-item patch:number global:patches-actives-list patch:actives
@@ -329,7 +329,7 @@ to setup:setup-externalities
   let ext-patch nobody
   if global:setup-type = "random" [
     ; with 2 mayors : equidistance
-    let m to-list (mayors with [self != global:regional-authority])
+    let m list:to-list (mayors with [self != global:regional-authority])
     ifelse length m = 2 [
       set ext-patch one-of patches with [abs (distance item 0 m - distance item 1 m) < sqrt 2 and pxcor < max-pxcor and pxcor > min-pxcor and pycor < max-pycor and pycor > min-pycor ]
     ][ set ext-patch one-of patches]
@@ -466,7 +466,7 @@ to setup:setup-cached-distances
   output-print "Caching distances"
   
   ; setup congestion (from transportation setup - split in two)
-  set global:patches-congestion rep 1 (count patches)
+  set global:patches-congestion list:rep 1 (count patches)
   
   set global:#-patches count patches
   set global:dmax sqrt ((world-width ^ 2) + (world-height ^ 2))  
@@ -602,7 +602,7 @@ to setup:setup-mayor-characteristics
     
   ]
   
-  if global:setup-type = "random" [set global:mayors-populations rep 0 global:#-initial-territories set global:mayors-employments rep 0 global:#-initial-territories set global:mayors-names rep "" global:#-initial-territories]
+  if global:setup-type = "random" [set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories]
   
   
   ; corresponding number pf territories

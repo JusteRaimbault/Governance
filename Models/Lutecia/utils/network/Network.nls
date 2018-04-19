@@ -15,7 +15,7 @@ to utils:network:planarize-network [vertices-agentset edges-agentset]
   ;; gore way ?
   let links-breed agentset-uniform-singular-breed edges-agentset
   
-  let edge-list to-list edges-agentset
+  let edge-list list:to-list edges-agentset
   let current-inter get-first-inter edge-list
   while [length current-inter > 0][
       let x first first current-inter let y last first current-inter let coords list x y let l1 item 1 current-inter let l2 last current-inter 
@@ -58,7 +58,7 @@ to utils:network:planarize-network [vertices-agentset edges-agentset]
           ask t22 [run (word "create-" links-breed "-with myself")]
         ]
         ;remove and kill
-        set edge-list concatenate (list edge-list (to-list [my-links] of new-inter))
+        set edge-list list:concatenate (list edge-list (list:to-list [my-links] of new-inter))
         set edge-list remove l2 remove l1 edge-list
         ask l1 [die] ask l2 [die]
         

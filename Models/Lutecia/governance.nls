@@ -147,7 +147,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   
   ;verbose (word "Mean-travel-distance : " indicators:mean-travel-distance)
   
-  let best-choice [] let delta-acc 0 let deltas rep 0 length olds
+  let best-choice [] let delta-acc 0 let deltas list:rep 0 length olds
   foreach choices [
     recall-nw-config old-nw-config
     verbose (word "Infra : " ? )

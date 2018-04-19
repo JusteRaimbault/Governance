@@ -313,7 +313,7 @@ to network-biological:simplify-network
          ;let ends [] let l 0 let d 0 foreach to-list my-biological-network-links [set ends lput [other-end] of ? ends ask ? [set l l + bio-link-length set d d + diameter die]]
          ;ask first ends [create-biological-network-link-with last ends [set bio-link-length l set diameter d / 2]] die
        ;]
-       let l to-list my-biological-network-links
+       let l list:to-list my-biological-network-links
        let e1 [other-end] of first l let e2 [other-end] of last l let d1 [biological-network-link:diameter] of first l let d2 [biological-network-link:diameter] of last l
        ask e1 [create-biological-network-link-with e2 [set biological-network-link:diameter (min list d1 d2)]]
        ask my-biological-network-links [die] die
