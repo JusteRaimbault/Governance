@@ -60,6 +60,14 @@ to-report indicators:ts-indicator [indic]
 end
 
 
+to-report indicators:causal-moving-average [indic window]
+  if global:history-indicators = 0 [report 0]
+  let full-ts table:get global:history-indicators indic
+  if length full-ts = 0 [report 0]
+  if length full-ts < window [report mean full-ts]
+  report mean sublist full-ts (length full-ts - window) (length full-ts)
+end
+
 
 
 ;;
@@ -67,7 +75,7 @@ end
 to-report indicators:rank-size-hierarchy [x]
   if length x = 0 [report [0 0]]
   if max x = 0 and min x = 0 [report [0 0]]
-  let sol matrix:regress matrix:from-column-list (list (map [log ? 10] sort-by [?1 >= ?2] x) (map [log ? 10] seq 1 length x 1))
+  let sol matrix:regress matrix:from-column-list (list (map [log ? 10] sort-by [?1 >= ?2] x) (map [log ? 10] list:seq 1 length x 1))
   report (list (last first sol) (first last sol))
 end
 

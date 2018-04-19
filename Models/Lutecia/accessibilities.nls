@@ -24,14 +24,14 @@ to compute-patches-accessibilities
   ask patches [
      set patch:prev-accessibility patch:a-to-e-accessibility + patch:e-to-a-accessibility
      ; only one csp for now
-     set patch:a-to-e-accessibility patch:actives * scalar-product (global:patches-employments-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
-     set patch:e-to-a-accessibility patch:employments * scalar-product (global:patches-actives-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:a-to-e-accessibility patch:actives * list:scalar-product (global:patches-employments-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:e-to-a-accessibility patch:employments * list:scalar-product (global:patches-actives-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
      
      set patch:current-accessibility patch:a-to-e-accessibility + patch:e-to-a-accessibility
      
      ; update also travel distances
-     set patch:a-to-e-distance patch:actives * scalar-product (global:patches-employments-list) (matrix:get-row global:effective-distance-matrix patch:number)
-     set patch:e-to-a-distance patch:employments * scalar-product (global:patches-actives-list) (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:a-to-e-distance patch:actives * list:scalar-product (global:patches-employments-list) (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:e-to-a-distance patch:employments * list:scalar-product (global:patches-actives-list) (matrix:get-row global:effective-distance-matrix patch:number)
   ]
 end
 

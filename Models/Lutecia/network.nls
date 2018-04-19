@@ -183,7 +183,7 @@ end
 ;    with memorized nw-age in table patch -> age
 to network:update-network-age [old-nw-age]
   ask transportation-links [
-    let new-age 0 let ages rep 0 (ticks + 1); ages memorized in a list
+    let new-age 0 let ages list:rep 0 (ticks + 1); ages memorized in a list
     foreach link:footprint [
       ask ? [
          ifelse table:has-key? old-nw-age patch:number [
@@ -195,7 +195,7 @@ to network:update-network-age [old-nw-age]
       ]
     ]
     ; age is element with max value
-    set transportation-link:age max-index ages
+    set transportation-link:age list:max-index ages
   ]
   
   display:update-nw-display
@@ -215,7 +215,7 @@ to network:cache-nw-measures
   nw:set-context transportation-nodes transportation-links
   ask transportation-links [set transportation-link:length link-length set transportation-link:bw-centrality 0]
   set global:shortest-paths table:make set global:nw-relative-speeds table:make set global:nw-distances table:make
-  let clist to-list transportation-nodes let i 0 let j 1
+  let clist list:to-list transportation-nodes let i 0 let j 1
   repeat (length clist - 1) [
     let c1 item i clist
     set j i + 1
@@ -227,7 +227,7 @@ to network:cache-nw-measures
       ; if the network is not connected, some kind of infinite value
       if l = 0 [set l 100 * sqrt (world-width ^ 2 + world-height ^ 2)]
       ; update shortest path table
-      table:put global:shortest-paths (list [who] of c1 [who] of c2) path table:put global:shortest-paths (list [who] of c2 [who] of c1) (rev path)
+      table:put global:shortest-paths (list [who] of c1 [who] of c2) path table:put global:shortest-paths (list [who] of c2 [who] of c1) (list:rev path)
       ; update nw distance table
       table:put global:nw-distances (list [who] of c1 [who] of c2) l table:put global:nw-distances (list [who] of c2 [who] of c1) l
       ; update relative speed table

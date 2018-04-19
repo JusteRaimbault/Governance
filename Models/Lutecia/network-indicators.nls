@@ -75,6 +75,6 @@ end
 ;   (indicator of relative cost)
 to-report network-indicators:relative-nw-length
   if count transportation-nodes = 0 [report 0]
-  let norm sum [sum map [distance ?] (to-list other (mayors with [self != global:regional-authority]))] of (mayors with [self != global:regional-authority]) / 2
+  let norm sum [sum map [distance ?] (list:to-list other (mayors with [self != global:regional-authority]))] of (mayors with [self != global:regional-authority]) / 2
   report sum [link-length] of transportation-links / norm
 end

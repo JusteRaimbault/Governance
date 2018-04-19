@@ -98,15 +98,44 @@ Question to answer through the study of sustainability indicators :
   \item \textit{less interesting regarding luti : classification of output urban forms ?}
 \end{itemize}
 
+
+Luti stylized facts to be targeted by the model : from \cite{wegener2004land}, some qualitative empirical behavior can be studied in the model.
+
+%  - impact of LU on Transport :
+%  o (no mode)    - correlation residential density / transportation mode 
+%  o : flows by patch ? (pb : unique mode)    - employment density => more public transport
+%  o (no design)    - neighborhood design (e.g. traditional vs car-oriented) influences trip length and modal shares
+%  o : flows = f(d) ? no mode    - distance to public transport and employment centers => model shares
+%  o (no city size)    - larger cities have highest public transport model share and shorter trips
+%  - impact of Transport on LU :
+%  x : delta pop = f(access)    - more accessible areas are developed faster
+%  x : idem pop    - employments locate in highly accessible areas
+%  x : access - sprawl - trip length    - good accessibility => suburban dispersal => longer trips
+%  - transport :
+%  o (no mode)    - travel cost / travel time => modal choice
+%  x : effective distance - trip length    - travel time improvement => more and longer trips (Zahavi law)
+
+\begin{itemize}
+	\item ``\textit{more accessible areas are developed faster}'': $\rho\left[X_i,\Delta P_i\right] > 0$
+	\item ``\textit{employments locate in highly accessible areas}'': $\rho\left[X_i,E_i\right] > 0$
+	\item ``\textit{good access $\implies$ suburban dispersal $\implies$ longer trips}'': $\rho\left[X_i,t_i\right] > 0$ at the scale of a run, $\rho\left[\tilde{X},\alpha_A\right] > 0$ on repetitions
+	\item ``\textit{travel time improvement $\implies$ more and longer trips}'': $\rho\left[t_i,d_i\right] < 0$ where $d_i = \sum_j \frac{\phi_{ij}}{\sum_{kl} \phi_{kl}} \cdot d_{ij}$ is the average travel distance from patch i.
+\end{itemize}
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%
 \section{Results}
 
 
 \subsection{Sensitivity to indicators and convergence}
 
+\subsubsection{Sensitivity experiment}
+
 \textit{First direct sampling to check the relative sensitivity to parameters, to see if we should fix spatial configurations}
 
-Basic experience plan (\href{https://github.com/JusteRaimbault/Governance/commit/8f848a20abca8c51b927e18c1aaf1ad3434af2cb}{commit}) :
+Basic experience plan (\href{https://github.com/JusteRaimbault/Governance/commit/8f848a20abca8c51b927e18c1aaf1ad3434af2cb}{commit 8f848a}) :
 LHS for parameters (400) x 6 scenarios x Random spatial configurations (100 repetitions)
 
 
@@ -115,10 +144,10 @@ LHS for parameters (400) x 6 scenarios x Random spatial configurations (100 repe
 We fit indicators using linear models as a function of parameters and scenario number. An Analysis of Variance shows a comparable sensitivity to scenarios, parameters, and repetitions. Network indicators are as expected mostly sensitive to scenarios.
 
 % anova results
-%            betaDC            gammaCDA            gammaCDE           lambdaAcc      relocationRate         
-%          0.3450713           0.5668607           0.4788092          44.2444789           2.2583533          
-%networkSpeed     as.factor(scenario)           Residuals 
-%  23.2901668         7.2698536              21.5464062 
+%             betaDC            gammaCDA            gammaCDE           lambdaAcc      relocationRate        networkSpeed 
+%          0.1055526           0.6849464           0.4647941          45.7127247           2.2179705          23.1167898 
+%as.factor(scenario)           Residuals 
+%          7.2665224          20.4306995 
 
 \begin{table}
 \caption{ANOVA of the direct sampling experiment}
@@ -126,7 +155,7 @@ We fit indicators using linear models as a function of parameters and scenario n
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline
 Parameter & $\beta$ & $\gamma_A$ & $\gamma_E$ & $\lambda$ & $\alpha$ & $v_0$ & scenario & residuals \\
-\% variance & 0.35 & 0.57 & 0.48 & 44.24 & 2.26 & 23.29 & 7.27 & 21.55 \\
+\% variance & 0.11 & 0.68 & 0.46 & 45.71 & 2.22 & 23.12 & 7.27 & 20.43 \\
 \hline
 \end{tabular}
 \end{center}
@@ -135,9 +164,29 @@ Parameter & $\beta$ & $\gamma_A$ & $\gamma_E$ & $\lambda$ & $\alpha$ & $v_0$ & s
 Since the most influent parameters for relative accessibility are the cost of energy $\lambda$ and the network speed $v_0$, and since these are relatively exogenous factors (compared to the governable parameters within the region e.g.), we fix them in following experiments to standard values of $\lambda = 0.005$ and $v_0 = 5$.
 
 
-%\paragraph{Results: repetitions}
+\paragraph{Results: repetitions}
 
-%To have a rough ideas of the number of repetitions needed to reach a given confidence interval on averages
+To have a rough ideas of the number of repetitions needed to reach a given confidence interval on averages, we consider the relative accessibility $\tilde{X}$. Distributions can roughly be approximated as Gaussians (see Fig.~\ref{fig:distrib-access}), and we can use the formula giving the size of the confidence interval around the mean as $2\sigma z_{level} / \sqrt{n}$.
+
+Looking at the distribution of $\frac{c_i + c_j}{\left|m_i - m-j\right|}$ for all $(i,j)$, where $c_i$ and $c_j$ are half-width of confidence intervals and $m_i,m_j$ the average estimated values, we find that the 97.5\% centile corresponds to value of 0.96, what means that a large majority of estimated values can be tell apart at a 95\% confidence level.
+
+
+%%%%%%%%%%%%%%
+\begin{figure}
+	\includegraphics[width=\textwidth]{figures/20180417_184334_SPACEMATTERS_distrib_relativeAccessibility.png}
+	\caption{Distribution of relative accessibility $\tilde{X}$ for two example parameter values and the 6 scenarios (parameter point 10 corresponds to $\beta = 1.71,\gamma_A=0.787,\gamma_E=0.798,\lambda=0.00572,v_0=4.15,\alpha=0.96$, parameter point 20 to $\beta = 0.74,\gamma_A=0.92,\gamma_E=0.70,\lambda=0.0045,v_0=2.72,\alpha=0.74$).\label{fig:distrib-access}}
+\end{figure}
+
+
+
+\subsubsection{Refined experiment}
+
+\textit{Similar experience plan, with fixed $\lambda$ and $v_0$, additional scenarios (complete network), and a weighted congestion indicator.} (\href{https://github.com/JusteRaimbault/Governance/commit/26f7f77b9a4fc378a0985de4493fe94a50846ce4}{commit 26f7f7}) :
+
+200 replications x 500 parameter points (LHS) x 8 scenarios
+
+
+
 
 
 
@@ -146,6 +195,9 @@ Since the most influent parameters for relative accessibility are the cost of en
 \textit{TODO : compare tree and full network scenarios to the slime mould}
 
 
+
+
+%%%%%%%%%%%%%%%%
 \subsection{PSE}
 
 \textit{PSE to launch separately on sustainability/urban form - decide if across scenarios or if scenario as discrete genome}

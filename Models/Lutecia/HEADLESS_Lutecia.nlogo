@@ -85,6 +85,8 @@ __includes [
   "morphology.nls"
   "network-indicators.nls"
 
+  "indicators-stylized.nls"
+
 
   ;;;;;;;;;;
   ; Experiments
@@ -383,6 +385,13 @@ patches-own [
 
   ; number of jobs on the patch
   patch:employments
+
+  ;
+  patch:delta-actives
+
+  ;
+  patch:delta-employments
+
 
   ; number of the patch (used as index in distance matrices)
   patch:number

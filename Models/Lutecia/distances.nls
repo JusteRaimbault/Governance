@@ -26,7 +26,7 @@ to distances:update-effective-matrices
      set global:nw-access-table table:make
      
      let i 0
-     repeat global:#-patches [let k 0 repeat length global:network-clusters [table:put global:nw-access-table (list i k) item (min-index (matrix:get-sparse-row global:euclidian-distance-matrix i (item k global:network-clusters))) (item k global:network-clusters) set k k + 1] set i i + 1]
+     repeat global:#-patches [let k 0 repeat length global:network-clusters [table:put global:nw-access-table (list i k) item (list:min-index (matrix:get-sparse-row global:euclidian-distance-matrix i (item k global:network-clusters))) (item k global:network-clusters) set k k + 1] set i i + 1]
    
      ;construct nw distance submatrix (size #-nw-patches^2)
      ;let nw-submatrix matrix:sparse-submatrix network-distance-matrix nw-patches nw-patches
@@ -219,7 +219,7 @@ to update-inters-recompute [new-inters new-nw-patches]
         if ? = next-inter [set nints (list (list current-inter (matrix:get global:euclidian-distance-matrix current-inter ?))) 
             set current-inter next-inter if (k + 1) < length current-inters [set next-inter item (k + 1) current-inters set nints lput (list next-inter (matrix:get global:euclidian-distance-matrix ? next-inter)) nints set k k + 1]]
         ifelse table:has-key? global:closest-nw-inters ? [
-           table:put global:closest-nw-inters ? (concatenate (list table:get global:closest-nw-inters ? nints))
+           table:put global:closest-nw-inters ? (list:concatenate (list table:get global:closest-nw-inters ? nints))
         ][
            table:put global:closest-nw-inters ? nints
         ]
@@ -266,7 +266,7 @@ to update-inters [new-inters in-between]
          let chge? (length prev-crossing-ends = length table:get global:closest-nw-inters ?)
          if chge? [
            let i 0 foreach table:get global:closest-nw-inters ? [set chge? (chge? and first ? = first item i prev-crossing-ends) set i i + 1]
-           set i 0 let chgerev true foreach rev table:get global:closest-nw-inters ? [set chgerev (chgerev and first ? = first item i prev-crossing-ends) set i i + 1]
+           set i 0 let chgerev true foreach list:rev table:get global:closest-nw-inters ? [set chgerev (chgerev and first ? = first item i prev-crossing-ends) set i i + 1]
            set chge? (chge? or chgerev)
          ]
          
@@ -346,7 +346,7 @@ to update-inters [new-inters in-between]
     if i > 0 [set closest-inters lput (list (item (i - 1) new-inters) (matrix:get global:euclidian-distance-matrix ? (item (i - 1) new-inters))) closest-inters]
     if (i + 1) < (length new-inters) [set closest-inters lput (list (item (i + 1) new-inters) (matrix:get global:euclidian-distance-matrix ? (item (i + 1) new-inters))) closest-inters]
     ifelse table:has-key? global:closest-nw-inters ? [
-      table:put global:closest-nw-inters ? (concatenate (list (table:get global:closest-nw-inters ?) closest-inters))
+      table:put global:closest-nw-inters ? (list:concatenate (list (table:get global:closest-nw-inters ?) closest-inters))
     ][
       table:put global:closest-nw-inters ? closest-inters
     ]
@@ -390,7 +390,7 @@ to update-vertices-and-paths [new-inters]
          ifelse position o new-inters < position d new-inters [
            table:put global:network-shortest-paths (list o d) (sublist new-inters (position o new-inters) ((position d new-inters) + 1))
          ][
-           table:put global:network-shortest-paths (list o d) (rev sublist new-inters (position d new-inters) ((position o new-inters) + 1))
+           table:put global:network-shortest-paths (list o d) (list:rev sublist new-inters (position d new-inters) ((position o new-inters) + 1))
          ]
          
          let di matrix:get global:euclidian-distance-matrix o d
@@ -426,13 +426,13 @@ to update-vertices-and-paths [new-inters]
           ; add the new vertex if between two existing vertices of a path
           if member? n1 p and member? n2 p [
             ifelse position n1 p < position n2 p [
-               table:put changed-paths ind (concatenate (list (sublist p 0 (position n1 p + 1)) (list o) (sublist p (position n2 p) length p)) )
+               table:put changed-paths ind (list:concatenate (list (sublist p 0 (position n1 p + 1)) (list o) (sublist p (position n2 p) length p)) )
                ; i1 -> o ; o -> i1 will be tackled by reverse path
                table:put changed-paths (list (first ind) o) (lput o (sublist p 0 (position n1 p + 1)))
                ; idem for i2
                table:put changed-paths (list o (last ind)) (fput o (sublist p (position n2 p) length p))
             ][
-               table:put changed-paths ind (concatenate (list (sublist p 0 (position n2 p + 1)) (list o) (sublist p (position n1 p) length p)) )
+               table:put changed-paths ind (list:concatenate (list (sublist p 0 (position n2 p + 1)) (list o) (sublist p (position n1 p) length p)) )
                table:put changed-paths (list (first ind) o) (lput o (sublist p 0 (position n2 p + 1)))
                table:put changed-paths (list o (last ind)) (fput o (sublist p (position n1 p) length p))
             ]
@@ -497,7 +497,7 @@ to update-vertices-and-paths [new-inters]
          debug (word " -- Final path : " path)
          
          if path != [] [
-            table:put global:network-shortest-paths (list d o) path table:put global:network-shortest-paths (list o d) rev path
+            table:put global:network-shortest-paths (list d o) path table:put global:network-shortest-paths (list o d) list:rev path
          
             ;; update network distance matrix
             let di path-length path
@@ -554,7 +554,7 @@ to shortcut [i1 i2]
     ifelse p = [] [
       if table:get global:network-shortest-paths (list o i1) != [] and table:get global:network-shortest-paths (list i2 d) != [] [
          ; here connect two old weak component clusters
-         table:put global:network-shortest-paths ind (concatenate (list table:get global:network-shortest-paths (list o i1) table:get global:network-shortest-paths (list i2 d) ))   
+         table:put global:network-shortest-paths ind (list:concatenate (list table:get global:network-shortest-paths (list o i1) table:get global:network-shortest-paths (list i2 d) ))   
          matrix:set global:network-distance-matrix o d dpot  
       ]
     ][
@@ -563,9 +563,9 @@ to shortcut [i1 i2]
           
           if matrix:get global:network-distance-matrix o d > dpot [
             ifelse position i1 p < position i2 p [
-              table:put new-paths ind (concatenate (list (sublist p 0 (position i1 p + 1)) (sublist p (position i2 p) length p)) )
+              table:put new-paths ind (list:concatenate (list (sublist p 0 (position i1 p + 1)) (sublist p (position i2 p) length p)) )
                 ][
-              table:put new-paths ind (concatenate (list (sublist p 0 (position i2 p + 1)) (sublist p (position i1 p) length p)) )
+              table:put new-paths ind (list:concatenate (list (sublist p 0 (position i2 p + 1)) (sublist p (position i1 p) length p)) )
             ]
             matrix:set global:network-distance-matrix o d dpot  
           ]
@@ -644,7 +644,7 @@ to-report connex-components
           if length c > 1 [
             repeat (length c - k1 - 1) [
                let c2 item k2 c
-               if (member? e1 c1 and member? e2 c2) or (member? e2 c1 and member? e1 c2) [set clusters replace-item k1 clusters (remove-duplicates concatenate (list c1 c2)) set to-del lput k2 to-del]
+               if (member? e1 c1 and member? e2 c2) or (member? e2 c1 and member? e1 c2) [set clusters replace-item k1 clusters (remove-duplicates list:concatenate (list c1 c2)) set to-del lput k2 to-del]
                set k2 k2 + 1
             ]
           ]
@@ -729,7 +729,7 @@ to update-network-distance-matrix [everything]
       set i1 table:get global:closest-nw-inters p1 set i2 table:get global:closest-nw-inters p2
       ][]
       ;][print error-message inspect one-of patches with [number = p1] inspect one-of patches with [number = p2]]
-      ifelse i1 = i2 or rev i1 = i2 or member? p1 (map first i2) or member? p2 (map first i1) [
+      ifelse i1 = i2 or list:rev i1 = i2 or member? p1 (map first i2) or member? p2 (map first i1) [
         ; patches are on same link
         set d (matrix:get global:euclidian-distance-matrix p1 p2) * global:network-min-pace * ((network-pace (item p1 global:patches-congestion) (max global:patches-congestion)) + (network-pace (item p2 global:patches-congestion) (max global:patches-congestion))) / 2
       ][

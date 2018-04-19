@@ -1,0 +1,27 @@
+
+;;
+; specific indicators for stylized facts
+
+;;
+; correlation between accessibility and population growth estimated on patches
+to-report indicators-stylized:cor-access-dev
+  let x [patch:current-accessibility] of patches
+  let y [patch:delta-actives] of patches
+  report list:pearson-correlation x y
+end
+
+;;
+; moving window average
+to-report indicators-stylized:cor-access-dev-mw
+  report indicators:causal-moving-average "indicators-stylized:cor-access-dev" 15 
+end
+
+
+;;
+; correlation between accessibility and employments estimated on patches
+to-report indicators-stylized:cor-access-employments
+  let x [patch:current-accessibility] of patches
+  let y [patch:employments] of patches
+  report list:pearson-correlation x y
+end
+
