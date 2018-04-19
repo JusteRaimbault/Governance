@@ -81,8 +81,8 @@ val dummy = ScalaTask("println(id+\" - \"+replication+\" - \"+scenario)") set (
 )
 */
 
-val purpose = "TEST_SAMPLING"
-//val purpose = "SPACEMATTERS"
+//val purpose = "TEST_SAMPLING"
+val purpose = "DIRECT_SAMPLING"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
@@ -97,7 +97,7 @@ val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes
 
 val replications =
  Replication (
-   evaluation = (model on env by 20 hook indics_hook),
+   evaluation = (model on env by 10 hook indics_hook),
    //evaluation = (dummy on env hook indics_hook),
    seed = replication,
    replications = 200
