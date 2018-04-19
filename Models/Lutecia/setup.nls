@@ -120,6 +120,7 @@ to setup:setup-globals
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
     "global:rel-diff-actives" "global:rel-diff-employments" "indicators:mean-accessibility-balance" "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments"
+    "indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false"
     )
   
   
