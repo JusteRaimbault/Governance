@@ -21,6 +21,13 @@ val relocationRate=Val[Double]
 val id = Val[Int]
 val replication = Val[Int]
 
+// scenarios variables
+val scenario=Val[Int]
+val nwType=Val[String]
+val centerNumber=Val[Int]
+val gammaSlimeMould=Val[Double]
+
+
 // reporters
 
 // sustainibility
@@ -41,11 +48,13 @@ val meanDistanceEmployments=Val[Double]
 val slopeEmployments=Val[Double]
 val entropyEmployments=Val[Double]
 
-// scenarios variables
-val scenario=Val[Int]
-val nwType=Val[String]
-val centerNumber=Val[Int]
-val gammaSlimeMould=Val[Double]
+
+// stylized facts
+val corAccessDev=Val[Double]
+val corAccessEmployments=Val[Double]
+val corAccessTimeWeighted=Val[Double]
+val corAccessTimeUnweighted=Val[Double]
+
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
@@ -70,7 +79,11 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
   netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments),
   netLogoOutputs += ("global:initial-nw-random-type",nwType),
   netLogoOutputs += ("global:#-initial-territories",centerNumber),
-  netLogoOutputs += ("global:network-biological-gamma",gammaSlimeMould)
+  netLogoOutputs += ("global:network-biological-gamma",gammaSlimeMould),
+  netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDev),
+  netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
+  netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
+  netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted)
 )
 
 
@@ -81,8 +94,9 @@ val dummy = ScalaTask("println(id+\" - \"+replication+\" - \"+scenario)") set (
 )
 */
 
-//val purpose = "TEST_SAMPLING"
-val purpose = "DIRECT_SAMPLING"
+
+val purpose = "TEST"
+//val purpose = "DIRECT_SAMPLING"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
@@ -91,8 +105,8 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
 
 
 
-//val env = LocalEnvironment(60)
-val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(40)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
@@ -100,7 +114,7 @@ val replications =
    evaluation = (model on env by 10 hook indics_hook),
    //evaluation = (dummy on env hook indics_hook),
    seed = replication,
-   replications = 200
+   replications = 5
 )
 
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
@@ -117,7 +131,8 @@ val exploration =
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
    ((LHS (
-      500
+      //500
+      1
       //,lambdaAcc in Range(0.001,0.01)
       //,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)

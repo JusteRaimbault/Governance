@@ -60,6 +60,8 @@ to-report indicators:ts-indicator [indic]
 end
 
 
+;;
+; moving average of a time indicator
 to-report indicators:causal-moving-average [indic window]
   if global:history-indicators = 0 [report 0]
   let full-ts table:get global:history-indicators indic
@@ -68,6 +70,14 @@ to-report indicators:causal-moving-average [indic window]
   report mean sublist full-ts (length full-ts - window) (length full-ts)
 end
 
+
+;;
+; time average on full period
+to-report indicators:time-average [indic]
+   if global:history-indicators = 0 [report 0]
+  let full-ts table:get global:history-indicators indic
+  report mean full-ts
+end
 
 
 ;;

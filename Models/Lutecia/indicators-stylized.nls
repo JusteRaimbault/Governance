@@ -16,6 +16,11 @@ to-report indicators-stylized:cor-access-dev-mw
   report indicators:causal-moving-average "indicators-stylized:cor-access-dev" 15 
 end
 
+to-report indicators-stylized:cor-access-dev-avg
+  report indicators:time-average "indicators-stylized:cor-access-dev"
+end
+
+
 
 ;;
 ; correlation between accessibility and employments estimated on patches
@@ -24,4 +29,34 @@ to-report indicators-stylized:cor-access-employments
   let y [patch:employments] of patches
   report list:pearson-correlation x y
 end
+
+
+to-report indicators-stylized:cor-access-employments-avg
+  report indicators:time-average "indicators-stylized:cor-access-employments"
+end
+
+
+
+
+;;
+; correlation between accessibility and average travel time
+to-report indicators-stylized:cor-access-time [weighted?]
+  let avgdist []
+  ifelse not weighted? [
+    set avgdist map mean matrix:to-row-list global:effective-distance-matrix
+  ][
+    let atot sum [patch:actives] of patches let etot sum [patch:employments] of patches
+    set avgdist [(patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot)) ] of patches
+  ]
+  let avgtime map [global:network-speed / ?] avgdist
+  let sortaccess map [first ?] (sort-by [last ?1 < last ?2] ([(list patch:current-accessibility patch:number)] of patches))
+  report list:pearson-correlation avgtime sortaccess
+end
+
+
+to-report indicators-stylized:cor-access-time-avg [weighted?]
+  report indicators:time-average (word "indicators-stylized:cor-access-time " weighted?)
+end
+
+
 
