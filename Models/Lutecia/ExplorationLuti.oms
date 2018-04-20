@@ -24,7 +24,7 @@ val replication = Val[Int]
 // scenarios variables
 val scenario=Val[Int]
 val nwType=Val[String]
-val centerNumber=Val[Int]
+val centerNumber=Val[Double]
 val gammaSlimeMould=Val[Double]
 
 
