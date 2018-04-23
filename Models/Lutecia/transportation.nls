@@ -83,11 +83,13 @@ to transportation:affectation [affect?]
          let a1 table:get global:nw-access-table (list p1 0) let a2 table:get global:nw-access-table (list p2 0)
          
          ; need extended paths here !
-           if table:has-key? global:network-shortest-paths (list a1 a2) and table:has-key? global:closest-nw-inters a1 and table:has-key? global:closest-nw-inters a2 [ 
-             let path table:get global:network-shortest-paths (list (one-of map [first ?] table:get global:closest-nw-inters a1) (one-of map [first ?] table:get global:closest-nw-inters a2))
+	if table:has-key? global:closest-nw-inters a1 and table:has-key? global:closest-nw-inters a2 [
+           let i1 (one-of map [first ?] table:get global:closest-nw-inters a1) let i2 (one-of map [first ?] table:get global:closest-nw-inters a2)
+            if table:has-key? global:network-shortest-paths (list i1 i2) [ 
+             let path table:get global:network-shortest-paths (list i1 i2)
              foreach path [set global:patches-congestion replace-item ? global:patches-congestion (item ? global:patches-congestion + matrix:get global:flow-matrix p1 p2)]
            ]
-       
+         ]
        ]
 
 

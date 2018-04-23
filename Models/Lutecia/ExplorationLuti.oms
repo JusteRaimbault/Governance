@@ -24,7 +24,7 @@ val replication = Val[Int]
 // scenarios variables
 val scenario=Val[Int]
 val nwType=Val[String]
-val centerNumber=Val[Int]
+val centerNumber=Val[Double]
 val gammaSlimeMould=Val[Double]
 
 
@@ -94,8 +94,9 @@ val dummy = ScalaTask("println(id+\" - \"+replication+\" - \"+scenario)") set (
 )
 */
 
-val purpose = "TEST"
-//val purpose = "SPACEMATTERS"
+
+//val purpose = "TEST"
+val purpose = "DIRECT_SAMPLING"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
@@ -104,16 +105,16 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
 
 
 
-val env = LocalEnvironment(40)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(40)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (model on env by 20 hook indics_hook),
+   evaluation = (model on env by 10 hook indics_hook),
    //evaluation = (dummy on env hook indics_hook),
    seed = replication,
-   replications = 5
+   replications = 200
 )
 
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
@@ -130,8 +131,8 @@ val exploration =
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
    ((LHS (
-      //500
-      1
+      500
+      //1
       //,lambdaAcc in Range(0.001,0.01)
       //,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)
