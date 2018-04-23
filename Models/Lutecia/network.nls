@@ -145,12 +145,15 @@ end
 
 
 
-
+;;
+; transportation node constructor
 to network:new-transportation-node
   set shape "circle" set size 0.2 set color red
 end
 
 
+;;
+; transportation link constructor
 to network:new-transportation-link
   set color red set thickness 0.2
   
@@ -206,7 +209,7 @@ end
 
 
 ;; 
-;  network indicators
+;  network indicators : cache variables for different measures for efficiency
 to network:cache-nw-measures
   
   ;simplify-network
@@ -232,8 +235,9 @@ to network:cache-nw-measures
       table:put global:nw-distances (list [who] of c1 [who] of c2) l table:put global:nw-distances (list [who] of c2 [who] of c1) l
       ; update relative speed table
       let deucl 0 ask c1 [set deucl distance c2]
+      ; deucl should never be 0 if the network has been simplified -> patch with 0 below
       ;table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
-      table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (l / deucl)
+      ifelse deucl = 0 [table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) 0][table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (l / deucl)]
 
       set j j + 1
     ]
