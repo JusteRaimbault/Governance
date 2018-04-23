@@ -9,6 +9,8 @@
 ;-> hierarchy case, population, evol hierarchy.  -- TODO --
 
 
+;;
+;
 to indicators:update-indicators
   foreach global:tracked-indicators [
     let val run-result ?
@@ -115,6 +117,12 @@ to-report indicators:overall-mean-accessibility
   report accessibilities:mean-accessibility patches
 end
 
+
+;;
+;
+to-report indicators:patches-accessibilities
+  report [patch:current-accessibility] of patches
+end
 
 ;;
 ; evolution of accessibility

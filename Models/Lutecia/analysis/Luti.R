@@ -141,21 +141,26 @@ ggsave(filename = paste0(resdir,'distrib_rhoAccessDev.png'),width=15,height=10,u
 sres = res %>% group_by(parid,scenario) %>% summarize(avg = mean(corAccessEmployments),ci = sd(corAccessEmployments)*1.96/sqrt(n()))
 g = ggplot(res[res$parid%in%parids,],aes(x=corAccessEmployments,group=paste0(parid,"-",scenario),colour=paste0(parid,"-",scenario)))
 g+geom_density(alpha=0.4)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg,colour=paste0(parid,"-",scenario)))+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg-ci,colour=paste0(parid,"-",scenario)),linetype=2)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg+ci,colour=paste0(parid,"-",scenario)),linetype=2)+
-  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"["*X*","*Delta*"P]"))+stdtheme
+  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"[X,E]"))+stdtheme
 ggsave(filename = paste0(resdir,'distrib_rhoAccessEmployments.png'),width=15,height=10,units='cm')
 
 sres = res %>% group_by(parid,scenario) %>% summarize(avg = mean(corAccessTimeUnweighted),ci = sd(corAccessTimeUnweighted)*1.96/sqrt(n()))
 g = ggplot(res[res$parid%in%parids,],aes(x=corAccessTimeUnweighted,group=paste0(parid,"-",scenario),colour=paste0(parid,"-",scenario)))
 g+geom_density(alpha=0.4)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg,colour=paste0(parid,"-",scenario)))+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg-ci,colour=paste0(parid,"-",scenario)),linetype=2)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg+ci,colour=paste0(parid,"-",scenario)),linetype=2)+
-  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"["*X*","*Delta*"P]"))+stdtheme
+  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"["*X*","*T[u]*"]"))+stdtheme
 ggsave(filename = paste0(resdir,'distrib_rhoAccessTimeUnweighted.png'),width=15,height=10,units='cm')
 
 sres = res %>% group_by(parid,scenario) %>% summarize(avg = mean(corAccessTimeWeighted),ci = sd(corAccessTimeWeighted)*1.96/sqrt(n()))
 g = ggplot(res[res$parid%in%parids,],aes(x=corAccessTimeWeighted,group=paste0(parid,"-",scenario),colour=paste0(parid,"-",scenario)))
 g+geom_density(alpha=0.4)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg,colour=paste0(parid,"-",scenario)))+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg-ci,colour=paste0(parid,"-",scenario)),linetype=2)+geom_vline(data=sres[sres$parid%in%parids,],aes(xintercept=avg+ci,colour=paste0(parid,"-",scenario)),linetype=2)+
-  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"["*X*","*Delta*"P]"))+stdtheme
+  scale_color_discrete(name="id-scenario")+xlab(expression(rho*"["*X*","*T[w]*"]"))+stdtheme
 ggsave(filename = paste0(resdir,'distrib_rhoAccessTimeUnweighted.png'),width=15,height=10,units='cm')
 
+
+
+
+###
+## significance of corrs
 
 
 

@@ -262,7 +262,8 @@ end
 
 
 
-
+;;
+; simplify the network (overlapping nodes)
 to network:simplify-network 
   
   let n count transportation-nodes with [count transportation-nodes-here > 1]
