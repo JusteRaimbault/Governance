@@ -168,7 +168,7 @@ Since the most influent parameters for relative accessibility are the cost of en
 
 To have a rough ideas of the number of repetitions needed to reach a given confidence interval on averages, we consider the relative accessibility $\tilde{X}$. Distributions can roughly be approximated as Gaussians (see Fig.~\ref{fig:distrib-access}), and we can use the formula giving the size of the confidence interval around the mean as $2\sigma z_{level} / \sqrt{n}$.
 
-Looking at the distribution of $\frac{c_i + c_j}{\left|m_i - m-j\right|}$ for all $(i,j)$, where $c_i$ and $c_j$ are half-width of confidence intervals and $m_i,m_j$ the average estimated values, we find that the 97.5\% centile corresponds to value of 0.96, what means that a large majority of estimated values can be tell apart at a 95\% confidence level.
+Looking at the distribution of $\frac{c_i + c_j}{\left|m_i - m-j\right|}$ for all $(i,j)$, where $c_i$ and $c_j$ are half-width of confidence intervals and $m_i,m_j$ the average estimated values, we find that the 97.5\% centile corresponds to a value of 0.96, what means that a large majority of estimated values can be differentiated at a 95\% confidence level with this number of repetitions.
 
 
 %%%%%%%%%%%%%%
@@ -176,14 +176,23 @@ Looking at the distribution of $\frac{c_i + c_j}{\left|m_i - m-j\right|}$ for al
 	\includegraphics[width=\textwidth]{figures/20180417_184334_SPACEMATTERS_distrib_relativeAccessibility.png}
 	\caption{Distribution of relative accessibility $\tilde{X}$ for two example parameter values and the 6 scenarios (parameter point 10 corresponds to $\beta = 1.71,\gamma_A=0.787,\gamma_E=0.798,\lambda=0.00572,v_0=4.15,\alpha=0.96$, parameter point 20 to $\beta = 0.74,\gamma_A=0.92,\gamma_E=0.70,\lambda=0.0045,v_0=2.72,\alpha=0.74$).\label{fig:distrib-access}}
 \end{figure}
+%%%%%%%%%%%%%%
 
 
 
 \subsubsection{Refined experiment}
 
-\textit{Similar experience plan, with fixed $\lambda$ and $v_0$, additional scenarios (complete network), and a weighted congestion indicator.} (\href{https://github.com/JusteRaimbault/Governance/commit/2186d50f90aa0df81bc611b618e1dbaca04776c5}{commit 26f7f7}) :
+\textit{Similar experience plan, with fixed $\lambda$ and $v_0$, additional scenarios (complete network), a weighted congestion indicator, and indicators for correlations (test for stylized facts).} (\href{https://github.com/JusteRaimbault/Governance/commit/8f7725b982bfb3bce51a58fbd516d690556abf89}{commit 8f7725b}) :
 
-200 replications x 500 parameter points (LHS) x 8 scenarios
+$\rightarrow$ 200 replications x 500 parameter points (LHS) x 8 scenarios
+
+% Anova result
+%             betaDC            gammaCDA            gammaCDE      relocationRate as.factor(scenario)           Residuals 
+%          0.2508843           0.2262883           0.7520632           7.0737038          39.8984301          51.7986304 
+
+For this experiment, we find that with the Anova that the average accessibility is mainly explained by the scenario (39.9\%) and residuals (51.8\%), the relocation rate $\alpha$ plays a significant role, and other parameters have a marginal role ($\beta$ 0.25\%, $\gamma_A$ 0.22\%, $\gamma_E$ 0.75\%).
+
+With 200 replications, we obtain a third quartile of 1.07 for the relative confidence interval between all possible couples.
 
 
 
