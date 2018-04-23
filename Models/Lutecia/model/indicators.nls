@@ -124,9 +124,36 @@ to-report indicators:patches-accessibilities
   report [patch:current-accessibility] of patches
 end
 
+;;
+; flatmap patches/times access
+to-report indicators:patches-alltimes-accessibilities
+   report reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-accessibilities"
+end
+
+
 to-report indicators:patches-delta-actives
   report [patch:delta-actives] of patches
 end
+
+;;
+;
+to-report indicators:patches-alltimes-delta-actives
+  report reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-delta-actives"
+end
+
+
+
+to-report indicators:patches-employments
+  report [patch:employments] of patches
+end
+
+
+;;
+;
+to-report indicators:patches-alltimes-employments
+  report reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-employments"
+end
+
 
 ;;
 ; evolution of accessibility

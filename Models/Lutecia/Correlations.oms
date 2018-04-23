@@ -1,0 +1,128 @@
+
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
+
+// Parameters
+val lambdaAcc = Val[Double]
+val networkSpeed = Val[Double]
+val gammaCDA=Val[Double]
+val gammaCDE=Val[Double]
+val betaDC=Val[Double]
+val relocationRate=Val[Double]
+
+val id = Val[Int]
+val replication = Val[Int]
+
+// scenarios variables
+val scenario=Val[Int]
+val nwType=Val[String]
+val centerNumber=Val[Double]
+val gammaSlimeMould=Val[Double]
+
+
+// reporters
+val accessibilities = Val[Array[Double]]
+val deltaActives = Val[Array[Double]]
+val employments = Val[Array[Double]]
+
+val corAccessDev=Val[Array[Double]]
+val corAccessEmployments=Val[Array[Double]]
+
+val nPatches=Val[Double]
+val b=Val[Int]
+
+// experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
+val cmds = List(
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:run-experiment-luti"
+)
+
+val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  netLogoOutputs += ("indicators:patches-alltimes-accessibilities",accessibilities),
+  netLogoOutputs += ("indicators:patches-alltimes-delta-actives",deltaActives),
+  netLogoOutputs += ("indicators:patches-alltimes-employments",employments),
+  netLogoOutputs += ("count patches",nPatches)
+)
+
+
+val purpose = "TEST"
+//val purpose = "CORRS"
+
+val nReplications=2
+
+// output
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
+  arraysOnSingleRow := true
+)
+
+
+
+val env = LocalEnvironment(4)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+
+val replications =
+ Replication (
+   evaluation = (model on env),
+   seed = replication,
+   replications = nReplications
+)
+
+
+// aggregation task
+val flatten = ScalaTask("val accessibilities = accessibilities.flatten; val deltaActives = deltaActives.flatten; val employments = employments.flatten; val nPatches = nPatches.average")set(
+  inputs += (accessibilities,deltaActives,employments,nPatches),
+  outputs += (accessibilities,deltaActives,employments,nPatches)
+)
+
+val estimateCorrs = RTask("""
+        source("corrs.R")
+        rhoaccessdev = timecorrs(access,dactives,n=n,b=b)
+        rhoaccessemp = timecorrs(access,employments,n=n,b=b)
+    """) set (
+      b := nReplications,
+      resources += workDirectory / "analysis/corrs.R",
+      rInputs += (nPatches.array,"n"),
+      rInputs += (b,"b"),
+      rInputs += (accessibilities.array,"access"),
+      rInputs += (deltaActives.array,"dactives"),
+      rInputs += (employments.array,"employments"),
+      rOutputs += ("rhoaccessdev",corAccessDev),
+      rOutputs += ("rhoaccessemp",corAccessEmployments)
+    )
+
+
+
+//relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
+val exploration =
+  DirectSampling(
+    evaluation = replications,
+    sampling =
+    /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
+    (networkSpeed in (2.0 to 6.0 by 2.0)) x
+    (gammaCDA in (0.1 to 1.0 by 0.1))x
+    (gammaCDE in (0.1 to 1.0 by 0.1))x
+    (betaDC in (0.5 to 2.0 by 0.5))x
+    (relocationRate in (0.1 to 1.0 by 0.1))x
+    (scenario in (0 to 5 by 1))
+  ) withIndex id )*/
+   ((LHS (
+      //500
+      2
+      //,lambdaAcc in Range(0.001,0.01)
+      //,networkSpeed in Range(2.5,10.0)
+      ,gammaCDA in Range(0.5,1.0)
+      ,gammaCDE in Range(0.5,1.0)
+      ,betaDC in Range(0.5,2.0)
+      ,relocationRate in Range(0.0,1.0)
+    ) withIndex id) x (scenario in (0 to 3 by 1)) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) ),
+    aggregation = (flatten -- (estimateCorrs hook indics_hook))
+  )
+
+
+exploration
