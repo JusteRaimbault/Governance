@@ -1,0 +1,125 @@
+// Define the variables that are transmitted between the tasks
+// Parameters
+
+val lambdaAcc = Val[Double]
+val networkSpeed = Val[Double]
+val gammaCDA=Val[Double]
+val gammaCDE=Val[Double]
+val betaDC=Val[Double]
+val relocationRate=Val[Double]
+
+val replication = Val[Int]
+
+// scenarios variables
+val scenario=Val[Int]
+val nwType=Val[String]
+val centerNumber=Val[Double]
+val gammaSlimeMould=Val[Double]
+
+
+// reporters
+
+// sustainibility
+val relativeAccessibility = Val[Double]
+val nwCongestion = Val[Double]
+
+// network shape
+val nwRelativeLength = Val[Double]
+val nwRelativeSpeed = Val[Double]
+
+// urban form
+val moranActives=Val[Double]
+val meanDistanceActives=Val[Double]
+val slopeActives=Val[Double]
+val entropyActives=Val[Double]
+val moranEmployments=Val[Double]
+val meanDistanceEmployments=Val[Double]
+val slopeEmployments=Val[Double]
+val entropyEmployments=Val[Double]
+
+
+// stylized facts
+val corAccessDev=Val[Double]
+val corAccessEmployments=Val[Double]
+val corAccessTimeWeighted=Val[Double]
+val corAccessTimeUnweighted=Val[Double]
+
+
+// experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
+val cmds = List(
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:run-experiment-luti"
+)
+
+val model = NetLogo5Task(workDirectory / "Lutecia/HEADLESS_Lutecia.nlogo", cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
+  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
+  netLogoOutputs += ("indicators:mean-congestion",nwCongestion),
+  netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
+  netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
+  netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
+  netLogoOutputs += ("indicators:morphology:mean-distance-actives",meanDistanceActives),
+  netLogoOutputs += ("indicators:morphology:slope-actives",slopeActives),
+  netLogoOutputs += ("indicators:morphology:entropy-actives",entropyActives),
+  netLogoOutputs += ("indicators:morphology:moran-employments",moranEmployments),
+  netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmployments),
+  netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmployments),
+  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments),
+  netLogoOutputs += ("global:initial-nw-random-type",nwType),
+  netLogoOutputs += ("global:#-initial-territories",centerNumber),
+  netLogoOutputs += ("global:network-biological-gamma",gammaSlimeMould),
+  netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDev),
+  netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
+  netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
+  netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted),
+  lambdaAcc := 0.005, 
+  networkSpeed := 5.0
+)
+    
+val opositeRelativeAccessibility = Val[Double]
+
+val post = ScalaTask("""
+  val opositeRelativeAccessibility = 1.0 - relativeAccessibility
+    """) set (
+    inputs += (relativeAccessibility),
+    outputs += (opositeRelativeAccessibility),
+    (inputs, outputs) += nwCongestion,
+  )
+
+
+val evolution =
+  SteadyStateEvolution(
+    algorithm = OSE(
+      origin = Seq(
+        relocationRate in (0.0 to 1.0 by 0.1),
+        gammaCDA in (0.0 to 1.0 by 0.1),
+        gammaCDE in (0.0 to 1.0 by 0.1),
+        betaDC in (0.0 to 5.0 by 0.1),
+        scenario in (0 to 7 by 1)),
+      objectives = Seq(
+        (opositeRelativeAccessibility, 0.02),
+        (nwCongestion, 0.2)
+      ),
+      stochastic = Stochastic(seed = replication)
+    ),
+    evaluation = model -- post,
+    termination = 20 minutes
+  )
+  
+val island = 
+  IslandEvolution(
+    island = evolution, 
+    parallelism = 1000,
+    termination = 100000
+  )
+
+val savePopulationHook = SavePopulationHook(island, workDirectory / "results")
+
+island hook savePopulationHook
+
+
+
+
+
+

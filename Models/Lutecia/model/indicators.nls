@@ -119,9 +119,13 @@ end
 
 
 ;;
-;
+; accessibilities for all patches
 to-report indicators:patches-accessibilities
   report [patch:current-accessibility] of patches
+end
+
+to-report indicators:patches-delta-actives
+  report [patch:delta-actives] of patches
 end
 
 ;;

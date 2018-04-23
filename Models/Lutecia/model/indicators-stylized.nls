@@ -2,6 +2,18 @@
 ;;
 ; specific indicators for stylized facts
 
+
+
+
+;;
+; 
+to-report indicators-stylized:cor-access-dev-alltimes
+  let x reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-accessibilities"
+  let y reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-delta-actives"
+  report list:pearson-correlation x y
+end
+
+
 ;;
 ; correlation between accessibility and population growth estimated on patches
 to-report indicators-stylized:cor-access-dev
