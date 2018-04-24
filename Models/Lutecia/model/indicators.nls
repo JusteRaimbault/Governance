@@ -157,6 +157,20 @@ end
 
 
 ;;
+; 
+to-report indicators:patches-access-time
+
+end
+
+to-report indicators:patches-alltimes-access-time
+  
+end
+
+
+
+
+
+;;
 ; evolution of accessibility
 to-report indicators:relative-accessibility
   ;carefully[

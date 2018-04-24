@@ -4,6 +4,17 @@
 ;;;;;;;;;;;;;;
 
 
+
+;;
+; l must be a list of lists ; extracts first element of ordered lists
+to-report list:order-by-last-element [l]
+  report map [first ?] (sort-by [last ?1 < last ?2] l)
+end
+
+
+
+
+
 ;;agentset/list functions
 
 to-report list:to-list [agentset]

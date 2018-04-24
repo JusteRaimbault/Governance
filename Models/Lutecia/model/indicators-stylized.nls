@@ -17,8 +17,8 @@ end
 ;;
 ; correlation between accessibility and population growth estimated on patches
 to-report indicators-stylized:cor-access-dev
-  let x [patch:current-accessibility] of patches
-  let y [patch:delta-actives] of patches
+  let x list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
+  let y list:order-by-last-element ([(list patch:delta-actives patch:number)] of patches)
   report list:pearson-correlation x y
 end
 
@@ -37,8 +37,8 @@ end
 ;;
 ; correlation between accessibility and employments estimated on patches
 to-report indicators-stylized:cor-access-employments
-  let x [patch:current-accessibility] of patches
-  let y [patch:employments] of patches
+  let x list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
+  let y list:order-by-last-element ([(list patch:employments patch:number)] of patches)
   report list:pearson-correlation x y
 end
 
@@ -61,7 +61,8 @@ to-report indicators-stylized:cor-access-time [weighted?]
     set avgdist [(patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot)) ] of patches
   ]
   let avgtime map [global:network-speed / ?] avgdist
-  let sortaccess map [first ?] (sort-by [last ?1 < last ?2] ([(list patch:current-accessibility patch:number)] of patches))
+  ;let sortaccess map [first ?] (sort-by [last ?1 < last ?2] ([(list patch:current-accessibility patch:number)] of patches))
+  let sortaccess list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
   report list:pearson-correlation avgtime sortaccess
 end
 

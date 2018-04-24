@@ -34,7 +34,11 @@ val nPatches=Val[Double]
 val nPatchesarray=Val[Double]
 
 val corAccessDev=Val[Array[Double]]
+val corAccessDevMin=Val[Array[Double]]
+val corAccessDevMax=Val[Array[Double]]
 val corAccessEmployments=Val[Array[Double]]
+val corAccessEmploymentsMin=Val[Array[Double]]
+val corAccessEmploymentsMax=Val[Array[Double]]
 
 
 val b=Val[Int]
@@ -61,10 +65,8 @@ val purpose = "TEST"
 val nReplications=3
 
 // output
-val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
-  arraysOnSingleRow := true
-)
-
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv")
+//set (arraysOnSingleRow := true)
 
 
 val env = LocalEnvironment(4)
@@ -100,6 +102,8 @@ val estimateCorrs = RTask("""
         show(length(access));#show(length(access[[1]]))
         rhoaccessdev = timecorrs(c(unlist(access)),c(unlist(dactives)),n=c(unlist(n))[1],b=b)
         rhoaccessemp = timecorrs(c(unlist(access)),c(unlist(employments)),n=c(unlist(n))[1],b=b)
+        relocationRate=c(unlist(relocationRate))[1];gammaCDA=c(unlist(gammaCDA))[1];gammaCDE=c(unlist(gammaCDE))[1];betaDC=c(unlist(betaDC))[1];lambdaAcc=c(unlist(lambdaAcc))[1];networkSpeed=c(unlist(networkSpeed))[1];
+        scenario=c(unlist(scenario))[1];id=c(unlist(id))[1];
     """) set (
       b := nReplications,
       resources += workDirectory / "analysis/corrs.R",
@@ -113,9 +117,15 @@ val estimateCorrs = RTask("""
       //rInputs += (deltaActives.toArray.toArray,"dactives"),
       //rInputs += (employments.toArray.toArray,"employments"),
       rOutputs += ("rhoaccessdev",corAccessDev),
-      rOutputs += ("rhoaccessemp",corAccessEmployments)//,
-      //inputs += (relocationRate.toArray.toArray,gammaCDA.toArray.toArray,gammaCDE.toArray.toArray,betaDC.toArray.toArray,lambdaAcc.toArray.toArray,networkSpeed.toArray.toArray,scenario.toArray.toArray,replication.toArray.toArray,id.toArray.toArray),
-      //outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id)
+      rOutputs += ("rhoaccessdevmin",corAccessDevMin),
+      rOutputs += ("rhoaccessdevmax",corAccessDevMax),
+      rOutputs += ("rhoaccessemp",corAccessEmployments),
+      rOutputs += ("rhoaccessempmin",corAccessEmploymentsMin),
+      rOutputs += ("rhoaccessempmax",corAccessEmploymentsMax),
+      rOutputs += ("tws",tw),
+      rOutputs += ("t0",t0),
+      rInputs += (relocationRate.toArray,gammaCDA.toArray,gammaCDE.toArray,betaDC.toArray,lambdaAcc.toArray,networkSpeed.toArray,scenario.toArray,id.toArray),
+      rOutputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,id)
     )
 
 

@@ -963,7 +963,7 @@ global:total-time-steps
 global:total-time-steps
 0
 10000
-15
+594
 1
 1
 NIL
