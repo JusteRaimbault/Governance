@@ -121,7 +121,7 @@ end
 ;;
 ; accessibilities for all patches
 to-report indicators:patches-accessibilities
-  report [patch:current-accessibility] of patches
+  report list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
 end
 
 ;;
@@ -131,8 +131,10 @@ to-report indicators:patches-alltimes-accessibilities
 end
 
 
+;;
+;
 to-report indicators:patches-delta-actives
-  report [patch:delta-actives] of patches
+  report list:order-by-last-element ([(list patch:delta-actives patch:number)] of patches)
 end
 
 ;;
@@ -145,7 +147,7 @@ end
 ;;
 ;
 to-report indicators:patches-employments
-  report [patch:employments] of patches
+  report list:order-by-last-element ([(list patch:employments patch:number)] of patches)
 end
 
 
@@ -158,14 +160,24 @@ end
 
 ;;
 ; 
-to-report indicators:patches-access-time
-
+to-report indicators:patches-unweighted-access-time
+  let avgdist map mean matrix:to-row-list global:effective-distance-matrix
+  report map [global:network-speed / ?] avgdist
 end
 
-to-report indicators:patches-alltimes-access-time
-  
+to-report indicators:patches-alltimes-unweighted-access-time
+  report reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-unweighted-access-time"
 end
 
+to-report indicators:patches-weighted-access-time
+  let atot sum [patch:actives] of patches let etot sum [patch:employments] of patches
+  let avgdist list:order-by-last-element ([(list ((patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot))) patch:number)] of patches)
+  report map [global:network-speed / ?] avgdist
+end
+
+to-report indicators:patches-alltimes-weighted-access-time
+  report reduce [list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-weighted-access-time"
+end
 
 
 

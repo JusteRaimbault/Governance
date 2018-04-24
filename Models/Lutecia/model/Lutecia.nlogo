@@ -1277,7 +1277,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.1
+0.83
 0.01
 1
 NIL

@@ -25,13 +25,11 @@ val gammaSlimeMould=Val[Double]
 
 // reporters
 val accessibilities = Val[Array[Double]]
-val accessibilitiesarray = Val[Array[Double]]
 val deltaActives = Val[Array[Double]]
-val deltaActivesarray = Val[Array[Double]]
 val employments = Val[Array[Double]]
-val employmentsarray = Val[Array[Double]]
+val unweightedTime=Val[Array[Double]]
+val weightedTime=Val[Array[Double]]
 val nPatches=Val[Double]
-val nPatchesarray=Val[Double]
 
 val corAccessDev=Val[Array[Double]]
 val corAccessDevMin=Val[Array[Double]]
@@ -39,13 +37,21 @@ val corAccessDevMax=Val[Array[Double]]
 val corAccessEmployments=Val[Array[Double]]
 val corAccessEmploymentsMin=Val[Array[Double]]
 val corAccessEmploymentsMax=Val[Array[Double]]
+val corAccessWeightedtime=Val[Array[Double]]
+val corAccessWeightedtimeMin=Val[Array[Double]]
+val corAccessWeightedtimeMax=Val[Array[Double]]
+val corAccessUnweightedtime=Val[Array[Double]]
+val corAccessUnweightedtimeMin=Val[Array[Double]]
+val corAccessUnweightedtimeMax=Val[Array[Double]]
+val tw=Val[Array[Double]]
+val t0=Val[Array[Double]]
 
 
 val b=Val[Int]
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
-  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 200 ${replication}",
   "experiments-luti:run-experiment-luti"
 )
 
@@ -55,55 +61,50 @@ val model = NetLogo5Task(workDirectory / "model/HEADLESS_Lutecia.nlogo",cmds,emb
   netLogoOutputs += ("indicators:patches-alltimes-accessibilities",accessibilities),
   netLogoOutputs += ("indicators:patches-alltimes-delta-actives",deltaActives),
   netLogoOutputs += ("indicators:patches-alltimes-employments",employments),
+  netLogoOutputs += ("indicators:patches-alltimes-unweighted-access-time",unweightedTime),
+  netLogoOutputs += ("indicators:patches-alltimes-weighted-access-time",weightedTime),
   netLogoOutputs += ("count patches",nPatches)
 )
 
 
-val purpose = "TEST"
-//val purpose = "CORRS"
+//val purpose = "TEST"
+val purpose = "CORRELATIONS"
 
-val nReplications=3
+val nReplications=50
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv")
 //set (arraysOnSingleRow := true)
 
 
-val env = LocalEnvironment(4)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(4)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (model on env),
+   evaluation = model,
    seed = replication,
    replications = nReplications
 )
 
 
-// aggregation task
-/*
-val flatten = ScalaTask("""
- val accessibilitiesarray = accessibilities.flatten.to[Array]
- println(accessibilitiesarray.toString)
- val deltaActivesarray = deltaActives.flatten
- val employmentsarray = employments.flatten
- val nPatchesarray = nPatches.map{_.average}.average
- println(nPatchesarray.toString)
- """)set(
-  inputs += (accessibilities.toArray.toArray,deltaActives.toArray.toArray,employments.toArray.toArray,nPatches.toArray.toArray),
-  outputs += (accessibilitiesarray,deltaActivesarray,employmentsarray,nPatchesarray)
-)
-*/
-
 val estimateCorrs = RTask("""
+        #ultra dirty rscript
         source("corrs.R")
         show(c(unlist(access)));show(c(unlist(dactives)));show(c(unlist(employments)))
         show(length(access));#show(length(access[[1]]))
-        rhoaccessdev = timecorrs(c(unlist(access)),c(unlist(dactives)),n=c(unlist(n))[1],b=b)
-        rhoaccessemp = timecorrs(c(unlist(access)),c(unlist(employments)),n=c(unlist(n))[1],b=b)
+        rhoaccessdevres = timecorrs(c(unlist(access)),c(unlist(dactives)),n=c(unlist(n))[1],b=b)
+        rhoaccessempres = timecorrs(c(unlist(access)),c(unlist(employments)),n=c(unlist(n))[1],b=b)
+        rhoaccesswtimeres = timecorrs(c(unlist(access)),c(unlist(weightedtime)),n=c(unlist(n))[1],b=b)
+        rhoaccessutimeres = timecorrs(c(unlist(access)),c(unlist(unweightedtime)),n=c(unlist(n))[1],b=b)
         relocationRate=c(unlist(relocationRate))[1];gammaCDA=c(unlist(gammaCDA))[1];gammaCDE=c(unlist(gammaCDE))[1];betaDC=c(unlist(betaDC))[1];lambdaAcc=c(unlist(lambdaAcc))[1];networkSpeed=c(unlist(networkSpeed))[1];
         scenario=c(unlist(scenario))[1];id=c(unlist(id))[1];
+        rhoaccessdev=rhoaccessdevres$allrho;rhoaccessdevmin=rhoaccessdevres$rhominus;rhoaccessdevmax=rhoaccessdevres$rhoplus
+        rhoaccessemp=rhoaccessempres$allrho;rhoaccessempmin=rhoaccessempres$rhominus;rhoaccessempmax=rhoaccessempres$rhoplus
+        rhoaccessweightedtime=rhoaccesswtimeres$allrho;rhoaccessweightedtimemin=rhoaccesswtimeres$rhominus;rhoaccessweightedtimemax=rhoaccesswtimeres$rhoplus
+        rhoaccessunweightedtime=rhoaccessutimeres$allrho;rhoaccessunweightedtimemin=rhoaccessutimeres$rhominus;rhoaccessunweightedtimemax=rhoaccessutimeres$rhoplus
+        tws=rhoaccessdevres$alltws;t0=rhoaccessdevres$allt0s;
     """) set (
       b := nReplications,
       resources += workDirectory / "analysis/corrs.R",
@@ -112,16 +113,20 @@ val estimateCorrs = RTask("""
       rInputs += (accessibilities.toArray,"access"),
       rInputs += (deltaActives.toArray,"dactives"),
       rInputs += (employments.toArray,"employments"),
-      //rInputs += (nPatches.toArray.toArray,"n"),
-      //rInputs += (accessibilities.toArray.toArray,"access"),
-      //rInputs += (deltaActives.toArray.toArray,"dactives"),
-      //rInputs += (employments.toArray.toArray,"employments"),
+      rInputs += (weightedTime.toArray,"weightedtime"),
+      rInputs += (unweightedTime.toArray,"unweightedtime"),
       rOutputs += ("rhoaccessdev",corAccessDev),
       rOutputs += ("rhoaccessdevmin",corAccessDevMin),
       rOutputs += ("rhoaccessdevmax",corAccessDevMax),
       rOutputs += ("rhoaccessemp",corAccessEmployments),
       rOutputs += ("rhoaccessempmin",corAccessEmploymentsMin),
       rOutputs += ("rhoaccessempmax",corAccessEmploymentsMax),
+      rOutputs += ("rhoaccessweightedtime",corAccessWeightedtime),
+      rOutputs += ("rhoaccessweightedtimemin",corAccessWeightedtimeMin),
+      rOutputs += ("rhoaccessweightedtimemax",corAccessWeightedtimeMax),
+      rOutputs += ("rhoaccessunweightedtime",corAccessUnweightedtime),
+      rOutputs += ("rhoaccessunweightedtimemin",corAccessUnweightedtimeMin),
+      rOutputs += ("rhoaccessunweightedtimemax",corAccessUnweightedtimeMax),
       rOutputs += ("tws",tw),
       rOutputs += ("t0",t0),
       rInputs += (relocationRate.toArray,gammaCDA.toArray,gammaCDE.toArray,betaDC.toArray,lambdaAcc.toArray,networkSpeed.toArray,scenario.toArray,id.toArray),
@@ -133,7 +138,7 @@ val estimateCorrs = RTask("""
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
 val exploration =
   DirectSampling(
-    evaluation = replications -- estimateCorrs hook indics_hook,
+    evaluation = (replications -- estimateCorrs) on env by 10 hook indics_hook,
     sampling =
     /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
     (networkSpeed in (2.0 to 6.0 by 2.0)) x
@@ -144,15 +149,14 @@ val exploration =
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
    ((LHS (
-      //500
-      1
+      500
       //,lambdaAcc in Range(0.001,0.01)
       //,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)
       ,gammaCDE in Range(0.5,1.0)
       ,betaDC in Range(0.5,2.0)
       ,relocationRate in Range(0.0,1.0)
-    ) withIndex id) x (scenario in (0 to 3 by 1)) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) )//,
+    ) withIndex id) x (scenario in (0 to 7 by 1)) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) )//,
     //aggregation = (flatten -- (estimateCorrs hook indics_hook))
     //aggregation = (estimateCorrs hook indics_hook)
   )
