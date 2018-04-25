@@ -58,7 +58,7 @@ to-report indicators-stylized:cor-access-time [weighted?]
     ifelse not (global:effective-distance-matrix = 0) [set avgdist map mean matrix:to-row-list global:effective-distance-matrix][set avgdist list:rep 1 count patches]
   ][
     let atot sum [patch:actives] of patches let etot sum [patch:employments] of patches if atot = 0 [set atot 1] if etot = 0 [set etot 1]
-    set avgdist [(patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot)) ] of patches if sum avgdist = 0 [set avgdist list:rep 1 count patches]
+    set avgdist list:order-by-last-element ([(list ((patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot))) patch:number)] of patches) if sum avgdist = 0 [set avgdist list:rep 1 count patches]
   ]
   let avgtime map [global:network-speed / ?] avgdist
   ;let sortaccess map [first ?] (sort-by [last ?1 < last ?2] ([(list patch:current-accessibility patch:number)] of patches))
