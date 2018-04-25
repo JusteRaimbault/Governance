@@ -84,7 +84,7 @@ val env = LocalEnvironment(4)
 
 val replications =
  Replication (
-   evaluation = model on env,
+   evaluation = model on env,//by 10
    seed = replication,
    replications = nReplications
 )
@@ -152,7 +152,11 @@ val getFinalCorrs = ScalaTask("""
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
 val exploration =
   DirectSampling(
+<<<<<<< HEAD
     evaluation = (replications -- estimateCorrs) hook indics_hook,
+=======
+    evaluation = (replications -- estimateCorrs hook indics_hook),
+>>>>>>> 416e8083ef72fc5ea8e17e6affcf2750c451eb44
     sampling =
     /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
     (networkSpeed in (2.0 to 6.0 by 2.0)) x
