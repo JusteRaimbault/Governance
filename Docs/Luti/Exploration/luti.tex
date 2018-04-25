@@ -122,6 +122,7 @@ Luti stylized facts to be targeted by the model : from \cite{wegener2004land}, s
 	%\item ``\textit{travel time improvement $\implies$ more and longer trips}'': $\rho\left[t_i,d_i\right] < 0$ where $d_i = \sum_j \frac{\phi_{ij}}{\sum_{kl} \phi_{kl}} \cdot d_{ij}$ is the average travel distance from patch i. % not clear on flows
 \end{itemize}
 
+$\rightarrow$ associated indicators. Correlation are estimated on all patches and bootstrap repetitions, on time windows of length $T_w$ starting at an offset $t_0$. (\textit{for now we use $T_w = 1$ and $t_0 = t_f$})
 
 
 
@@ -214,7 +215,13 @@ With 200 replications, we obtain a third quartile of 1.07 for the relative confi
 
 \subsection{OSE}
 
-\textit{experiment Romain}
+%\textit{experiment Romain}
+
+\subsubsection{Test}
+
+Test on an optimal region for indicators for congestion and accessibility \href{https://github.com/JusteRaimbault/Governance/commit/7f6355aba398948242e7b3f9984c20c3137900c9}{commit 7f6355ab}
+
+$\rightarrow$ promising results as similar indicator values can be given by very different parameter values. Artifact due to neighborhood of $\alpha = 0$ (solution : replace congestion by relative congestion to have a single point in parameter space, since when $\alpha \simeq 0$ accessibility is constant but congestion still strongly dependent on initial network configuration).
 
 
 

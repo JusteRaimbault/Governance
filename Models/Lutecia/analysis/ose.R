@@ -39,8 +39,16 @@ dev.off()
 
 
 # input plots
+oseres$opositeRelativeAccessibility=cut(oseres$opositeRelativeAccessibility,5)
+ggpairs(data=oseres,columns = params,
+        aes(colour=opositeRelativeAccessibility)
+)
+ggsave(filename = paste0(resdir,'scatterparams_color-relAcc.png'),width = 60,height=30,units='cm')
 
-
-
+oseres$nwCongestion=cut(oseres$nwCongestion,5)
+ggpairs(data=oseres,columns = params,
+        aes(colour=nwCongestion)
+)
+ggsave(filename = paste0(resdir,'scatterparams_color-nwCongestion.png'),width = 60,height=30,units='cm')
 
 
