@@ -67,23 +67,24 @@ val model = NetLogo5Task(workDirectory / "model/HEADLESS_Lutecia.nlogo",cmds,emb
 )
 
 
-//val purpose = "TEST"
-val purpose = "CORRELATIONS"
+val purpose = "TEST"
+//val purpose = "CORRELATIONS"
 
-val nReplications=50
+//val nReplications=50
+val nReplications=1
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv")
 //set (arraysOnSingleRow := true)
 
 
-//val env = LocalEnvironment(4)
-val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(4)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = model,
+   evaluation = model on env,
    seed = replication,
    replications = nReplications
 )
@@ -92,8 +93,8 @@ val replications =
 val estimateCorrs = RTask("""
         #ultra dirty rscript
         source("corrs.R")
-        show(c(unlist(access)));show(c(unlist(dactives)));show(c(unlist(employments)))
-        show(length(access));#show(length(access[[1]]))
+        #show(c(unlist(access)));show(c(unlist(dactives)));show(c(unlist(employments)))
+        #show(length(access));#show(length(access[[1]]))
         rhoaccessdevres = timecorrs(c(unlist(access)),c(unlist(dactives)),n=c(unlist(n))[1],b=b)
         rhoaccessempres = timecorrs(c(unlist(access)),c(unlist(employments)),n=c(unlist(n))[1],b=b)
         rhoaccesswtimeres = timecorrs(c(unlist(access)),c(unlist(weightedtime)),n=c(unlist(n))[1],b=b)
@@ -105,7 +106,9 @@ val estimateCorrs = RTask("""
         rhoaccessweightedtime=rhoaccesswtimeres$allrho;rhoaccessweightedtimemin=rhoaccesswtimeres$rhominus;rhoaccessweightedtimemax=rhoaccesswtimeres$rhoplus
         rhoaccessunweightedtime=rhoaccessutimeres$allrho;rhoaccessunweightedtimemin=rhoaccessutimeres$rhominus;rhoaccessunweightedtimemax=rhoaccessutimeres$rhoplus
         tws=rhoaccessdevres$alltws;t0=rhoaccessdevres$allt0s;
-    """) set (
+        #
+        summary(corrtrends(c(unlist(access)),c(unlist(dactives)),n=c(unlist(n))[1],b=b))
+    """,libraries=Seq("segmented")) set (
       b := nReplications,
       resources += workDirectory / "analysis/corrs.R",
       rInputs += (b,"b"),
@@ -134,11 +137,22 @@ val estimateCorrs = RTask("""
     )
 
 
+// get final correlations from all estimated correlations
+/*
+val getFinalCorrs = ScalaTask("""
+
+
+      """
+      ) set (
+        inputs += (corAccessDev,corAccessEmployments,corrAccessWeightedtime,corAccessUnweightedtime)
+        outputs += ()
+      )
+*/
 
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
 val exploration =
   DirectSampling(
-    evaluation = (replications -- estimateCorrs) on env by 10 hook indics_hook,
+    evaluation = (replications -- estimateCorrs) hook indics_hook,
     sampling =
     /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
     (networkSpeed in (2.0 to 6.0 by 2.0)) x
@@ -149,7 +163,8 @@ val exploration =
     (scenario in (0 to 5 by 1))
   ) withIndex id )*/
    ((LHS (
-      500
+      //500
+      1
       //,lambdaAcc in Range(0.001,0.01)
       //,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)

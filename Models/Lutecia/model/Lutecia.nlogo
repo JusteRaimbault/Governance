@@ -747,10 +747,10 @@ NIL
 0
 
 PLOT
-1132
-183
-1355
-338
+1019
+184
+1242
+339
 convergence
 NIL
 NIL
@@ -1010,10 +1010,10 @@ TEXTBOX
 1
 
 PLOT
-1132
-16
-1355
-182
+1019
+17
+1242
+183
 accessibility
 NIL
 NIL
@@ -1180,10 +1180,10 @@ setup/conf/synth_unbalanced_close.conf
 String
 
 PLOT
-1357
-16
-1565
-183
+1244
+17
+1452
+184
 morphology
 moran
 slope
@@ -1220,10 +1220,10 @@ global:evolve-landuse?
 -1000
 
 PLOT
-1357
-185
-1564
-339
+1244
+186
+1451
+340
 mean-travel-distance
 NIL
 NIL
@@ -1277,7 +1277,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.83
+0.42
 0.01
 1
 NIL
@@ -1415,10 +1415,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1132
-342
-1354
-492
+1456
+16
+1678
+166
 cor-access-dev
 NIL
 NIL
@@ -1435,10 +1435,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-dev-mw"
 
 PLOT
-1357
-341
-1569
-491
+1457
+171
+1678
+321
 corr-access-employments
 NIL
 NIL
@@ -1453,6 +1453,46 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-employments"
 "pen-1" 1.0 0 -2674135 true "" "plot 0"
 "pen-2" 1.0 0 -13791810 true "" "plot indicators:causal-moving-average \"indicators-stylized:cor-access-employments\" 15"
+
+PLOT
+1020
+341
+1220
+491
+cor-access-wtime
+NIL
+NIL
+0.0
+10.0
+-0.05
+0.05
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-time true"
+"pen-1" 1.0 0 -2674135 true "" "plot 0"
+"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw true"
+
+PLOT
+1224
+344
+1424
+494
+cor-access-utime
+NIL
+NIL
+0.0
+10.0
+-0.05
+0.05
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-time false"
+"pen-1" 1.0 0 -2674135 true "" "plot 0"
+"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw false"
 
 @#$#@#$#@
 ## Context
