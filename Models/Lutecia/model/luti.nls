@@ -12,7 +12,7 @@ to luti:luti
   output-print "luti module"
   
   ;; compute acc and utilities
-  compute-patches-variables
+  accessibilities:compute-patches-variables
   
   ;; update ext
   luti:update-externalities
@@ -79,6 +79,8 @@ end
 to luti:update-externalities
   
   if global:with-externalities? [
+    
+    output-print "... externality"
     
     foreach global:external-facility [
        ask patch-with-number ? [

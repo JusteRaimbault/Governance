@@ -10,7 +10,7 @@
 
 
 ;;
-;
+;  put in memory values of indicators for tracked time-series
 to indicators:update-indicators
   foreach global:tracked-indicators [
     let val run-result ?
@@ -19,28 +19,31 @@ to indicators:update-indicators
 end
 
 
+;;
+; print indicators in output
 to indicators:compute-indicators
   network:cache-nw-measures
   
-  output-print (word "mean-accessibility : " indicators:mean-accessibility patches)
-  output-print (word "mean-accessibility-balance : " indicators:mean-accessibility-balance)
-  output-print (word "mean-travel-distance : " indicators:mean-travel-distance)
-  output-print (word "actives-entropy : " indicators:morphology:entropy-actives)
-  output-print (word "moran-actives : " indicators:morphology:moran-actives)
-  output-print (word "collaboration wanted : " wanted-collaboration-rate)
-  output-print (word "collaboration realized : " realized-collaboration-rate)
-  output-print (word "externality-decrep : " externality-decrepitude)
-  output-print (word "mean-congestion : " indicators:mean-congestion)
-  output-print (word "total-nw-length : " indicators:network:total-nw-length)
-  output-print (word "relative-nw-length : " network-indicators:relative-nw-length)
-  output-print (word "mean-relative-speed : " indicators:network:mean-relative-speed)
-  output-print (word "mean-closeness-centrality : " indicators:network:mean-closeness-centrality)
-  output-print (word "mean-bw-centrality : " indicators:network:mean-bw-centrality)
-  output-print (word "mean-path-length : " indicators:network:mean-path-length)
-  output-print (word "nw-diameter : " indicators:network:nw-diameter)
-  output-print (word "alpha-bw-centrality : " indicators:network:alpha-bw-centrality)
-  output-print (word "alpha-closeness-centrality : " indicators:network:alpha-closeness-centrality)
-  output-print (word "indicators:relative-accessibility : " indicators:relative-accessibility)
+  output-print (word "mean-accessibility = " indicators:mean-accessibility patches)
+  output-print (word "mean-accessibility-balance = " indicators:mean-accessibility-balance)
+  output-print (word "mean-travel-distance = " indicators:mean-travel-distance)
+  output-print (word "actives-entropy = " indicators:morphology:entropy-actives)
+  output-print (word "moran-actives = " indicators:morphology:moran-actives)
+  output-print (word "collaboration wanted = " indicators:wanted-collaboration-rate)
+  output-print (word "collaboration realized = " indicators:realized-collaboration-rate)
+  output-print (word "externality-decrep = " indicators:externality-decrepitude)
+  output-print (word "mean-congestion = " indicators:mean-congestion)
+  output-print (word "relative-congestion = " indicators:relative-congestion)
+  output-print (word "total-nw-length = " indicators:network:total-nw-length)
+  output-print (word "relative-nw-length = " network-indicators:relative-nw-length)
+  output-print (word "mean-relative-speed = " indicators:network:mean-relative-speed)
+  output-print (word "mean-closeness-centrality = " indicators:network:mean-closeness-centrality)
+  output-print (word "mean-bw-centrality = " indicators:network:mean-bw-centrality)
+  output-print (word "mean-path-length = " indicators:network:mean-path-length)
+  output-print (word "nw-diameter = " indicators:network:nw-diameter)
+  output-print (word "alpha-bw-centrality = " indicators:network:alpha-bw-centrality)
+  output-print (word "alpha-closeness-centrality = " indicators:network:alpha-closeness-centrality)
+  output-print (word "indicators:relative-accessibility = " indicators:relative-accessibility)
 end
 
 to indicators:compute-network-indicators
@@ -255,6 +258,14 @@ end
 
 
 ;;
+; relative congestion in time
+to-report indicators:relative-congestion
+  let ts-cong indicators:ts-indicator "indicators:mean-congestion"
+  report item (length ts-cong - 1) ts-cong / item 0 ts-cong
+end
+
+
+;;
 ; congestion on patches
 to-report indicators:mean-patch-congestion
   report mean global:patches-congestion
@@ -423,7 +434,7 @@ end
 
 ;;
 ; Sum of employments in the external facility
-to-report externality-employments
+to-report indicators:externality-employments
   ifelse global:external-facility = 0 or length global:external-facility = 0 [
     report 0 
   ][
@@ -433,7 +444,7 @@ end
 
 
 
-to-report wanted-collaboration-rate
+to-report indicators:wanted-collaboration-rate
   ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
@@ -442,7 +453,7 @@ to-report wanted-collaboration-rate
 end
 
 
-to-report realized-collaboration-rate
+to-report indicators:realized-collaboration-rate
   ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
@@ -450,7 +461,7 @@ to-report realized-collaboration-rate
   ]
 end
 
-to-report expected-collaboration-rate
+to-report indicators:expected-collaboration-rate
   ifelse length global:collaborations-wanted = 0 [
     report 0
   ][
@@ -459,8 +470,8 @@ to-report expected-collaboration-rate
 end
 
 
-to-report externality-decrepitude
-  report externality-employments / (global:employments-max * global:ext-employments-proportion-of-max)
+to-report indicators:externality-decrepitude
+  report indicators:externality-employments / (global:employments-max * global:ext-employments-proportion-of-max)
 end
   
 

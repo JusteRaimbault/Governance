@@ -28,7 +28,7 @@ val gammaSlimeMould=Val[Double]
 
 // sustainibility
 val relativeAccessibility = Val[Double]
-val nwCongestion = Val[Double]
+val relativeCongestion = Val[Double]
 
 // network shape
 val nwRelativeLength = Val[Double]
@@ -61,8 +61,8 @@ val cmds = List(
 val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
-  //netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
-  //netLogoOutputs += ("indicators:mean-congestion",nwCongestion),
+  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
+  netLogoOutputs += ("indicators:relative-congestion",relativeCongestion),
   //netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
   //netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
   //netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
@@ -76,10 +76,10 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
   //netLogoOutputs += ("global:initial-nw-random-type",nwType),
   //netLogoOutputs += ("global:#-initial-territories",centerNumber),
   //netLogoOutputs += ("global:network-biological-gamma",gammaSlimeMould),
-  netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDev),
-  netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted)
+  //netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDev),
+  //netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
+  //netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
+  //netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted)
 )
 
 val modelFixedParams = model set (lambdaAcc := 0.005, networkSpeed := 5.0)

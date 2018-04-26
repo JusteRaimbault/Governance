@@ -17,7 +17,8 @@ to transportation:transportation
   transportation:compute-flows
   
   ; use effective paths matrix to compute wardrop ?
-  transportation:affectation false
+  ;transportation:affectation false
+  transportation:affectation true
   
   ; update congestion given the affectation
   transportation:update-congestion

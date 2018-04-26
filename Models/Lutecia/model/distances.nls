@@ -372,7 +372,7 @@ to update-vertices-and-paths [new-inters]
   set global:network-distance-matrix  matrix:make-constant global:#-patches global:#-patches (global:dmax + 1)
   
   foreach table:keys global:network-shortest-paths [
-    let p table:get global:network-shortest-paths ? let o first ? let d last ? let di path-length p
+    let p table:get global:network-shortest-paths ? let o first ? let d last ? let di distances:path-length p
     matrix:set global:network-distance-matrix o d di matrix:set global:network-distance-matrix d o di
   ]
   
@@ -442,7 +442,7 @@ to update-vertices-and-paths [new-inters]
     ]
     foreach table:keys changed-paths [
       ;debug (word "Updating path " (table:get network-shortest-paths ?) " into " (table:get changed-paths ?) " for inter " o)
-      let p (table:get changed-paths ?) let d path-length p
+      let p (table:get changed-paths ?) let d distances:path-length p
       table:put global:network-shortest-paths ? p
       matrix:set global:network-distance-matrix (first ?) (last ?) d matrix:set global:network-distance-matrix (last ?) (first ?) d
     ]   
@@ -500,7 +500,7 @@ to update-vertices-and-paths [new-inters]
             table:put global:network-shortest-paths (list d o) path table:put global:network-shortest-paths (list o d) list:rev path
          
             ;; update network distance matrix
-            let di path-length path
+            let di distances:path-length path
             matrix:set global:network-distance-matrix d o di matrix:set global:network-distance-matrix o d di
             ;debug (word "... via neighbors : " table:get network-shortest-paths (list o d))
          ]
@@ -711,11 +711,11 @@ to update-network-distance-matrix [everything]
   
   if everything [
   
-  set global:network-distance-matrix matrix:make-constant global:#-patches global:#-patches ((10 * global:dmax) * global:network-min-pace * (network-pace (max global:patches-congestion) (max global:patches-congestion)))
+  set global:network-distance-matrix matrix:make-constant global:#-patches global:#-patches ((10 * global:dmax) * global:network-min-pace * (distances:network-pace (max global:patches-congestion) (max global:patches-congestion)))
   
   ; compute path length
   let paths-length table:make
-  foreach table:keys global:network-shortest-paths [table:put paths-length ? (congested-distance table:get global:network-shortest-paths ?)]
+  foreach table:keys global:network-shortest-paths [table:put paths-length ? (distances:congested-distance table:get global:network-shortest-paths ?)]
   
   
   ; iterate on nw patches
@@ -731,14 +731,14 @@ to update-network-distance-matrix [everything]
       ;][print error-message inspect one-of patches with [number = p1] inspect one-of patches with [number = p2]]
       ifelse i1 = i2 or list:rev i1 = i2 or member? p1 (map first i2) or member? p2 (map first i1) [
         ; patches are on same link
-        set d (matrix:get global:euclidian-distance-matrix p1 p2) * global:network-min-pace * ((network-pace (item p1 global:patches-congestion) (max global:patches-congestion)) + (network-pace (item p2 global:patches-congestion) (max global:patches-congestion))) / 2
+        set d (matrix:get global:euclidian-distance-matrix p1 p2) * global:network-min-pace * ((distances:network-pace (item p1 global:patches-congestion) (max global:patches-congestion)) + (distances:network-pace (item p2 global:patches-congestion) (max global:patches-congestion))) / 2
       ][
         ; otherwise go through nw
         foreach i1 [
           let n1 first ? foreach i2 [
              let n2 first ?
              if table:has-key? paths-length (list n1 n2) [ 
-                set d min (list d (((matrix:get global:euclidian-distance-matrix p1 n1) * global:network-min-pace * (network-pace (item p1 global:patches-congestion) (max global:patches-congestion))) +((matrix:get global:euclidian-distance-matrix p2 n2) * global:network-min-pace * (network-pace (item p2 global:patches-congestion) (max global:patches-congestion))) + table:get paths-length (list n1 n2))) 
+                set d min (list d (((matrix:get global:euclidian-distance-matrix p1 n1) * global:network-min-pace * (distances:network-pace (item p1 global:patches-congestion) (max global:patches-congestion))) +((matrix:get global:euclidian-distance-matrix p2 n2) * global:network-min-pace * (distances:network-pace (item p2 global:patches-congestion) (max global:patches-congestion))) + table:get paths-length (list n1 n2))) 
              ]
           ] 
         ]
@@ -783,7 +783,7 @@ end
 
 ;;
 ; euclidian length of a path, used to update shortest paths in the nw
-to-report path-length [path]
+to-report distances:path-length [path]
   let res 0
   if length path > 0 [
     let current-patch first path
@@ -799,13 +799,13 @@ end
 ;;
 ; given a path, reports generalized time to go through it
 ; taking congestion into account
-to-report congested-distance [path]
+to-report distances:congested-distance [path]
   let res 0
   if length path > 0 [
     let current-patch first path
     foreach but-first path [
       let next-patch ?
-      set res res + (matrix:get global:euclidian-distance-matrix current-patch next-patch) * global:network-min-pace * ((network-pace (item current-patch global:patches-congestion) (max global:patches-congestion)) + (network-pace (item next-patch global:patches-congestion) (max global:patches-congestion))) / 2
+      set res res + (matrix:get global:euclidian-distance-matrix current-patch next-patch) * global:network-min-pace * ((distances:network-pace (item current-patch global:patches-congestion) (max global:patches-congestion)) + (distances:network-pace (item next-patch global:patches-congestion) (max global:patches-congestion))) / 2
       set current-patch next-patch
     ]
   ]
@@ -815,11 +815,15 @@ end
 
 ;;
 ; Pace as a function of congestion
-to-report network-pace [cong max-cong]
+to-report distances:network-pace [cong max-cong]
   
-  ; Q : find a more elaborate function (such as BPR)
+  ; TODO : implement a more elaborate function (such as BPR)
   
-  report (cong / max-cong) * global:congestion-price
+  ifelse global:with-congestion? [
+    report (cong / max-cong) * global:congestion-price
+  ][
+    report 1
+  ]
 end
 
 

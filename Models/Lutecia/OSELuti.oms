@@ -73,10 +73,10 @@ val model = NetLogo5Task(workDirectory / "Lutecia/HEADLESS_Lutecia.nlogo", cmds,
   netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted),
-  lambdaAcc := 0.005, 
+  lambdaAcc := 0.005,
   networkSpeed := 5.0
 )
-    
+
 val opositeRelativeAccessibility = Val[Double]
 
 val post = ScalaTask("""
@@ -106,10 +106,10 @@ val evolution =
     evaluation = model -- post,
     termination = 20 minutes
   )
-  
-val island = 
+
+val island =
   IslandEvolution(
-    island = evolution, 
+    island = evolution,
     parallelism = 1000,
     termination = 100000
   )
@@ -117,9 +117,3 @@ val island =
 val savePopulationHook = SavePopulationHook(island, workDirectory / "results")
 
 island hook savePopulationHook
-
-
-
-
-
-
