@@ -244,18 +244,30 @@ globals[
   ;; Transportation
   ;;;;;;;;;;;;;
 
+  ;;
+  ;  Take congestion into account .
+  global:with-congestion?
+
+  ;;
+  ;  Price of congestion (see distance:network-pace function)
   global:congestion-price
+
+  ;;
+  ;  Spatial range to compute transportation flows (effective commuting range)
   global:lambda-flows
 
-  ;; transportation flows \phi_ij between patches
+  ;;
+  ; transportation flows \phi_ij between patches
   global:flow-matrix
 
-  ;; congestion in patches
+  ;;
+  ; congestion in patches
   ; list ordered by patch number
   global:patches-congestion
 
-  ;; maximal pace (inverse of speed) in the transportation network
-  ;network-max-pace
+  ;;
+  ; maximal pace (inverse of speed) in the transportation network
+  ; network-max-pace
   global:euclidian-min-pace
   global:network-min-pace
 
@@ -269,9 +281,13 @@ globals[
   global:collaborations-realized
   global:collaborations-expected
 
+  ;;
+  ; discrete choices parameter for the corresponding game
   global:beta-dc-game
 
-  ;evolve-network?
+  ;;
+  ; should the network evolve ?
+  ;global:evolve-network?
 
 
   ;;;;;;;;;;;;;
@@ -766,10 +782,10 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
-1071
-567
-1528
-861
+1045
+756
+1502
+1050
 10
 
 TEXTBOX
@@ -938,10 +954,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-724
-618
-885
-651
+14
+776
+175
+809
 compute indicators
 indicators:compute-indicators
 NIL
@@ -1043,7 +1059,7 @@ BUTTON
 245
 703
 update
-compute-patches-variables\ndisplay:color-patches
+accessibilities:compute-patches-variables\ndisplay:color-patches
 NIL
 1
 T
@@ -1097,10 +1113,10 @@ NIL
 1
 
 BUTTON
-725
-584
-885
-617
+15
+742
+175
+775
 construct infrastructure
 governance:manual-infrastructure-construction
 T
@@ -1259,10 +1275,10 @@ Run
 1
 
 TEXTBOX
-721
-560
-871
-578
+11
+718
+161
+736
 Interactive
 11
 0.0
@@ -1389,10 +1405,10 @@ global:initial-nw-random-type
 1
 
 MONITOR
-1542
-583
-1609
-628
+1516
+772
+1583
+817
 bio ticks
 global:bio-ticks
 17
@@ -1415,10 +1431,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1456
-16
-1678
-166
+1501
+582
+1723
+732
 cor-access-dev
 NIL
 NIL
@@ -1435,10 +1451,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-dev-mw"
 
 PLOT
-1457
-171
-1678
-321
+1276
+582
+1499
+732
 corr-access-employments
 NIL
 NIL
@@ -1455,10 +1471,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators:causal-moving-average \"indicators-stylized:cor-access-employments\" 15"
 
 PLOT
-1020
-341
-1220
-491
+871
+582
+1071
+732
 cor-access-wtime
 NIL
 NIL
@@ -1475,10 +1491,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw true"
 
 PLOT
-1224
-344
-1424
-494
+1074
+582
+1274
+732
 cor-access-utime
 NIL
 NIL
@@ -1493,6 +1509,35 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-time false"
 "pen-1" 1.0 0 -2674135 true "" "plot 0"
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw false"
+
+TEXTBOX
+875
+543
+957
+561
+Correlations
+12
+0.0
+1
+
+PLOT
+1026
+380
+1318
+556
+Relative sustainibility indics
+NIL
+NIL
+0.0
+10.0
+0.95
+1.05
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13403783 true "" "if ticks > 0 [plot indicators:relative-accessibility]"
+"pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
 
 @#$#@#$#@
 ## Context

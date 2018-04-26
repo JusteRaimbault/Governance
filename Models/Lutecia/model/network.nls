@@ -254,8 +254,9 @@ to network:cache-nw-measures
   ]
   
   
-  ; compute congestions
-  transportation:affectation true
+  ; recompute congestions
+  ; not needed : affectation done at each time step, distance not changed by caching measures
+  ;transportation:affectation true
   
   
 end

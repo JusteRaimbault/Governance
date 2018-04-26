@@ -77,6 +77,7 @@ to setup:setup-globals
   
   ;;;;;
   ;; transportation
+  set global:with-congestion? false
   set global:network-min-pace 1
   set global:euclidian-min-pace global:network-speed
   set global:congestion-price 1
@@ -119,7 +120,9 @@ to setup:setup-globals
     "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments" ; morphology employments
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "global:rel-diff-actives" "global:rel-diff-employments" "indicators:mean-accessibility-balance"
+    "global:rel-diff-actives" "global:rel-diff-employments" ; convergence
+    "indicators:mean-congestion" ; congestion
+    "indicators:mean-accessibility-balance"
     "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments""indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false" ; timely correlations
     "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
     )
@@ -547,7 +550,7 @@ end
 
 ;; initial utilities and accessibilities
 to setup:setup-patch-variables
-  compute-patches-variables
+  accessibilities:compute-patches-variables
   set global:initial-max-acc max [patch:current-accessibility] of patches
 end
 

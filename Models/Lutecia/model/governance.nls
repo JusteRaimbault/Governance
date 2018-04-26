@@ -29,7 +29,7 @@ to governance:governance
   
     ; recompute patch vars here - as indicators are called after the end of this stage.
     ;  Q : to gain perf, do it only at the end ? -- OK not so much time
-    compute-patches-variables
+    accessibilities:compute-patches-variables
   
   ]
   
@@ -140,7 +140,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
   distances:update-effective-matrices
   
   ; old mean accessibility
-  compute-patches-accessibilities
+  accessibilities:compute-patches-accessibilities
   let old-acc accessibilities:mean-accessibility patchset
   let olds (list accessibilities:mean-accessibility patches)
   foreach sort-on [who] (mayors with [self != global:regional-authority]) [set olds lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) olds] 
@@ -157,7 +157,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
       distances:update-network potential-infra
       distances:update-effective-matrices
       ; recompute new accessibilities
-      compute-patches-accessibilities
+      accessibilities:compute-patches-accessibilities
       let new-acc accessibilities:mean-accessibility patchset
       let news (list accessibilities:mean-accessibility patches)
       foreach sort-on [who] (mayors with [self != global:regional-authority]) [set news lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) news]
@@ -377,7 +377,7 @@ if mouse-down? [
   ]
   if length global:to-construct = 2[
     governance:construct-infrastructure (list global:to-construct) save-nw-config
-    compute-patches-variables
+    accessibilities:compute-patches-variables
     display:update-display
     set global:to-construct []
     verbose (word "mean-travel-distance : " indicators:mean-travel-distance)

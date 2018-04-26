@@ -6,10 +6,13 @@
 
 ;;
 ; update acc, form factor and utilities
-to compute-patches-variables
-  compute-patches-accessibilities
-  compute-patches-form-factor
-  compute-patches-utilities
+to accessibilities:compute-patches-variables
+  
+  output-print "... updating patch variables"
+  
+  accessibilities:compute-patches-accessibilities
+  accessibilities:compute-patches-form-factor
+  accessibilities:compute-patches-utilities
   
   ; color patches here, for more understanding of the infrastructure explo process
   display:color-patches
@@ -20,7 +23,7 @@ end
 ;;
 ;  Compute patches accessibilities
 ;   given current distributions and effective distance matrix
-to compute-patches-accessibilities
+to accessibilities:compute-patches-accessibilities
   ask patches [
      set patch:prev-accessibility patch:a-to-e-accessibility + patch:e-to-a-accessibility
      ; only one csp for now
@@ -38,10 +41,10 @@ end
 ;;
 ; Compute form factor, as couples [a-form-factor,e-form-factor]
 ;
-to compute-patches-form-factor
+to accessibilities:compute-patches-form-factor
   ; only one csp : nothing to do
   ask patches [
-    set patch:form-factor (list actives-form-factor employments-form-factor)
+    set patch:form-factor (list accessibilities:actives-form-factor accessibilities:employments-form-factor)
   ]
 end
 
@@ -49,7 +52,7 @@ end
 ;;
 ; patches utilities
 ;  note : could be in same loop as accessibilities ? more flexibility.
-to compute-patches-utilities
+to accessibilities:compute-patches-utilities
   ask patches [
     set patch:a-utility (patch:a-to-e-accessibility ^ global:gamma-cobb-douglas-a) * ((first patch:form-factor) ^ (1 - global:gamma-cobb-douglas-a))
     set patch:e-utility (patch:e-to-a-accessibility ^ global:gamma-cobb-douglas-e) * ((last patch:form-factor) ^ (1 - global:gamma-cobb-douglas-e))
@@ -79,7 +82,7 @@ end
 ;;
 ; form factor for actives :
 ;  they search to flee from density, both of actives and employments
-to-report actives-form-factor
+to-report accessibilities:actives-form-factor
   if patch:actives = 0 or patch:employments = 0 [report 1]
   report 1 / (patch:actives * patch:employments)
 end
@@ -88,7 +91,7 @@ end
 ;;
 ; form factor for employments:
 ;  take only accessibility into account (for now)
-to-report employments-form-factor
+to-report accessibilities:employments-form-factor
   report 1
 end
 
