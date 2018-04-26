@@ -187,6 +187,8 @@ globals[
   ;; Transportation
   ;;;;;;;;;;;;;
 
+  global:with-congestion?
+
   ;; transportation flows \phi_ij between patches
   global:flow-matrix
 
