@@ -13,8 +13,29 @@ source(paste0(Sys.getenv('CS_HOME'),'/CityNetwork/Models/Utils/R/plots.R'))
 pseresdir='20180425_1511_PSE'
 res <- as.tbl(read.csv('explo/20180425_1511_PSE/population1655.csv'))
 
-resdir = paste0(Sys.getenv('CS_HOME'),'/Governance/Results/Luti/',pseresdir,'/');dir.create(resdir)
+figdir = paste0(Sys.getenv('CS_HOME'),'/Governance/Results/Luti/',pseresdir,'/');dir.create(resdir)
 
+
+###
+# scatterplots of outputs
+
+indicators=c("corAccessDev","corAccessEmployments","corAccessTimeWeighted","corAccessTimeUnweighted")
+
+res$relocationRate = cut(res$relocationRate,6)
+ggpairs(data=res,columns = indicators,
+        aes(colour=relocationRate,alpha=0.4)
+)
+ggsave(filename = paste0(figdir,'scatterplot_colorrelocationRate.png'),width=40,height=25,units='cm')
+
+# rq : 200^4 = 1.6e9 -> memory fail for correlations
+
+###
+# Convergence
+
+pops = read.csv('counts.csv',sep=';')
+names(pops)=c("pop","time")
+summary(lm(data=pops,pop~time))
+plot(pops[,2],pops[,1],type='l')
 
 
 

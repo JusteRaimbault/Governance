@@ -94,10 +94,12 @@ val evolution =
         betaDC in (0.0,10.0),
         scenario in (0 to 7 by 1)
       objectives =  Seq(
-        corAccessDev in (-1.0 to 1.0 by 0.01),
-        corAccessEmployments in (-1.0 to 1.0 by 0.01),
-        corAccessTimeWeighted in (-1.0 to 1.0 by 0.01),
-        corAccessTimeUnweighted in (-1.0 to 1.0 by 0.01))
+        //corAccessDev in (-1.0 to 1.0 by 0.01),
+        //corAccessEmployments in (-1.0 to 1.0 by 0.01),
+        //corAccessTimeWeighted in (-1.0 to 1.0 by 0.01),
+        //corAccessTimeUnweighted in (-1.0 to 1.0 by 0.01))
+        relativeAccessibility in (0.5 to 1.5 by 0.05),
+        relativeCongestion in (0.5 to 1.5 by 0.05)
       stochastic = Stochastic(seed = replication)
     ),
     evaluation = modelFixedParams,
