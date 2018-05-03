@@ -632,7 +632,7 @@ CHOOSER
 global:patches-display
 global:patches-display
 "governance" "patch:actives" "patch:employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
-13
+1
 
 TEXTBOX
 11
@@ -1317,7 +1317,7 @@ global:total-infrastructure-stock
 global:total-infrastructure-stock
 0
 100
-0.0
+1.0
 1
 1
 NIL

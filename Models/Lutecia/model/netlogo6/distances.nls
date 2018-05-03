@@ -209,12 +209,13 @@ to update-inters-recompute [new-inters new-nw-patches]
   ask transportation-links [let f [] foreach link:footprint[? -> ask ? [set f lput patch:number f]] set footprints lput f footprints]
   set global:closest-nw-inters table:make
   foreach footprints [
-    ? ->
-    let current-fp ? let current-inters []
-    foreach current-fp [if position ? global:nw-inters != false [set current-inters lput ? current-inters]]
+   current-fp ->
+    let current-inters []
+    foreach current-fp [? -> if position ? global:nw-inters != false [set current-inters lput ? current-inters]]
     if length current-inters > 1 [
       let k 1 let current-inter item 0 current-inters let next-inter item 1 current-inters
       foreach current-fp [
+        ? ->
         let nints []
         if ? = current-inter [set nints (list (list next-inter (matrix:get global:euclidian-distance-matrix current-inter next-inter)))]
         if ? != current-inter and ? != next-inter [set nints (list (list current-inter (matrix:get global:euclidian-distance-matrix current-inter ?)) (list next-inter (matrix:get global:euclidian-distance-matrix ? next-inter)))]
@@ -244,60 +245,59 @@ to update-inters [new-inters in-between]
   
   ;; add intersections
   foreach new-inters [
-    ? ->
+    new-inter ->
     
     ;; add to nw inters set
-    set global:nw-inters lput ? global:nw-inters
+    set global:nw-inters lput new-inter global:nw-inters
     
     ;; update nw-closest-inter for crossing link
-    let ni ?
     
     let to-replace table:make
     
-    if table:has-key? global:closest-nw-inters ? [
+    if table:has-key? global:closest-nw-inters new-inter [
        ; was already on a link, then it is the link crossed
        
        ;debug (word "old inter : " ?)
        
-       let prev-crossing-ends table:get global:closest-nw-inters ?
-       table:remove global:closest-nw-inters ?
+       let prev-crossing-ends table:get global:closest-nw-inters new-inter
+       table:remove global:closest-nw-inters new-inter
        foreach table:keys global:closest-nw-inters [
-         
+         closest-inter ->
          ;debug (word "patch " ? " - inters "  table:get closest-nw-inters ?)
          
          ; find table entries with same extremities
-         let chge? (length prev-crossing-ends = length table:get global:closest-nw-inters ?)
+         let chge? (length prev-crossing-ends = length table:get global:closest-nw-inters closest-inter)
          if chge? [
-           let i 0 foreach table:get global:closest-nw-inters ? [set chge? (chge? and first ? = first item i prev-crossing-ends) set i i + 1]
-           set i 0 let chgerev true foreach list:rev table:get global:closest-nw-inters ? [set chgerev (chgerev and first ? = first item i prev-crossing-ends) set i i + 1]
+           let i 0 foreach table:get global:closest-nw-inters closest-inter [? -> set chge? (chge? and first ? = first item i prev-crossing-ends) set i i + 1]
+           set i 0 let chgerev true foreach list:rev table:get global:closest-nw-inters closest-inter [? -> set chgerev (chgerev and first ? = first item i prev-crossing-ends) set i i + 1]
            set chge? (chge? or chgerev)
          ]
          
         ; output-print chge?
         ; must change the table entry
-        let oldints table:get global:closest-nw-inters ?
+        let oldints table:get global:closest-nw-inters closest-inter
         if chge? [
              let nints []
-             let dni matrix:get global:euclidian-distance-matrix ? ni
+             let dni matrix:get global:euclidian-distance-matrix closest-inter new-inter
              let d1 last first oldints let n1 first first oldints
              let d2 last last oldints let n2 first last oldints
-             let dn1 matrix:get global:euclidian-distance-matrix ni n1
+             let dn1 matrix:get global:euclidian-distance-matrix new-inter n1
              
-             debug (word "ni : " ni " - n1 : " n1 " - n2 : " n2 " - ? : " ?)
+             debug (word "ni : " new-inter " - n1 : " n1 " - n2 : " n2 " - ? : " closest-inter)
              debug (word "dni : " dni " - d1 : " d1 " - d2 : " d2 " - dn1 : " dn1)  ; DEBUG      
              ;debug first first oldints debug first last oldints
              
              ; heuristic ?
              ifelse abs (d1 + dni - dn1 ) < 1 [
-               set nints (list (list ni dni) (list (first first oldints) d1))
+               set nints (list (list new-inter dni) (list (first first oldints) d1))
              ][
-               set nints (list (list ni dni) (list (first last oldints) d2))
+               set nints (list (list new-inter dni) (list (first last oldints) d2))
              ]
         
-             table:put global:closest-nw-inters ? nints
+             table:put global:closest-nw-inters closest-inter nints
          ]
                
-         if not member? ? global:nw-inters[
+         if not member? closest-inter global:nw-inters[
            table:put to-replace (first first oldints) (first last oldints)
            table:put to-replace (first last oldints) (first first oldints)
          ]
@@ -305,7 +305,7 @@ to update-inters [new-inters in-between]
        ]
        
        ; and reput the entry for the intersection itself (has been removed, will be completed after)
-       table:put global:closest-nw-inters ni prev-crossing-ends
+       table:put global:closest-nw-inters new-inter prev-crossing-ends
        
        
     ]
@@ -318,9 +318,9 @@ to update-inters [new-inters in-between]
     ;;;;;;;;;;;;;;
     
     foreach global:nw-inters [
-      let n1 ?
+      n1 ->
       if table:has-key? to-replace n1 and table:has-key? global:closest-nw-inters n1 [
-         let newints [] foreach table:get global:closest-nw-inters n1 [ifelse first ? = table:get to-replace n1 [set newints lput (list ni (matrix:get global:euclidian-distance-matrix ni n1)) newints][set newints lput ? newints]]
+         let newints [] foreach table:get global:closest-nw-inters n1 [? -> ifelse first ? = table:get to-replace n1 [set newints lput (list new-inter (matrix:get global:euclidian-distance-matrix new-inter n1)) newints][set newints lput ? newints]]
          table:put global:closest-nw-inters n1 newints
       ]
     ]
@@ -642,9 +642,9 @@ to-report connex-components
   
   foreach table:keys global:network-shortest-paths [
     ;show table:get network-shortest-paths ?
-    ? ->
-    if table:get global:network-shortest-paths ? != [] [
-      let e1 first ? let e2 last ?
+    od ->
+    if table:get global:network-shortest-paths od != [] [
+      let e1 first od let e2 last od
       let existing? false let k1 0 let k2 1 let c clusters let to-del []
       if length c > 0 [
         repeat length c [
@@ -665,7 +665,7 @@ to-report connex-components
       ]
       ; create a new cluster if needed
       if not existing? [
-        set clusters lput (remove-duplicates ?) clusters
+        set clusters lput (remove-duplicates od) clusters
         ;debug (word "new : " ?)
       ]
     ]
