@@ -684,7 +684,7 @@ to setup:setup-headless-vars
   
   ;set initial-nw? true
   
-  
+  set global:conf-file ""
   
   
   

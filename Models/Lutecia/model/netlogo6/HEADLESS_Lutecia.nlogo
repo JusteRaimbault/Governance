@@ -1,4 +1,3 @@
-
 ;;;;;;;;;;;;;;;;;;;;;
 ;; MetropolSim v3.0
 ;;
@@ -13,7 +12,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;
 
-extensions[matrix table context nw gradient numanal gis morphology]
+extensions[matrix table context nw palette gis morphology]
 
 __includes [
 
@@ -538,10 +537,10 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 833
 27
-1273
-488
-7
-7
+1271
+466
+-1
+-1
 28.666666666666668
 1
 10
@@ -1021,9 +1020,8 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
-
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -1039,7 +1037,6 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
-
 @#$#@#$#@
 0
 @#$#@#$#@
