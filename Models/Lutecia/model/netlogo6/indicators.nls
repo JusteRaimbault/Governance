@@ -1,0 +1,480 @@
+
+;;;;;;;;;;;;;;;;;;;
+;; Indicators of system performance
+;;;;;;;;;;;;;;;;;;;
+
+;-> convergence ? == stability ?
+;-> distance moyenne deplacements == weighted mean by actives, employments of effective distance
+;-> delta configs successives  ok diff-*
+;-> hierarchy case, population, evol hierarchy.  -- TODO --
+
+
+;;
+;  put in memory values of indicators for tracked time-series
+to indicators:update-indicators
+  foreach global:tracked-indicators [
+    ? ->
+    let val run-result ?
+    table:put global:history-indicators ? (lput val (table:get global:history-indicators ?))
+  ]
+end
+
+
+;;
+; print indicators in output
+to indicators:compute-indicators
+  network:cache-nw-measures
+  
+  output-print (word "mean-accessibility = " indicators:mean-accessibility patches)
+  output-print (word "mean-accessibility-balance = " indicators:mean-accessibility-balance)
+  output-print (word "mean-travel-distance = " indicators:mean-travel-distance)
+  output-print (word "actives-entropy = " indicators:morphology:entropy-actives)
+  output-print (word "moran-actives = " indicators:morphology:moran-actives)
+  output-print (word "collaboration wanted = " indicators:wanted-collaboration-rate)
+  output-print (word "collaboration realized = " indicators:realized-collaboration-rate)
+  output-print (word "externality-decrep = " indicators:externality-decrepitude)
+  output-print (word "mean-congestion = " indicators:mean-congestion)
+  output-print (word "relative-congestion = " indicators:relative-congestion)
+  output-print (word "total-nw-length = " indicators:network:total-nw-length)
+  output-print (word "relative-nw-length = " network-indicators:relative-nw-length)
+  output-print (word "mean-relative-speed = " indicators:network:mean-relative-speed)
+  output-print (word "mean-closeness-centrality = " indicators:network:mean-closeness-centrality)
+  output-print (word "mean-bw-centrality = " indicators:network:mean-bw-centrality)
+  output-print (word "mean-path-length = " indicators:network:mean-path-length)
+  output-print (word "nw-diameter = " indicators:network:nw-diameter)
+  output-print (word "alpha-bw-centrality = " indicators:network:alpha-bw-centrality)
+  output-print (word "alpha-closeness-centrality = " indicators:network:alpha-closeness-centrality)
+  output-print (word "indicators:relative-accessibility = " indicators:relative-accessibility)
+end
+
+to indicators:compute-network-indicators
+  network:cache-nw-measures
+  ; total-nw-length mean-relative-speed mean-closeness-centrality mean-bw-centrality mean-path-length nw-diameter
+  output-print (word "total-nw-length : " indicators:network:total-nw-length)
+  output-print (word "mean-relative-speed : " indicators:network:mean-relative-speed)
+  output-print (word "mean-closeness-centrality : " indicators:network:mean-closeness-centrality)
+  output-print (word "mean-bw-centrality : " indicators:network:mean-bw-centrality)
+  output-print (word "mean-path-length : " indicators:network:mean-path-length)
+  output-print (word "nw-diameter : " indicators:network:nw-diameter)
+end
+
+
+;;
+; TS indicators
+to-report indicators:ts-indicator [indic]
+  report table:get global:history-indicators indic
+end
+
+
+;;
+; moving average of a time indicator
+to-report indicators:causal-moving-average [indic window]
+  if global:history-indicators = 0 [report 0]
+  let full-ts table:get global:history-indicators indic
+  if length full-ts = 0 [report 0]
+  if length full-ts < window [report mean full-ts]
+  report mean sublist full-ts (length full-ts - window) (length full-ts)
+end
+
+
+;;
+; time average on full period
+to-report indicators:time-average [indic]
+   if global:history-indicators = 0 [report 0]
+  let full-ts table:get global:history-indicators indic
+  report mean full-ts
+end
+
+
+;;
+; generic rank size hierarchy
+to-report indicators:rank-size-hierarchy [x]
+  if length x = 0 [report [0 0]]
+  if max x = 0 and min x = 0 [report [0 0]]
+  let sol matrix:regress matrix:from-column-list (list (map [? -> log ? 10] sort-by [[?1 ?2] -> ?1 >= ?2] x) (map [? -> log ? 10] list:seq 1 length x 1))
+  report (list (last first sol) (first last sol))
+end
+
+
+
+
+;;
+; distance to target network
+to-report indicators:target-network-distance
+  ; kill potential previous target network
+  ;ask transportation-links with [status = "ghost"] [ask both-ends [die] die]
+  ;report network:network-distances transportation-links with [status = "initial"] transportation-links with [status = "ghost"]
+  report network:network-distances transportation-links ghost-transportation-links
+end
+
+
+
+;;
+; mean accessibility of employments and actives
+to-report indicators:mean-accessibility [patchset]
+  report accessibilities:mean-accessibility patchset
+end
+
+;;
+; mean accessibility for all patches
+to-report indicators:overall-mean-accessibility
+  report accessibilities:mean-accessibility patches
+end
+
+
+;;
+; accessibilities for all patches
+to-report indicators:patches-accessibilities
+  report list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
+end
+
+;;
+; flatmap patches/times access
+to-report indicators:patches-alltimes-accessibilities
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-accessibilities"
+end
+
+
+;;
+;
+to-report indicators:patches-delta-actives
+  report list:order-by-last-element ([(list patch:delta-actives patch:number)] of patches)
+end
+
+;;
+;
+to-report indicators:patches-alltimes-delta-actives
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-delta-actives"
+end
+
+
+;;
+;
+to-report indicators:patches-employments
+  report list:order-by-last-element ([(list patch:employments patch:number)] of patches)
+end
+
+
+;;
+;
+to-report indicators:patches-alltimes-employments
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-employments"
+end
+
+
+;;
+; 
+to-report indicators:patches-unweighted-access-time
+  let avgdist map mean matrix:to-row-list global:effective-distance-matrix
+  report map [? -> global:network-speed / ?] avgdist
+end
+
+to-report indicators:patches-alltimes-unweighted-access-time
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-unweighted-access-time"
+end
+
+to-report indicators:patches-weighted-access-time
+  let atot sum [patch:actives] of patches let etot sum [patch:employments] of patches
+  let avgdist list:order-by-last-element ([(list ((patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot))) patch:number)] of patches)
+  report map [? -> global:network-speed / ?] avgdist
+end
+
+to-report indicators:patches-alltimes-weighted-access-time
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-weighted-access-time"
+end
+
+
+
+
+;;
+; evolution of accessibility
+to-report indicators:relative-accessibility
+  ;carefully[
+    let ts-access indicators:ts-indicator "indicators:overall-mean-accessibility"
+    report item (length ts-access - 1) ts-access / item 0 ts-access 
+  ;][report 0]
+end
+
+
+;;
+; mean accessibility for a given mayor
+to-report indicators:mean-accessibility-mayor [i]
+  report accessibilities:mean-accessibility (patches with [patch:governing-mayor = mayor i])
+end
+
+;;
+; Balance in the case of two mayors
+to-report indicators:mean-accessibility-balance
+  ifelse count mayors = 2 [
+    report indicators:mean-accessibility-mayor 0 / indicators:mean-accessibility-mayor 1
+  ][report 0]
+end
+
+
+; min / max access
+to-report indicators:max-accessibility
+   report max [max (list patch:a-to-e-accessibility patch:e-to-a-accessibility)] of patches
+end
+
+to-report indicators:min-accessibility
+   report min [min (list patch:a-to-e-accessibility patch:e-to-a-accessibility)] of patches
+end
+
+
+; mean travel distance
+to-report indicators:mean-travel-distance
+  if (sum [patch:actives] of patches) * (sum [patch:employments] of patches) = 0 [report 0]
+  report sum [patch:a-to-e-distance + patch:e-to-a-distance] of patches / (2 * (sum [patch:actives] of patches) * (sum [patch:employments] of patches))
+end
+
+
+;;
+; TODO
+; mean nw distance between nw patches
+;to-report mean-network-distance
+;  
+;end
+
+
+to-report indicators:mean-effective-distance
+  if global:effective-distance-matrix = 0 [report 0]
+  report mean map mean matrix:to-row-list global:effective-distance-matrix
+end
+
+;;
+; mean congestion in network
+;  TODO : link congestion is not affected ; use patch congestion instead, for network intersections
+;
+;  -- the current indicators must be called after transportation affectation -- (affectation at each step is not yet supported as we do not take congestion into account in effective distances)
+;to-report indicators:mean-congestion
+;  if count transportation-links > 0 [report mean [transportation-link:congestion] of transportation-links]
+;  report 1
+;end
+to-report indicators:mean-congestion
+  let nonzerocong remove 0 (remove-duplicates global:patches-congestion)
+  ifelse length nonzerocong = 0 [report 0][
+     let norm sum map sum matrix:to-row-list global:flow-matrix report sum nonzerocong / (length nonzerocong * norm)
+  ]
+end
+
+
+;;
+; relative congestion in time
+to-report indicators:relative-congestion
+  let ts-cong indicators:ts-indicator "indicators:mean-congestion"
+  report item (length ts-cong - 1) ts-cong / item 0 ts-cong
+end
+
+
+;;
+; congestion on patches
+to-report indicators:mean-patch-congestion
+  report mean global:patches-congestion
+end
+
+
+;; last variability of relocation process
+to-report indicators:stability
+  report ((global:diff-employments / sum [patch:employments] of patches) + (global:diff-actives / sum [patch:actives] of patches) ) / 2
+end
+
+
+to-report indicators:mean-flow
+  report matrix:mean global:flow-matrix
+end
+
+to-report indicators:min-flow
+  report first matrix:min global:flow-matrix
+end
+
+to-report indicators:max-flow
+  report first matrix:max global:flow-matrix
+end
+
+
+;;;;
+;; Morphological indicators
+
+
+to-report indicators:morphology:moran-actives
+  report morphology:moran-actives
+end
+
+to-report indicators:morphology:entropy-actives
+  report morphology:entropy-actives
+end
+
+to-report indicators:morphology:slope-actives
+  report morphology:slope-actives
+end
+
+to-report indicators:morphology:slope-rsquared-actives
+  report morphology:slope-rsquared-actives
+end
+
+to-report indicators:morphology:mean-distance-actives
+  report morphology:mean-distance-actives
+end
+
+to-report indicators:morphology:moran-employments
+  report morphology:moran-employments
+end
+
+to-report indicators:morphology:entropy-employments
+  report morphology:entropy-employments
+end
+
+to-report indicators:morphology:slope-employments
+  report morphology:slope-employments
+end
+
+to-report indicators:morphology:slope-rsquared-employments
+  report morphology:slope-rsquared-employments
+end
+
+to-report indicators:morphology:mean-distance-employments
+  report morphology:mean-distance-employments
+end
+
+
+;;
+; mean distance to centre (to measure sprawl)
+to-report indicators:mean-distance-to-centre-actives
+  let atot sum [patch:actives] of patches
+  report sum [patch:actives / atot * distance (patch 0 0)] of patches
+end
+
+to-report indicators:mean-distance-to-centre-employments
+  let etot sum [patch:employments] of patches
+  report sum [patch:employments / etot * distance (patch 0 0)] of patches
+end
+
+to-report indicators:center-actives-prop
+  report [patch:actives] of patch 0 0 / sum [patch:actives] of patches
+end
+
+
+to-report indicators:center-employments-prop
+  report [patch:employments] of patch 0 0 / sum [patch:employments] of patches
+end
+
+
+
+;;
+;  Network indicators
+
+;;
+; nw diameter
+to-report indicators:network:nw-diameter
+  report network-indicators:nw-diameter
+end
+
+;;
+; mean path length
+to-report indicators:network:mean-path-length
+  report network-indicators:mean-path-length
+end
+
+;;
+;  bw centrality, normalized by number of paths considered
+to-report indicators:network:mean-bw-centrality
+  report network-indicators:mean-bw-centrality
+end
+
+
+;
+; TODO -- network indicators are not tracked --
+;to-report indicators:relative-mean-betweenness
+;  let ts-access indicators:ts-indicator "indicators:network:mean-bw-centrality"
+;    report item (length ts-access - 1) ts-access / item 0 ts-access 
+;end
+;
+
+
+;;
+; hierarchy betwenness centrality
+to-report indicators:network:alpha-bw-centrality
+  report first indicators:rank-size-hierarchy ([transportation-link:bw-centrality] of transportation-links)
+end
+
+;;
+; average closeness centrality
+to-report indicators:network:mean-closeness-centrality
+  let n count transportation-nodes if n = 0 [report 0]
+  report (mean [transportation-node:closeness-centrality] of transportation-nodes) / n
+end
+
+
+;;
+; hierarchy closeness
+to-report indicators:network:alpha-closeness-centrality
+  report first indicators:rank-size-hierarchy ([transportation-node:closeness-centrality] of transportation-nodes)
+end
+
+
+;;
+; mean relative speed
+to-report indicators:network:mean-relative-speed
+  report network-indicators:mean-relative-speed
+end
+
+;;
+; nw length
+to-report indicators:network:total-nw-length
+  report network-indicators:total-nw-length
+end
+
+
+
+
+
+
+
+
+
+
+;;
+; Sum of employments in the external facility
+to-report indicators:externality-employments
+  ifelse global:external-facility = 0 or length global:external-facility = 0 [
+    report 0 
+  ][
+    report sum [patch:employments] of patches with [member? patch:number global:external-facility]
+  ]
+end
+
+
+
+to-report indicators:wanted-collaboration-rate
+  ifelse length global:collaborations-wanted = 0 [
+    report 0
+  ][
+    report sum global:collaborations-wanted / length global:collaborations-wanted
+  ]
+end
+
+
+to-report indicators:realized-collaboration-rate
+  ifelse length global:collaborations-wanted = 0 [
+    report 0
+  ][
+    report sum global:collaborations-realized / length global:collaborations-realized
+  ]
+end
+
+to-report indicators:expected-collaboration-rate
+  ifelse length global:collaborations-wanted = 0 [
+    report 0
+  ][
+    report mean global:collaborations-expected
+  ]
+end
+
+
+to-report indicators:externality-decrepitude
+  report indicators:externality-employments / (global:employments-max * global:ext-employments-proportion-of-max)
+end
+  
+
+
+

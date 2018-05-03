@@ -1,0 +1,697 @@
+
+;;;;;;;;;;;;;;;;;;;;;
+;; setup.nls
+;;;;;;;;;;;;;;;;;;;;;
+
+
+;;
+; General setup
+to setup:setup
+  
+  ; if headless, no need to reset as all patch vars will be 0 and no agents (different model instances).
+  if global:headless? = 0 [
+    clear-all
+  ]
+
+  output-print "Setting up"
+  
+  ; globals
+  setup:setup-globals
+  
+  ; world
+  setup:setup-world
+  
+  
+  ; setup patches
+  setup:setup-patches
+  
+  ; setup initial governance
+  setup:setup-territories
+  
+  ; setup initial configuration
+  setup:setup-initial-distributions
+  
+  ; setup externalities
+  setup:setup-externalities
+  
+  ; cached distances
+  setup:setup-cached-distances
+  
+  ; setup initial network
+  setup:setup-initial-network
+  
+  ; initial accessibilities
+  setup:setup-patch-variables
+  
+  ; setup transportation
+  setup:setup-transportation
+  
+  ; setup indicators
+  setup:setup-indicators
+  
+  ; display
+  setup:setup-display
+  
+  
+  
+end
+
+
+
+;;
+;  setup global variables
+to setup:setup-globals
+  
+  
+  ;;;;;
+  ;; network
+  set global:infra-snapping-tolerance 1
+  set global:initial-nw? true
+  
+  set global:network-biological-steps 1000
+  ;set network-biological-threshold 0.95
+  set global:network-biological-threshold 0.05
+  set global:network-biological-initial-diameter 1
+  set global:network-biological-input-flow 1
+  ;set network-biological-gamma 10
+  
+  ;;;;;
+  ;; transportation
+  set global:with-congestion? false
+  set global:network-min-pace 1
+  set global:euclidian-min-pace global:network-speed
+  set global:congestion-price 1
+  set global:lambda-flows 1 ; \in [0;1]
+  
+  ;;;;
+  ;; Externality
+  set global:with-externalities? false
+  set global:ext-employments-proportion-of-max 3
+  set global:ext-growth-factor 1
+  
+  
+  ;;;;
+  ;; Governance
+  set global:beta-dc-game 400
+  
+  
+  set global:to-construct []
+  set global:collaborations-wanted [] set global:collaborations-realized [] set global:collaborations-expected []
+  
+  ;
+  ;if is-string? global:conf-file [
+  if length global:conf-file > 0 [
+    let conf file:read-conf-file global:conf-file
+    set global:gis-network-file table:get conf "gis-network-file"
+    set global:gis-extent-file table:get conf "gis-extent-file"
+    set global:gis-centers-file table:get conf "gis-centers-file"
+    set global:gis-sea-file table:get conf "gis-sea-file"
+    set global:gis-economic-areas-file table:get conf "gis-economic-areas-file"
+    set global:gis-governed-patches-file table:get conf "gis-governed-patches-file"
+  ]
+  
+  ; population raster
+  set global:gis-population-raster-file "setup/gis/guangdong/pop2010_wgs84_georef.asc"
+  
+  set global:link-distance-function "distance-projection"
+  
+  ; indicators tracked in time
+  set global:tracked-indicators (list "indicators:overall-mean-accessibility" "indicators:mean-travel-distance" 
+    "indicators:morphology:moran-actives" "indicators:morphology:entropy-actives" "indicators:morphology:slope-actives" "indicators:morphology:slope-rsquared-actives" "indicators:morphology:mean-distance-actives" ; morphology actives
+    "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments" ; morphology employments
+    "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
+    "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
+    "global:rel-diff-actives" "global:rel-diff-employments" ; convergence
+    "indicators:mean-congestion" ; congestion
+    "indicators:mean-accessibility-balance"
+    "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments""indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false" ; timely correlations
+    "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
+    )
+  
+  
+  
+end
+
+
+to setup:setup-world
+  reset-ticks
+  
+  ; random seed
+  if global:seed != 0 [random-seed global:seed]
+  
+  ; resize world if needed
+  resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
+  set-patch-size 430 / global:world-size
+  
+end
+
+
+
+
+;;
+; setup patches
+to setup:setup-patches
+  
+  if global:setup-type = "gis-synthetic" [
+    gis:set-world-envelope gis:envelope-of gis:load-dataset global:gis-extent-file 
+  ]
+  
+  ; enveloppe of the world
+  ;; (enventually resize here ?)
+  if global:setup-type = "gis" [
+    
+    ; world-enveloppe
+    gis:set-world-envelope gis:envelope-of gis:load-dataset global:gis-extent-file
+    
+    ; sea patches
+    foreach gis:feature-list-of gis:load-dataset global:gis-sea-file [
+      ? -> ask patches with [gis:contains? ? self] [set patch:sea? true]
+    ]
+    
+  ]
+  
+  
+  ; setup patches number
+  let p 0
+  repeat count patches [
+    let x (floor (p / world-width)) + min-pxcor let y (p - world-width * floor (p / world-width)) + min-pycor
+    ask (patch x y) [set patch:number p] set p p + 1
+  ]
+end
+
+
+
+
+;;
+; setup mayors and governed patches
+to setup:setup-territories
+  
+ ; output-print "... Territories"
+  
+  ; for now hardcoded path to setup file (unload gui)
+  set global:ext-file "setup/ext.csv"
+  
+  setup:setup-mayor-characteristics
+  
+  ; create mayors
+  create-mayors global:#-initial-territories [
+    mayor:initial-position-mayor  
+    mayor:new-mayor
+  ]
+  
+  ; create regional authority
+  create-mayors 1 [set global:regional-authority self set hidden? true]
+  
+  setup:setup-governance-areas
+  
+  
+end
+
+
+;;
+;  setup governance areas
+to setup:setup-governance-areas
+ 
+  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+    ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
+  ]
+  
+  if global:setup-type = "gis" [
+    foreach gis:feature-list-of gis:load-dataset global:gis-governed-patches-file [
+      ? ->
+      let area-name gis:property-value ? "NAME"
+      ask patches with [gis:contains? ? self or gis:intersects? ? self] [
+        set patch:governing-mayor one-of mayors with [label = area-name]
+      ]
+    ]
+    
+    ; patches with no governing -> central authority
+    ask patches with [patch:governing-mayor = 0] [set patch:governing-mayor global:regional-authority]
+    
+  ] 
+  
+  
+end
+
+
+
+
+
+;;
+;  Setup initial distributions of actives and employments (polycentric Bussiere model)
+to setup:setup-initial-distributions
+  
+  output-print "... Distributions"
+  
+  setup:setup-population-distribution
+  
+  setup:setup-employment-distribution
+  
+  ; setup global lists
+  set global:patches-employments-list list:rep 0 count patches
+  set global:patches-actives-list list:rep 0 count patches
+  ask patches [
+    set global:patches-employments-list replace-item patch:number global:patches-employments-list patch:employments
+    set global:patches-actives-list replace-item patch:number global:patches-actives-list patch:actives
+  ]
+  
+end
+
+;;
+; population distribution
+to setup:setup-population-distribution
+   
+   if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+     let centers [patch-here] of mayors with [self != global:regional-authority]
+     foreach centers [
+      ? ->
+       let current-mayor one-of [mayors-here] of ? let current-pop 0
+       ifelse [mayor:population] of current-mayor = 0 [set current-pop global:actives-max][set current-pop [mayor:population] of current-mayor]
+       apply-monocentric-kernel "poisson" global:actives-spatial-dispersion current-pop "patch:actives" ?
+     ]
+   ]
+   
+   if global:setup-type = "gis" [
+      let gis-population-raster gis:load-dataset global:gis-population-raster-file
+      gis:apply-raster gis-population-raster patch:actives
+      ; replace Nans
+      ask patches [
+        if not (patch:actives < 0 or patch:actives > 0)[set patch:actives 0]
+      ]
+   ]
+   
+end
+
+;;
+; employments distribution
+to setup:setup-employment-distribution
+  
+  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+    let centers [patch-here] of mayors with [self != global:regional-authority]
+    foreach centers [
+      ? ->
+      let current-mayor one-of [mayors-here] of ? let current-emp 0
+      ifelse [mayor:employment] of current-mayor = 0 [set current-emp global:employments-max][set current-emp [mayor:employment] of current-mayor]
+      apply-monocentric-kernel "poisson" global:employments-spatial-dispersion current-emp "patch:employments" ?
+    ]
+  ]
+  
+  if global:setup-type = "gis" [
+    let economic-dataset gis:load-dataset global:gis-economic-areas-file
+    let properties gis:property-names economic-dataset
+  
+    foreach gis:feature-list-of economic-dataset [
+      ? ->
+       let current-employment-cat0 0 if member? "PRMRY_S" properties [set current-employment-cat0 gis:property-value ? "PRMRY_S"]
+       let current-employment-cat1 0 if member? "TERTIRY" properties [set current-employment-cat1 gis:property-value ? "TERTIRY"]
+       let current-employment current-employment-cat0 + current-employment-cat1
+       let eco-area-patches patches with [gis:contains? ? self or gis:intersects? ? self]
+       if count eco-area-patches > 0 [
+         repeat 1000 [ask one-of eco-area-patches [set patch:employments patch:employments + current-employment / 1000]]
+       ] 
+    ]
+  ]
+  
+end
+
+;;
+; Setup display
+to setup:setup-display
+  ; patches
+  display:color-patches
+  
+  ; administrative boundaries (fixed drawing)
+  display:draw-boundaries
+  
+  ; plots
+  display:setup-plots
+end
+
+
+
+
+;;
+;
+;
+to setup:setup-externalities
+  if global:with-externalities? [
+  
+  let ext-patch nobody
+  if global:setup-type = "random" [
+    ; with 2 mayors : equidistance
+    let m list:to-list (mayors with [self != global:regional-authority])
+    ifelse length m = 2 [
+      set ext-patch one-of patches with [abs (distance item 0 m - distance item 1 m) < sqrt 2 and pxcor < max-pxcor and pxcor > min-pxcor and pycor < max-pycor and pycor > min-pycor ]
+    ][ set ext-patch one-of patches]
+  ] 
+  if global:setup-type = "from-file" [
+    set ext-patch patch first global:ext-position last global:ext-position
+  ]
+    
+  set global:external-facility []
+  ask ext-patch [
+    set global:external-facility lput patch:number global:external-facility
+    sprout 1 [
+       set shape "airplane" set size 2 set color red set heading 0
+       
+    ]
+    
+    let by-patch-employment-number global:employments-max * global:ext-employments-proportion-of-max / 9   
+    set patch:employments by-patch-employment-number
+    ask neighbors [
+      set patch:employments by-patch-employment-number
+      set global:external-facility lput patch:number global:external-facility
+    ]
+  ] 
+  
+  ]
+  
+end
+
+
+
+;;
+; Initial network
+;
+;  Done AFTER nw distance caching ; updates
+to setup:setup-initial-network
+  
+  if global:initial-nw? != false [
+  
+    if global:setup-type = "random" [
+      ;;
+      ; Possible options :
+      ; try a radioconcentric network ? or use slime mould ?
+      ; -> may not be useful in a first time to have synthetic initial networks
+    
+      ; strategy : setup a ghost network ; construct infras then
+    
+      if global:initial-nw-random-type = "tree-skeleton" [
+         ask mayors with [self != global:regional-authority] [
+           hatch-ghost-transportation-nodes 1 ;[show self]
+         ]
+         
+         ; create a direct link between mayors
+         ask ghost-transportation-nodes [let p one-of ((other ghost-transportation-nodes) with [count my-ghost-transportation-links = 0]) if p != nobody [create-ghost-transportation-link-with p]]
+         
+         ; add supplementary nodes
+         ;; TODO : for comparison with slime mould, deactivated
+         ; -> add similar border nodes in slime mould ?
+         ;create-ghost-transportation-nodes 6 [setxy random-xcor random-ycor]
+         ;create-ghost-transportation-nodes 6 [let x 0 let y 0 ifelse random 2 = 0 [ifelse random 2 = 0[set x min-pxcor - 0.5][set x max-pxcor + 0.499] set y random-ycor][ifelse random 2 = 0 [set y max-pycor + 0.499][set y min-pycor - 0.5] set x random-xcor] setxy x y]
+   
+         ;ask ghost-transportation-nodes [ask one-of (other ghost-transportation-nodes) with-min [distance myself] [if not link-neighbor? myself [create-ghost-transportation-link-with myself]] ]
+         ;ask one-of ghost-transportation-nodes with-min [min map [distance ?] to-list (other ghost-transportation-nodes)] [create-ghost-transportation-link-with one-of ((other ghost-transportation-nodes) with-min [distance myself])]
+         
+         ; connexify the nodes
+         ;utils:network:connexify-network ghost-transportation-nodes ghost-transportation-links
+         utils:network:connexify-network-link-projection ghost-transportation-nodes ghost-transportation-links
+         
+         utils:network:simplify-ghost-network
+      ]
+      
+      
+      if global:initial-nw-random-type = "slime-mould" [
+          network-biological:grow-network
+      ]
+      
+      if global:initial-nw-random-type = "full" [
+         ask mayors with [self != global:regional-authority] [hatch-ghost-transportation-nodes 1]
+         ask ghost-transportation-nodes [ask ((other ghost-transportation-nodes) with [not link-neighbor? myself]) [create-ghost-transportation-link-with myself]]
+      ]
+      
+      
+      ;show network:ghost-network-as-infra-list
+      
+      governance:construct-infrastructure network-ghost:ghost-network-as-infra-list save-nw-config
+      network-ghost:kill-ghost-network
+    
+    ]
+  
+  
+    if global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
+      ; construct network from gis file
+      let old-config save-nw-config
+      let infra-list []
+      let network-dataset gis:load-dataset global:gis-network-file
+    
+      foreach gis:feature-list-of network-dataset [   
+        ? ->
+        foreach gis:vertex-lists-of ? [
+          let i 0 let l ?
+          foreach but-first ? [
+            let p1 gis:location-of item i l let p2 gis:location-of ?
+            ;output-print p1 output-print p2
+            if p1 != [] and p2 != [] [
+              set p1 ([list pxcor pycor] of patch first p1 last p1) set p2 ([list pxcor pycor] of patch first p2 last p2)
+              if p1 != p2 [
+                set infra-list lput (list p1 p2) infra-list
+              ]
+            ]
+            set i i + 1
+          ]
+        
+        ]    
+      ]
+    
+      governance:construct-infrastructure infra-list old-config
+     
+    ]
+  
+  ]
+  
+  ask transportation-links [set transportation-link:status "initial"]
+  
+  ; ghost nw at setup
+  if global:setup-type = "gis" [network-ghost:ghost-network-from-gis global:target-network-file]
+  
+  
+end
+
+
+;;
+; Cached distances : initialize matrices
+;
+to setup:setup-cached-distances
+  
+  output-print "Caching distances"
+  
+  ; setup congestion (from transportation setup - split in two)
+  set global:patches-congestion list:rep 1 (count patches)
+  
+  set global:#-patches count patches
+  set global:dmax sqrt ((world-width ^ 2) + (world-height ^ 2))  
+  
+  ; euclidian distance matrix
+  set global:euclidian-distance-matrix matrix:make-constant global:#-patches global:#-patches 0
+  let p1 0 let p2 0
+  repeat global:#-patches [
+     let x1 (floor (p1 / world-width)) + min-pxcor let y1 (p1 - world-width * floor (p1 / world-width)) + min-pycor
+     
+     ; profite of this loop to set correspondance number <-> coordinates ? NO has to be done before !
+     ;ask (patch x1 y1) [set number p1] 
+     
+     set p2 0
+     repeat global:#-patches [
+        let x2 (floor (p2 / world-width)) + min-pxcor let y2 (p2 - world-width * floor (p2 / world-width)) + min-pycor
+        matrix:set global:euclidian-distance-matrix p1 p2 sqrt ((x1 - x2) ^ 2 + (y1 - y2) ^ 2) 
+        set p2 p2 + 1
+     ]
+     set p1 p1 + 1
+  ]
+  
+  ; setup nw matrices, needed in particular if initial nw
+  setup:setup-nw-matrices
+  
+  ; update effective distances with generic function
+  distances:update-effective-matrices
+ 
+  
+end
+
+;;
+; setup initial network matrices
+to setup:setup-nw-matrices
+  tic output-print "...NW shortest distances"
+  set global:#-patches count patches
+  ifelse count transportation-nodes = 0 [
+    ; initialize nw distance at -1 if no nw
+    set global:network-distance-matrix matrix:make-constant global:#-patches global:#-patches -1
+    ; for paths, put in table only if in nw
+    set global:network-shortest-paths table:make
+    
+    ; nw intersections
+    set global:closest-nw-inters table:make
+    set global:nw-inters []
+    
+    
+    
+  ][
+    
+  ]
+  
+  let nw-patches-bool matrix:map [?1 -> bool-to-int (?1 > 0)] global:network-distance-matrix
+  set global:nw-patches [] let i 0
+  repeat global:#-patches [if sum matrix:get-row nw-patches-bool i > 0 [set global:nw-patches lput i global:nw-patches] set i i + 1]
+  
+  
+  set global:nw-access-table table:make set i 0
+  ; ! NO INITIAL NW
+  ;if nw-patches != [] [repeat #-patches [table:put nw-access-table i (min-index (matrix:get-sparse-row euclidian-distance-matrix i nw-patches)) set i i + 1]]
+  
+  set global:network-clusters []
+  set global:network-clusters-connectors table:make
+  
+  if global:log-level = "DEBUG" [toc]
+end
+
+
+;;
+; transportation
+to setup:setup-transportation
+  ;set global:patches-congestion rep 1 (count patches) ; -> done BEFORE network construction
+  transportation:compute-flows
+end
+
+
+;; initial utilities and accessibilities
+to setup:setup-patch-variables
+  accessibilities:compute-patches-variables
+  set global:initial-max-acc max [patch:current-accessibility] of patches
+end
+
+
+
+;;
+; Get number of mayors and position from csv file
+;
+;  -> sets the globals mayors-coordinates
+to setup:setup-mayor-characteristics
+  
+  set global:mayors-coordinates [] set global:mayors-populations [] set global:mayors-employments [] set global:mayors-names []
+  set global:ext-position []
+  
+  if global:setup-type = "from-file"[
+    let lines file:read-file global:positions-file
+  
+    foreach but-first but-first lines [
+      ? -> 
+      let p []
+      foreach string:explode ";" ? [set p lput read-from-string ? p]
+      set global:mayors-coordinates lput p global:mayors-coordinates
+    ]
+  
+    ; ext file : one only ?
+    foreach string:explode ";" first but-first but-first file:read-file global:ext-file [
+      ? ->
+       set global:ext-position lput read-from-string ? global:ext-position
+    ]
+  ]
+  
+  
+  if global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
+    let mayors-dataset gis:load-dataset global:gis-centers-file
+    
+    ; read coordinates and attributes
+    let properties gis:property-names mayors-dataset
+    ;show properties
+    foreach gis:feature-list-of mayors-dataset [
+      ? -> 
+       let current-pop 0 if member? "POPULATION" properties [set current-pop gis:property-value ? "POPULATION"]
+       let current-employment 0 if member? "EMPLOYMENT" properties [set current-employment gis:property-value ? "EMPLOYMENT"]
+       let current-name "" if member? "NAME" properties [set current-name gis:property-value ? "NAME"]
+       foreach gis:vertex-lists-of ? [
+          foreach ? [
+           ; center coordinates
+           set global:mayors-coordinates lput (gis:location-of ?) global:mayors-coordinates
+           ;show global:mayors-coordinates
+           ;show current-pop show current-employment
+           set global:mayors-populations lput current-pop global:mayors-populations
+           set global:mayors-employments lput current-employment global:mayors-employments
+           set global:mayors-names lput current-name global:mayors-names
+         ] 
+       ]
+    ]
+    
+    
+  ]
+  
+  if global:setup-type = "random" [set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories]
+  
+  
+  ; corresponding number pf territories
+  if global:setup-type != "random" [set global:#-initial-territories length global:mayors-coordinates]
+  
+end
+
+
+;;
+;  tracked indicators already assumed setup
+to setup:setup-indicators
+  
+  set global:history-indicators table:make
+  
+  foreach global:tracked-indicators [
+    ? -> 
+    table:put global:history-indicators ? []
+  ]
+  
+end
+
+
+
+;;
+; default values ; for headless run
+to setup:setup-headless-vars
+  
+  ; general 
+  set global:#-initial-territories 3
+  set global:log-level "DEFAULT"
+  ;set log-level "VERBOSE"
+  ;set total-time-steps 4
+  
+  ; world size setup as function of setup type
+  ;set world-size 30
+  
+  ; initial distributions
+  set global:actives-max 500 set global:employments-max 500
+  set global:actives-spatial-dispersion 1
+  set global:employments-spatial-dispersion 0.8
+  
+  
+  
+  ; luti params
+  ;set gamma-cobb-douglas-e 0.9
+  ;set gamma-cobb-douglas-a 0.65
+  ;set beta-discrete-choices 1.8
+  ;set lambda-accessibility 0.001
+  
+  ; governance params
+  ;set regional-decision-proba 0.5
+  
+  ;set road-length 2
+  set global:#-explorations 50
+  ;set game-type "random"
+  ;set game-type "simple-nash"
+  ;set collaboration-cost 0.0001
+  ;set construction-cost 0.001 
+  ;set beta-dc-game 400
+
+  ; transportation params
+  ;set congestion-price 50
+  ;set congestion-price 1
+ 
+  
+  ;set initial-nw? true
+  
+  
+  
+  
+  
+  
+end
+
+
+
+
+
