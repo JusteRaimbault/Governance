@@ -13,6 +13,7 @@ val gammaCDA=Val[Double]
 val gammaCDE=Val[Double]
 val betaDC=Val[Double]
 val relocationRate=Val[Double]
+val finalTime=Val[Int]
 
 val id = Val[Int]
 val replication = Val[Int]
@@ -54,13 +55,13 @@ val corAccessTimeUnweighted=Val[Double]
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
-  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} ${finalTime} ${replication}",
   "experiments-luti:run-experiment-luti"
 )
 
-val model = NetLogo5Task(workDirectory / "model/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
-  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
-  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
+val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,scenario,replication),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,scenario,replication),
   netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
   netLogoOutputs += ("indicators:relative-congestion",relativeCongestion),
   //netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
@@ -94,6 +95,7 @@ val evolution =
         gammaCDA in (0.0, 1.0),
         gammaCDE in (0.0, 1.0),
         betaDC in (0.0,10.0),
+        finalTime in (20 to 200 by 1),
         scenario in (0 to 7 by 1)),
       objectives =  Seq(
         //corAccessDev in (-1.0 to 1.0 by 0.01),

@@ -1,0 +1,116 @@
+
+/**
+*  Exploration of network generation
+*/
+
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
+
+// Parameters
+val nwType=Val[Int]
+val nwTypeName=Val[String]
+val centerNumber=Val[Double]
+val gammaSlimeMould=Val[Double]
+
+val id = Val[Int]
+val replication = Val[Int]
+
+// reporters
+
+// sustainibility
+val relativeAccessibility = Val[Double]
+val relativeCongestion = Val[Double]
+
+// network shape
+val nwRelativeLength = Val[Double]
+val nwRelativeSpeed = Val[Double]
+val nwCost = Val[Double]
+
+
+// urban form
+val moranActives=Val[Double]
+val meanDistanceActives=Val[Double]
+val slopeActives=Val[Double]
+val entropyActives=Val[Double]
+val moranEmployments=Val[Double]
+val meanDistanceEmployments=Val[Double]
+val slopeEmployments=Val[Double]
+val entropyEmployments=Val[Double]
+// -> given an urban form, network optimization ?
+// (only center number varies)
+
+// experiments-luti:setup-experiment-initial-network [networkType centers bioGamma rnd-seed]
+val cmds = List(
+  "experiments-luti:setup-experiment-initial-network ${} ${replication}"
+)
+
+val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
+  netLogoOutputs += ("indicators:mean-congestion",relativeCongestion),
+  netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
+  netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
+  netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
+  netLogoOutputs += ("indicators:morphology:mean-distance-actives",meanDistanceActives),
+  netLogoOutputs += ("indicators:morphology:slope-actives",slopeActives),
+  netLogoOutputs += ("indicators:morphology:entropy-actives",entropyActives),
+  netLogoOutputs += ("indicators:morphology:moran-employments",moranEmployments),
+  netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmployments),
+  netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmployments),
+  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments),
+  netLogoOutputs += ("global:initial-nw-random-type",nwTypeName)
+)
+
+
+
+//val purpose = "TEST"
+val purpose = "INITIAL_NETWORK"
+
+// output
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
+  arraysOnSingleRow := true
+)
+
+//val env = LocalEnvironment(40)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+
+val replications =
+ Replication (
+   evaluation = (model on env by 10 hook indics_hook),
+   //evaluation = (dummy on env hook indics_hook),
+   seed = replication,
+   replications = 200
+)
+
+//relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
+val exploration =
+  DirectSampling(
+    evaluation = replications,
+    sampling =
+    /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
+    (networkSpeed in (2.0 to 6.0 by 2.0)) x
+    (gammaCDA in (0.1 to 1.0 by 0.1))x
+    (gammaCDE in (0.1 to 1.0 by 0.1))x
+    (betaDC in (0.5 to 2.0 by 0.5))x
+    (relocationRate in (0.1 to 1.0 by 0.1))x
+    (scenario in (0 to 5 by 1))
+  ) withIndex id )*/
+   ((LHS (
+      500
+      //1
+      //,lambdaAcc in Range(0.001,0.01)
+      //,networkSpeed in Range(2.5,10.0)
+      ,gammaCDA in Range(0.5,1.0)
+      ,gammaCDE in Range(0.5,1.0)
+      ,betaDC in Range(0.5,2.0)
+      ,relocationRate in Range(0.0,1.0)
+    ) withIndex id) x (scenario in (0 to 7 by 1)) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) )
+  )
+
+
+exploration

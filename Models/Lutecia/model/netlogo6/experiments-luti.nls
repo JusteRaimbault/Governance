@@ -61,6 +61,49 @@ end
 
 
 
+
+;;
+; experiment on initial network only
+to experiments-luti:setup-experiment-initial-network [networkType centers bioGamma rnd-seed]
+  
+  clear-all
+  
+  show (word "Init nw experiment with :  nwtype =  " networkType " ; centers = " centers " ; gamma = " bioGamma " ; seed = " rnd-seed)
+  
+  setup:setup-headless-vars
+  
+  set global:headless? true
+  set global:failed 0
+ 
+  set global:setup-type "random" 
+  set global:evolve-network? false
+  set global:evolve-landuse? true
+  set global:stopping-type "time"
+  set global:initial-nw? true
+  
+  if networkType = 0 [set global:initial-nw-random-type "tree-skeleton"] if networkType = 1 [set global:initial-nw-random-type "full"] if networkType = 2 [set global:initial-nw-random-type "slime-mould"]
+  set global:#-initial-territories centers
+  set global:network-biological-gamma bioGamma
+  
+  ; parameters not needed (do not run)
+  ;set global:relocation-rate relocationRate
+  ;set global:gamma-cobb-douglas-a gammaA
+  ;set global:gamma-cobb-douglas-e gammaE
+  ;set global:beta-discrete-choices betaDC
+  ;set global:lambda-accessibility lambdaacc
+  ;set global:network-speed nwspeed
+  ;set global:total-time-steps finalTime
+  set global:seed rnd-seed
+  
+  set global:world-size 15
+  setup:setup
+  
+end
+
+
+
+
+
 ;;
 ;  luti experiment
 ;
