@@ -138,6 +138,12 @@ NetLogo5 implementation induces issues on nodes of the grid when too many classe
 
 Direct sampling with 400 parameter points, 100 repetitions (\href{https://github.com/JusteRaimbault/Governance/commit/598612118729afe4d606880582027f9cbb3a2b03}{commit 598612}).
 
+% summary(sres$maxdiff-sres$mindiff)
+%     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+%0.0001639 0.0557371 0.1560541 0.2346269 0.3774427 0.7730943 
+
+$\rightarrow$ For all parameter points, the confidence interval for the average cumulated difference on all indicators is centered around 0. The CI has a median size of 0.15, a third quartile at 0.37 and a max at 0.77. We conclude that there is no implementation bias in average.
+
 
 \subsection{Sensitivity to indicators and convergence}
 
