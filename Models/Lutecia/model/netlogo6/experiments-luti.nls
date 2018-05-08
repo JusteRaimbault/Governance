@@ -82,7 +82,7 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
   set global:initial-nw? true
   
   if networkType = 0 [set global:initial-nw-random-type "tree-skeleton"] if networkType = 1 [set global:initial-nw-random-type "full"] if networkType = 2 [set global:initial-nw-random-type "slime-mould"]
-  set global:#-initial-territories centers
+  set global:#-initial-territories (floor centers)
   set global:network-biological-gamma bioGamma
   
   ; parameters not needed (do not run)
