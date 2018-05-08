@@ -21,8 +21,8 @@ val replication = Val[Int]
 // reporters
 
 // sustainibility
-val relativeAccessibility = Val[Double]
-val relativeCongestion = Val[Double]
+val meanAccessibility = Val[Double]
+val meanCongestion = Val[Double]
 
 // network shape
 val nwRelativeLength = Val[Double]
@@ -43,14 +43,15 @@ val entropyEmployments=Val[Double]
 
 // experiments-luti:setup-experiment-initial-network [networkType centers bioGamma rnd-seed]
 val cmds = List(
-  "experiments-luti:setup-experiment-initial-network ${nwType} ${centerNumber} ${gammaSlimeMould} ${replication}"
+  "experiments-luti:setup-experiment-initial-network ${nwType} ${centerNumber} ${gammaSlimeMould} ${replication}",
+  "network:cache-nw-measures"
 )
 
-val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
   inputs += (nwType,centerNumber,gammaSlimeMould,replication,id),
   outputs += (nwType,centerNumber,gammaSlimeMould,replication,id),
-  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
-  netLogoOutputs += ("indicators:relative-congestion",relativeCongestion),
+  netLogoOutputs += ("indicators:overall-mean-accessibility",meanAccessibility),
+  netLogoOutputs += ("indicators:mean-congestion",meanCongestion),
   netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
   netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
   netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
@@ -66,24 +67,23 @@ val model = NetLogo5Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWork
 
 
 
-val purpose = "TEST"
-//val purpose = "INITIAL_NETWORK"
+//val purpose = "TEST"
+val purpose = "INITIAL_NETWORK"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
-val env = LocalEnvironment(2)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(2)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
    evaluation = (model on env by 20 hook indics_hook),
-   //evaluation = (dummy on env hook indics_hook),
    seed = replication,
-   replications = 2//50
+   replications = 100
 )
 
 //nwType,centerNumber,gammaSlimeMould,replication,id
@@ -92,8 +92,7 @@ val exploration =
     evaluation = replications,
     sampling =
    ((LHS (
-      //1000
-      1
+      2000
       ,centerNumber in Range(1.0,6.999)
       ,gammaSlimeMould in Range(0.5,2.5)
     ) withIndex id) x (nwType in (0 to 2 by 1)) )
