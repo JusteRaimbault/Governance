@@ -1,0 +1,292 @@
+
+;;;;;;;;;;;;;;
+;; Transportation Network functions
+;;;;;;;;;;;;;;
+
+
+
+
+
+;;
+; report the link corresponding to coordinates
+;   @param coords coordinates list
+;   @param construct? should the link be constructed ? different behavior with existing network
+;   @param validate? strict validation of infrastructure (if true, remove infras with footprint fully in network. for complex initial network setup, desactivate) TODO : no bug if always desactivate ? not good, gives not consistent infras
+to-report network:new-infra [coords construct? validate?]
+  let e1 nobody let e2 nobody let new-link nobody
+  ifelse length first coords = 2 and length last coords = 2 [
+    let x1 first first coords let y1 last first coords let x2 first last coords let y2 last last coords
+    ifelse construct? = false [
+      create-transportation-nodes 1 [network:new-transportation-node setxy x1 y1 set e1 self]
+      create-transportation-nodes 1 [network:new-transportation-node setxy x2 y2 set e2 self]
+    ][
+      set e1 one-of transportation-nodes with [xcor = x1 and ycor = y1] if e1 = nobody [create-transportation-nodes 1 [network:new-transportation-node setxy x1 y1 set e1 self]]
+      set e2 one-of transportation-nodes with [xcor = x2 and ycor = y2] if e2 = nobody [create-transportation-nodes 1 [network:new-transportation-node setxy x2 y2 set e2 self]]
+    ]
+  
+    
+    ;show e1 show e2
+    
+    ifelse e1 != nobody and e2 != nobody [
+      ask e2 [create-transportation-link-with e1 [network:new-transportation-link set new-link self]]
+  
+      ; check if link is valid
+      let valid? false
+      if validate? = false [set valid? true]
+        
+      ask new-link [
+        if validate? = true [foreach link:footprint [ask ? [set valid? (valid? or not member? patch:number global:nw-patches)]]]
+        set valid? (valid? and length link:footprint > 1)
+      ]
+ 
+      ifelse valid? [
+        report new-link
+      ][
+        verbose "¡¡ Unvalid infrastructure !!"
+        ask new-link [ask both-ends [die] die]
+        report nobody
+      ]
+    ][report nobody]
+  ][report nobody]
+end
+
+
+
+
+
+to-report network:random-infra [patchset infra-length]
+  ; first end is taken in patchset
+  let p1 one-of patchset
+  
+  ; fixed infra length
+  let p2 nobody if p1 != nobody [ask p1 [set p2 one-of patchset with [abs(distance myself - infra-length) < 0.5]]] ;; modif 1.5
+  if p2 = nobody [ if p1 != nobody [ask p1 [set p2 one-of patchset with [distance myself < infra-length]]]]
+  if p2 = nobody [ if p1 != nobody [ask p1 [set p2 one-of patches with [abs(distance myself - infra-length) < 0.5]]]] ; if patchset too small, test other end on all patches
+  
+  let c1 [] let c2 []
+  
+  ifelse p2 = nobody or p1 = nobody [
+    set c1 (list random-pxcor random-pycor) set c2 (list random-pxcor random-pycor)
+  ][
+    ; for each existing infrastructure, check if closer than snapping threshold, report projection if needed
+    set c1 (list [pxcor] of p1 [pycor] of p1) set c2 (list [pxcor] of p2 [pycor] of p2)
+    ask transportation-links [
+       ask p1 [
+         if distance-to-link myself < global:infra-snapping-tolerance [
+           ask myself [set c1 coord-of-projection-of ([pxcor] of p1) ([pycor] of p1)]
+         ]
+       ]
+       ask p2 [
+         if distance-to-link myself < global:infra-snapping-tolerance [
+           ask myself [set c2 coord-of-projection-of ([pxcor] of p2) ([pycor] of p2)]
+         ]
+       ]
+    ]
+    
+    
+  ]
+  
+  ifelse (first c1 = first c2 and last c1 = last c2) or (first c1 = last c2 and last c1 = first c2)[
+      report (list [] []) 
+    ]
+    [
+      report (list c1 c2) 
+    ] 
+end
+
+
+
+
+;;
+; get a geometrical distance measure between two networks
+;  -> area of non-crossing polygons ?
+to-report network:network-distances [e1 e2]
+  if count e1 = 0 or count e2 = 0 [report 0]
+  let res 0
+  ask e1 [
+    let dmin network:link-distance self (one-of e2)
+    ask e2 [
+      let d network:link-distance myself self if d < dmin [set dmin d]
+    ]
+    set res res + dmin
+  ]
+  report res
+end
+
+;;
+; distance between two links
+to-report network:link-distance [l1 l2]
+  
+  if global:link-distance-function = "distance-closest-ends" [
+    ; rough heuristic : mse between extremities ?
+    let res 0 let oend nobody
+    ask l1 [
+      ask end1 [
+        let e2 one-of (([both-ends] of l2) with-min [distance myself])
+        set oend one-of (([both-ends] of l2) with [self != e2])
+        ask e2 [set res res + distance myself]
+      ]
+      ask end2 [
+        ask oend [set res res + distance myself] 
+      ]
+    ]
+    report res
+  ]
+  
+  if global:link-distance-function = "distance-projection" [
+    ; projection of l1 on l2 (-> non-symmetric)
+    let res 0 ask l1 [ask both-ends [set res res + distance-to-link l2]]
+    report res
+  ]
+  
+  
+  
+end
+
+
+
+;;
+; transportation node constructor
+to network:new-transportation-node
+  set shape "circle" set size 0.2 set color red
+end
+
+
+;;
+; transportation link constructor
+to network:new-transportation-link
+  set color red set thickness 0.2
+  
+  ; define capacity ?
+  
+  
+  ; age -> done at the end of construction
+  ;set age ticks
+  
+end
+
+
+;;
+;  memorize links age in a table
+to-report network:network-age
+  let res table:make
+  ask transportation-links [
+    foreach link:footprint [
+      ask ? [
+        table:put res patch:number ([transportation-link:age] of myself)
+      ]
+    ] 
+  ]
+  report res
+end
+
+
+;;
+;  Update age variable of links
+;    with memorized nw-age in table patch -> age
+to network:update-network-age [old-nw-age]
+  ask transportation-links [
+    let new-age 0 let ages list:rep 0 (ticks + 1); ages memorized in a list
+    foreach link:footprint [
+      ask ? [
+         ifelse table:has-key? old-nw-age patch:number [
+           let a table:get old-nw-age patch:number
+           set ages replace-item a ages ((item a ages) + 1)
+         ][
+           set ages replace-item ticks ages ((item ticks ages) + 1)
+         ]
+      ]
+    ]
+    ; age is element with max value
+    set transportation-link:age list:max-index ages
+  ]
+  
+  display:update-nw-display
+  
+  
+end
+
+
+
+;; 
+;  network indicators : cache variables for different measures for efficiency
+to network:cache-nw-measures
+  
+  ;simplify-network
+  
+  ; caching shortest paths and measures
+  nw:set-context transportation-nodes transportation-links
+  ask transportation-links [set transportation-link:length link-length set transportation-link:bw-centrality 0]
+  set global:shortest-paths table:make set global:nw-relative-speeds table:make set global:nw-distances table:make
+  let clist list:to-list transportation-nodes let i 0 let j 1
+  repeat (length clist - 1) [
+    let c1 item i clist
+    set j i + 1
+    repeat (length clist - i - 1) [
+      ; compute shortest path
+      let c2 item j clist let path [] ask c1 [set path nw:weighted-path-to c2 "transportation-link:length"]
+      ; update link betweeness
+      let l 0 foreach path [ask ? [set l l + transportation-link:length set transportation-link:bw-centrality transportation-link:bw-centrality + 1]]
+      ; if the network is not connected, some kind of infinite value
+      if l = 0 [set l 100 * sqrt (world-width ^ 2 + world-height ^ 2)]
+      ; update shortest path table
+      table:put global:shortest-paths (list [who] of c1 [who] of c2) path table:put global:shortest-paths (list [who] of c2 [who] of c1) (list:rev path)
+      ; update nw distance table
+      table:put global:nw-distances (list [who] of c1 [who] of c2) l table:put global:nw-distances (list [who] of c2 [who] of c1) l
+      ; update relative speed table
+      let deucl 0 ask c1 [set deucl distance c2]
+      ; deucl should never be 0 if the network has been simplified -> patch with 0 below
+      ;table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (deucl / l)
+      ifelse deucl = 0 [table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) 0][table:put global:nw-relative-speeds (list [who] of c1 [who] of c2) (l / deucl)]
+
+      set j j + 1
+    ]
+    set i i + 1
+  ]
+  
+  ; using computed distances, can get closenesses
+  ask transportation-nodes [
+    let n1 who let s 0
+    ask other transportation-nodes [
+      let n2 who set s s + table:get global:nw-distances (list n1 n2)
+    ]
+    set transportation-node:closeness-centrality s
+  ]
+  
+  
+  ; recompute congestions
+  ; not needed : affectation done at each time step, distance not changed by caching measures
+  ;transportation:affectation true
+  
+  
+end
+
+
+
+;;
+; simplify the network (overlapping nodes)
+to network:simplify-network 
+  
+  let n count transportation-nodes with [count transportation-nodes-here > 1]
+  while [n > 0] [
+     let current-node one-of transportation-nodes with [count transportation-nodes-here > 1]
+     let to-connect [] let ages [] ask current-node [
+       ask other transportation-nodes-here [
+          ask my-transportation-links with [[patch-here] of other-end != [patch-here] of myself] [set to-connect lput other-end to-connect set ages lput transportation-link:age ages die] die
+       ]
+       let i 0 foreach to-connect [if not transportation-link-neighbor? ? [create-transportation-link-with ? [set transportation-link:age item i ages]] set i i + 1]
+     ]
+     set n count transportation-nodes with [count transportation-nodes-here > 1]
+  ]
+end
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+
+
+;;;;;;;;;;;;;;
+;; Logging utils
+;;;;;;;;;;;;;;
+
+
+;;
+;; add to global : log-level
+;;
+
+;; for now simple output log.
+;; TODO : file log, etc
+
+
+to setup-log [level]
+  set global:log-level level
+end
+
+
+
+;;
+; by default DEBUG level if not set
+to debug [msg]
+  if global:log-level = "DEBUG" or global:log-level = 0 [
+    output-print (word "(DEBUG) " msg)
+  ]
+end
+
+
+to verbose [msg]
+    ; output if log >= VERBOSE
+    if global:log-level = "VERBOSE" or global:log-level = "DEBUG" or global:log-level = 0 [
+       output-print (word "(VERBOSE) " msg)
+    ]    
+end

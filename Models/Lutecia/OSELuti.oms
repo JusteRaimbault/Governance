@@ -1,3 +1,8 @@
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
 // Define the variables that are transmitted between the tasks
 // Parameters
 
@@ -21,7 +26,7 @@ val gammaSlimeMould=Val[Double]
 
 // sustainibility
 val relativeAccessibility = Val[Double]
-val nwCongestion = Val[Double]
+val relativeCongestion = Val[Double]
 
 // network shape
 val nwRelativeLength = Val[Double]
@@ -51,11 +56,11 @@ val cmds = List(
   "experiments-luti:run-experiment-luti"
 )
 
-val model = NetLogo5Task(workDirectory / "Lutecia/HEADLESS_Lutecia.nlogo", cmds,embedWorkspace=true) set(
+val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo", cmds,embedWorkspace=true) set(
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication),
   netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
-  netLogoOutputs += ("indicators:mean-congestion",nwCongestion),
+  netLogoOutputs += ("indicators:mean-congestion",relativeCongestion),
   netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
   netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
   netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
@@ -73,18 +78,21 @@ val model = NetLogo5Task(workDirectory / "Lutecia/HEADLESS_Lutecia.nlogo", cmds,
   netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmployments),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeighted),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweighted),
-  lambdaAcc := 0.005,
+  lambdaAcc := 0.005, 
   networkSpeed := 5.0
 )
 
-val opositeRelativeAccessibility = Val[Double]
+val purpose = "OSE"
+
+    
+val oppositeRelativeAccessibility = Val[Double]
 
 val post = ScalaTask("""
-  val opositeRelativeAccessibility = 1.0 - relativeAccessibility
+  val oppositeRelativeAccessibility = 1.0 - relativeAccessibility
     """) set (
     inputs += (relativeAccessibility),
-    outputs += (opositeRelativeAccessibility),
-    (inputs, outputs) += nwCongestion,
+    outputs += (oppositeRelativeAccessibility),
+    (inputs, outputs) += relativeCongestion,
   )
 
 
@@ -98,22 +106,30 @@ val evolution =
         betaDC in (0.0 to 5.0 by 0.1),
         scenario in (0 to 7 by 1)),
       objectives = Seq(
-        (opositeRelativeAccessibility, 0.02),
-        (nwCongestion, 0.2)
+        (oppositeRelativeAccessibility, 0.0),
+        (relativeCongestion, 1.0)
       ),
       stochastic = Stochastic(seed = replication)
     ),
     evaluation = model -- post,
-    termination = 20 minutes
+    termination = 30 minutes
   )
-
-val island =
+  
+val island = 
   IslandEvolution(
-    island = evolution,
+    island = evolution, 
     parallelism = 1000,
     termination = 100000
   )
 
-val savePopulationHook = SavePopulationHook(island, workDirectory / "results")
+val savePopulationHook = SavePopulationHook(island, workDirectory /  "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmm")).format(new Date()))+"_"+purpose)
 
-island hook savePopulationHook
+val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+island on grid hook savePopulationHook
+
+
+
+
+
+

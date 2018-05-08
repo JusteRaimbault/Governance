@@ -1,0 +1,98 @@
+
+;;;;;;;;;;;;;;
+;; accessibility and utility functions
+;;;;;;;;;;;;;;
+
+
+;;
+; update acc, form factor and utilities
+to accessibilities:compute-patches-variables
+  
+  output-print "... updating patch variables"
+  
+  accessibilities:compute-patches-accessibilities
+  accessibilities:compute-patches-form-factor
+  accessibilities:compute-patches-utilities
+  
+  ; color patches here, for more understanding of the infrastructure explo process
+  display:color-patches
+  
+end
+
+
+;;
+;  Compute patches accessibilities
+;   given current distributions and effective distance matrix
+to accessibilities:compute-patches-accessibilities
+  ask patches [
+     set patch:prev-accessibility patch:a-to-e-accessibility + patch:e-to-a-accessibility
+     ; only one csp for now
+     set patch:a-to-e-accessibility patch:actives * list:scalar-product (global:patches-employments-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:e-to-a-accessibility patch:employments * list:scalar-product (global:patches-actives-list) map [exp (- global:lambda-accessibility * ?)] (matrix:get-row global:effective-distance-matrix patch:number)
+     
+     set patch:current-accessibility patch:a-to-e-accessibility + patch:e-to-a-accessibility
+     
+     ; update also travel distances
+     set patch:a-to-e-distance patch:actives * list:scalar-product (global:patches-employments-list) (matrix:get-row global:effective-distance-matrix patch:number)
+     set patch:e-to-a-distance patch:employments * list:scalar-product (global:patches-actives-list) (matrix:get-row global:effective-distance-matrix patch:number)
+  ]
+end
+
+;;
+; Compute form factor, as couples [a-form-factor,e-form-factor]
+;
+to accessibilities:compute-patches-form-factor
+  ; only one csp : nothing to do
+  ask patches [
+    set patch:form-factor (list accessibilities:actives-form-factor accessibilities:employments-form-factor)
+  ]
+end
+
+
+;;
+; patches utilities
+;  note : could be in same loop as accessibilities ? more flexibility.
+to accessibilities:compute-patches-utilities
+  ask patches [
+    set patch:a-utility (patch:a-to-e-accessibility ^ global:gamma-cobb-douglas-a) * ((first patch:form-factor) ^ (1 - global:gamma-cobb-douglas-a))
+    set patch:e-utility (patch:e-to-a-accessibility ^ global:gamma-cobb-douglas-e) * ((last patch:form-factor) ^ (1 - global:gamma-cobb-douglas-e))
+  ]
+  
+  ; renormalize utilities
+  let ma-a max [patch:a-utility] of patches let ma-e max [patch:e-utility] of patches
+  if ma-a > 0 [ask patches [set patch:a-utility patch:a-utility / ma-a]]
+  if ma-e > 0 [ask patches [set patch:e-utility patch:e-utility / ma-e]]
+end
+
+
+
+;;
+; mean accessibility of employments and actives
+;  normalized by total quantities of employment and actives ? YES but not on patchset, all patches !
+;
+;  -- symmetric a-e --
+to-report accessibilities:mean-accessibility [patchset]
+  ifelse sum [patch:actives] of patches > 0 and sum [patch:employments] of patches > 0 and count patchset > 0 [
+    report (sum [patch:a-to-e-accessibility + patch:e-to-a-accessibility] of patchset) / (2 * (sum [patch:actives] of patches) * (sum [patch:employments] of patches))
+  ][report 0]
+end
+
+
+
+;;
+; form factor for actives :
+;  they search to flee from density, both of actives and employments
+to-report accessibilities:actives-form-factor
+  if patch:actives = 0 or patch:employments = 0 [report 1]
+  report 1 / (patch:actives * patch:employments)
+end
+
+
+;;
+; form factor for employments:
+;  take only accessibility into account (for now)
+to-report accessibilities:employments-form-factor
+  report 1
+end
+
+

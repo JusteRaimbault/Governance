@@ -130,6 +130,21 @@ $\rightarrow$ associated indicators. Correlation are estimated on all patches an
 \section{Results}
 
 
+\subsection{Implementation}
+
+NetLogo5 implementation induces issues on nodes of the grid when too many classes are loaded $\rightarrow$ transition to Netlogo6.
+
+\textit{Experiment: reproducibility of outputs between the two implementations. Stochasticity is not handled similarly and outputs are different on runs with exactly same parameters including seed. Look at average values on several repetitions.}
+
+Direct sampling with 400 parameter points, 100 repetitions (\href{https://github.com/JusteRaimbault/Governance/commit/598612118729afe4d606880582027f9cbb3a2b03}{commit 598612}).
+
+% summary(sres$maxdiff-sres$mindiff)
+%     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+%0.0001639 0.0557371 0.1560541 0.2346269 0.3774427 0.7730943 
+
+$\rightarrow$ For all parameter points, the confidence interval for the average cumulated difference on all indicators is centered around 0. The CI has a median size of 0.15, a third quartile at 0.37 and a max at 0.77. We conclude that there is no implementation bias in average.
+
+
 \subsection{Sensitivity to indicators and convergence}
 
 \subsubsection{Sensitivity experiment}
@@ -191,7 +206,7 @@ $\rightarrow$ 200 replications x 500 parameter points (LHS) x 8 scenarios
 %             betaDC            gammaCDA            gammaCDE      relocationRate as.factor(scenario)           Residuals 
 %          0.2508843           0.2262883           0.7520632           7.0737038          39.8984301          51.7986304 
 
-For this experiment, we find that with the Anova that the average accessibility is mainly explained by the scenario (39.9\%) and residuals (51.8\%), the relocation rate $\alpha$ plays a significant role, and other parameters have a marginal role ($\beta$ 0.25\%, $\gamma_A$ 0.22\%, $\gamma_E$ 0.75\%).
+For this experiment, we find that with the Anova that the average accessibility is mainly explained by the scenario (39.9\%) and residuals (51.8\%), the relocation rate $\alpha$ plays a significant role, and other parameters have a marginal role ($\beta \simeq 0.25\%$, $\gamma_A \simeq 0.22\%$, $\gamma_E \simeq 0.75\%$).
 
 With 200 replications, we obtain a third quartile of 1.07 for the relative confidence interval between all possible couples.
 
@@ -222,6 +237,12 @@ With 200 replications, we obtain a third quartile of 1.07 for the relative confi
 Test on an optimal region for indicators for congestion and accessibility \href{https://github.com/JusteRaimbault/Governance/commit/7f6355aba398948242e7b3f9984c20c3137900c9}{commit 7f6355ab}
 
 $\rightarrow$ promising results as similar indicator values can be given by very different parameter values. Artifact due to neighborhood of $\alpha = 0$ (solution : replace congestion by relative congestion to have a single point in parameter space, since when $\alpha \simeq 0$ accessibility is constant but congestion still strongly dependent on initial network configuration).
+
+\textit{still bug in algo and model crashing in nl5 $\rightarrow$ results not to be taken into account.}
+
+\subsubsection{Sustainibility}
+
+Running OSE with sustainibility indicators (relative accessibility and relative congestion): what parameter lead to positive situations for both indicators ?
 
 
 

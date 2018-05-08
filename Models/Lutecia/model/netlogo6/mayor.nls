@@ -1,0 +1,51 @@
+
+;;;;;;;;;;;;;;;;;;
+;; mayor.nls
+;;;;;;;;;;;;;;;;;;
+
+
+
+;;
+; initial position in space
+;  (different implementation possible)
+to mayor:initial-position-mayor
+  if global:setup-type = "random" [
+    ;let m other mayors with [self != regional-authority]
+    let current-mayor self
+    ;show m
+    let p nobody let potp patches with [pxcor < max-pxcor - 1 and pxcor > min-pxcor + 1 and pycor < max-pycor - 1 and pycor > min-pycor + 1 and count (mayors in-radius 3) with [self != global:regional-authority and self != current-mayor] = 0]
+    ;show potp
+    ;ifelse count m > 0 [
+      ;set p one-of potp with [distance one-of m > 5]
+    ;][
+      ifelse global:#-initial-territories > 1 [
+        set p one-of potp
+      ][
+        set p patch 0 0
+      ]
+    ;]
+    setxy [pxcor] of p [pycor] of p
+  ]
+  if global:setup-type = "from-file" or global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
+    ; index given by already existing number of mayors, different from the regional authority
+    ;let i count mayors with [self != regional-authority]
+    ; -- does not work as all created at once ?
+    ;  -> use position in sorted who list
+    let i position who sort [who] of mayors
+    let pos item i global:mayors-coordinates
+    setxy first pos last pos
+    
+  ]
+end
+
+;;
+; ' constructor ' (basic characteristics)
+to mayor:new-mayor
+  set shape "building institution" set color yellow set label-color red set color 5 + (140 * (who + 1) / global:#-initial-territories)
+  
+  let i position who sort [who] of mayors
+  ; name
+  set label item i global:mayors-names
+  set mayor:population item i global:mayors-populations
+  set mayor:employment item i global:mayors-employments
+end

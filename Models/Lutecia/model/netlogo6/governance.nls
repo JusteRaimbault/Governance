@@ -1,0 +1,398 @@
+
+;;;;;;;;;;;;;;;;
+;; governance
+;;;;;;;;;;;;;;;;
+
+
+;; 
+;  Transportation network evolution (governance part of the model)
+;
+;  Contiguous actors with most wealth take decision ; or top-down regional planning.
+;
+;
+to governance:governance
+  
+  if global:evolve-network? [
+  
+    output-print "governance"
+  
+    ; get agents making the decision
+    let decidors governance:decision-makers
+  
+    ; corresponding potential place for infrastructures
+    ;let infra-choices potential-infrastructures decidors
+  
+    let old-config save-nw-config
+    set old-config lput network:network-age old-config ; add nw age
+    ; construct the best one
+    governance:construct-infrastructure (governance:best-infrastructure decidors old-config) old-config
+  
+    ; recompute patch vars here - as indicators are called after the end of this stage.
+    ;  Q : to gain perf, do it only at the end ? -- OK not so much time
+    accessibilities:compute-patches-variables
+  
+  ]
+  
+  
+  
+end
+
+
+;;
+; Gets mayors taking the decision at this step - can be region ?
+to-report governance:decision-makers
+  
+  ifelse random-float 1 < global:regional-decision-proba or global:#-initial-territories = 1 [
+     ; regional decision
+     report global:regional-authority
+  ][
+     ; local decision : choose according to wealth
+     ; -> implement various ways to draw constructors ?
+     ;
+     ; determinist : pair with max wealth
+     ;let ma 0 let maxpair []
+     ;ask mayors[ask other mayors [let etot [employments] of self + [employments] of myself if etot > ma [set ma etot set maxpair (list self myself)]]]
+     ;report maxpair
+     
+     ; uniform drawing proportionnal to wealth of each
+     ;  -> could test pair drawing
+     let local-mayors mayors with [self != global:regional-authority]
+     let etot sum [patch:employments] of local-mayors
+     let firstbuilder nobody let r random-float 1 let s 0
+     ask local-mayors [set s s + (patch:employments / etot) if s > r and firstbuilder = nobody [set firstbuilder self]]
+     ; draw the second
+     
+     ;;;;;;;;
+     ; not necessarily among neighbors ? -- TODO --
+     ;;;;;;;;
+     
+     let remaining-mayors mayors with [self != global:regional-authority and self != firstbuilder]
+     set etot sum [patch:employments] of remaining-mayors
+     let secondbuilder nobody set r random-float 1 set s 0
+     ask remaining-mayors [set s s + (patch:employments / etot) if s > r and secondbuilder = nobody [set secondbuilder self]]
+     
+     report (list firstbuilder secondbuilder)
+  ]
+  
+end
+
+
+;;
+; Reports a list of potential infras (which format ?)
+;
+;  FIND Heuristic in order to exploit reduced part of the space (already too long with very few patches if in O(n^2)
+;  here no game, report indifferently common and alone infras ? or report with distinct feature ?
+to-report governance:potential-infrastructures [decidors rlength patchset]
+  let res []
+  ifelse decidors = global:regional-authority [
+    repeat global:#-explorations [
+      set res lput (network:random-infra patchset rlength) res
+    ]
+  ][
+    ; number of infra to be explored scales as |decidors|^2, if number of patches is constant among decidors. (to fill 'same proportion' of territory)
+    ;  -> not necessary with all patches explored
+    ;repeat (#-explorations) * ((length decidors) ^ 2) [
+    repeat global:#-explorations [
+      
+      ; -- TODO -- selection of subset of patches should not be inside this function
+      ;set res lput (network:random-infra (patchset with [member? governing-mayor decidors]) rlength) res
+      
+      set res lput (network:random-infra patchset rlength) res
+    ]
+  ]
+  report res
+end
+
+
+;;
+; Given a set of choices and decidors, find the best infrastructure
+;
+;  Implement the game between the two players here -> evaluate all costs (have to be done anyway), then draw randomly issue of the game according to individual utilities 
+;
+;  @returns list of coordinates of extremities (better not to construct links here -> sure, as capacity congestion etc are not used at this step : only matrix needed.
+to-report governance:best-infrastructure [decidors old-config]
+  
+  ifelse decidors = global:regional-authority [
+    ; no game, find the best among the choices
+    let min-acc quantile ([patch:a-to-e-accessibility + patch:e-to-a-accessibility] of patches) 0.5
+    let patchset (patches with [patch:a-to-e-accessibility + patch:e-to-a-accessibility > min-acc])
+    let croadlength 0 ifelse global:game-type = "random" [set croadlength global:road-length][set croadlength (2 * global:road-length)]
+    report (list first governance:compare-infrastructures old-config (governance:potential-infrastructures global:regional-authority croadlength patchset) global:regional-authority patchset)
+  ][
+    ; generate potential infras here ?
+    ; no, in the game, as different if random or nash game
+    report governance:game-result decidors old-config
+  ]
+  
+end
+
+
+
+;;
+; raw comparison of infras : needs old configuration of a-e ? yes nw config for shortest paths
+;  -- NOTE -- for mean-acc ; shouldn't it be only on patches concerned by the decidor ?
+;    --> OK
+;
+to-report governance:compare-infrastructures [old-nw-config choices decidor patchset]
+  verbose (word "comparing " length choices " infras")
+  
+  recall-nw-config old-nw-config
+  distances:update-effective-matrices
+  
+  ; old mean accessibility
+  accessibilities:compute-patches-accessibilities
+  let old-acc accessibilities:mean-accessibility patchset
+  let olds (list accessibilities:mean-accessibility patches)
+  foreach sort-on [who] (mayors with [self != global:regional-authority]) [? -> set olds lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) olds] 
+  
+  ;verbose (word "Mean-travel-distance : " indicators:mean-travel-distance)
+  
+  let best-choice [] let delta-acc 0 let deltas list:rep 0 length olds
+  foreach choices [
+    ? ->
+    recall-nw-config old-nw-config
+    verbose (word "Infra : " ? )
+    let potential-infra network:new-infra ? false true
+    verbose (word " ; " potential-infra)
+    if potential-infra != nobody [
+      distances:update-network potential-infra
+      distances:update-effective-matrices
+      ; recompute new accessibilities
+      accessibilities:compute-patches-accessibilities
+      let new-acc accessibilities:mean-accessibility patchset
+      let news (list accessibilities:mean-accessibility patches)
+      foreach sort-on [who] (mayors with [self != global:regional-authority]) [set news lput (accessibilities:mean-accessibility patches with [patch:governing-mayor = ?]) news]
+    
+    
+      ; check if better delta-acc
+    
+      verbose (word "∆Z=" (new-acc - old-acc))
+      ;verbose (word "mean-travel-distance = " indicators:mean-travel-distance)
+    
+      ;if (new-acc - old-acc) < 0 [user-message ""]
+    
+      if (new-acc - old-acc) > delta-acc [
+        set best-choice ?
+        set delta-acc (new-acc - old-acc)
+        set deltas [] let i 0 foreach news [set deltas lput (? - item i olds) deltas set i i + 1]
+      ]
+    
+      ; kill the potential infra, will be reconstructed if indeed the best
+      ; debug
+      ;ask potential-infra [ask both-ends [hatch-ghost-transportation-nodes 1] let n1 one-of [ghost-transportation-nodes-here] of end1 let n2 one-of [ghost-transportation-nodes-here] of end2 ask n1 [create-ghost-transportation-link-with n2]]
+      ask potential-infra [ask both-ends [die] die]
+    
+    ]
+    
+    
+    
+    ; color patch here
+    display:color-patches
+    ;ask patches [set pcolor black] ask patches with [member? number nw-patches] [set pcolor green] 
+    
+  ]
+  
+  verbose (word "best infra is " best-choice " with ∆Z=" delta-acc)
+  
+  report (list best-choice deltas decidor)
+end
+
+
+
+;;
+; Implement the game between the two actors
+to-report governance:game-result [decidors old-config]
+  
+    if global:game-type = "random" [
+      verbose "Random decidor choice..."
+      
+      ; Random = no game, choose one decidor proportionally to wealth
+      ; any number of decidors
+      let r random-float 1
+      let dec nobody
+      let wtot sum map [? -> [mayor:wealth] of ?] decidors
+      let s 0
+      foreach decidors [? -> set s s + ([mayor:wealth] of ?) / wtot if r < s and dec = nobody [set dec ?]]
+      
+      ;let patchset (patches with [governing-mayor = dec])
+      let patchset patches
+      
+      ;let best compare-infrastructures old-config (potential-infrastructures (list dec) road-length patchset) (list dec) patchset
+      ; ! change domain where infras explored, adapt patchset on which access is evaluated
+      let best governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec) global:road-length patchset) (list dec) (patches with [patch:governing-mayor = dec])
+      
+      report (list first best)
+    ]
+   
+   
+   ;; Mixed strategy nash eq (2 players)
+   if (global:game-type = "simple-nash" or global:game-type = "discrete-choices") and length decidors = 2 [
+     
+      output-print global:game-type
+     
+      let dec1 first decidors let dec2 last decidors
+     
+      let patchset1 (patches with [patch:governing-mayor = dec1])
+      let patchset2 (patches with [patch:governing-mayor = dec2])
+      let patchset patches
+     
+      ;let best1 compare-infrastructures old-config (potential-infrastructures (list dec1) road-length patchset1) (list dec1) patchset1
+      ;let best2 compare-infrastructures old-config (potential-infrastructures (list dec2) road-length patchset2) (list dec2) patchset2
+      let best1 governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec1) global:road-length patchset) (list dec1) patchset1
+      let best2 governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec2) global:road-length patchset) (list dec2) patchset2
+      
+      let best12 governance:compare-infrastructures old-config (governance:potential-infrastructures global:regional-authority (2 * global:road-length) patchset) global:regional-authority patchset
+    let sortdec sort-by [[?1 ?2] -> [who] of ?1 < [who] of ?2] (list dec1 dec2)
+      let D11 item ((position dec1 sortdec) + 1) (item 1 best1) let D22 item ((position dec2 sortdec) + 1) (item 1 best2)
+      let Dc1 item ((position dec1 sortdec) + 1) (item 1 best12) let Dc2 item ((position dec2 sortdec) + 1) (item 1 best12)
+      
+      verbose (word "D11 = " D11 " ; D22 = " D22 " ; Dc1 = " Dc1 " ; Dc2 = " Dc2)
+      
+      ; no influence on nash result !
+      ;let construction-cost 1e-3
+      
+      ;let m1 (list (list (Dc1 - construction-cost - collaboration-cost) (D11 - construction-cost - collaboration-cost)) (list (D11 - construction-cost) (D11 - construction-cost)))
+      ;let m2 (list (list (Dc2 - construction-cost - collaboration-cost) (D22 - construction-cost - collaboration-cost)) (list (D22 - construction-cost) (D22 - construction-cost)))
+      
+      ;let eq generic-mixed-strategy-nash m1 m2
+      ;let p1 first eq let p2 last eq
+      
+      let p1 1 
+      let p2 1
+      
+      ifelse global:game-type = "simple-nash"[
+        if (Dc2 - D22) != 0 [set p1 global:collaboration-cost / (Dc2 - D22)]
+        if (Dc1 - D11) != 0 [set p2 global:collaboration-cost / (Dc1 - D11)]
+        set p1 min (list max (list p1 0) 1) ; impose proba
+        set p2 min (list max (list p2 0) 1)
+      ][
+        ; discrete-choices
+        ;set p1 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc1 - D11) (Dc2 - D22) beta-dc-game]) 0 1 0.01)
+        ;set p2 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc2 - D22) (Dc1 - D11) beta-dc-game]) 0 1 0.01)
+        set p1 (numanal:get-brent-root (word "dc-fun " (Dc1 - D11) " " (Dc2 - D22)) 0 1 0.01)
+        set p2 (numanal:get-brent-root (word "dc-fun " (Dc2 - D22) " " (Dc1 - D11)) 0 1 0.01)
+      ]
+      
+      
+      
+      verbose (word "denom : 1 : " (Dc2 - D22) " ; 2 : " (Dc1 - D11))
+      verbose (word "probas : p1 = " p1 " ; p2 = " p2)
+      ;verbose (word " dc game : p1 = " (numanal:brent-root (task [to-rootize-dc-game ? collaboration-cost (D11 - construction-cost) (Dc1 - D11) (D22 - construction-cost) (Dc2 - D22)  beta-dc-game]) 0 1 0.01) " ; p2 = " (numanal:brent-root (task [to-rootize-dc-game ? collaboration-cost (D22 - construction-cost) (Dc2 - D22)  (D11 - construction-cost) (Dc1 - D11) beta-dc-game]) 0 1 0.01))
+      
+      set global:collaborations-expected lput p1 lput p2 global:collaborations-expected
+      
+      let r1 random-float 1 let r2 random-float 1
+      if r1 < p1 and r2 < p2 [output-print (word "Game : C - C") set global:collaborations-wanted lput 1 lput 1 global:collaborations-wanted set global:collaborations-realized lput 1 global:collaborations-realized report (list first best12)]
+      if r1 < p1 and r2 > p2 [output-print (word "Game : C - NC") set global:collaborations-wanted lput 1 lput 0 global:collaborations-wanted set global:collaborations-realized lput 0 global:collaborations-realized report (list first best1 first best2)]
+      if r1 > p1 and r2 < p2 [output-print (word "Game : NC - C") set global:collaborations-wanted lput 0 lput 1 global:collaborations-wanted set global:collaborations-realized lput 0 global:collaborations-realized report (list first best1 first best2)]
+      if r1 > p1 and r2 > p2 [output-print (word "Game : NC - NC") set global:collaborations-wanted lput 0 lput 0 global:collaborations-wanted set global:collaborations-realized lput 0 global:collaborations-realized report (list first best1 first best2)]
+      report (list first best12)
+   ]  
+  
+   ; report empty if conditions were not met
+   report [[]]
+   
+end
+
+to-report dc-fun [p1 p2 x]
+  report governance:to-rootize-dc-game x global:collaboration-cost p1 p2 global:beta-dc-game
+end
+
+
+;;
+; Report probabilities for a 2 choice generic game
+;  
+;  @param mi [[Ui(C,C) Ui(A,C)][Ui(C,A) Ui(A,A)]]
+;  @returns [p1 = |P(C1 = C) ; p2 = |P(C2 = C)]
+;
+to-report governance:generic-mixed-strategy-nash [m1 m2]
+  let p1 (last last m1 - first last m1) / (first first m1 + last last m1 - first last m1 - last first m1)
+  let p2 (last last m2 - last first m2) / (first first m2 + last last m2 - first last m2 - last first m2)
+  report (list p1 p2)
+end
+
+
+
+to-report governance:to-rootize-dc-game [p1 J deltaC1 deltaC2 beta]
+  ;let num exp (beta * ((exp (beta * (p1 * deltaC2 - J)) / (exp(beta * (p1 * deltaC2 - J)) + exp (beta * deltaI2))) * deltaC1 - J))
+  ;report ((num / (num + exp (beta * deltaI1) )) - p1 )
+  report (1 / (1 + exp (- beta * (((deltaC1)/(1 + exp (- beta * ((p1 * (deltaC2)) - J)))) - J)))) - p1
+end
+
+
+
+
+;;
+; Construct the given infrastructures (list of infras)
+;
+; Update matrices distances etc here !
+to governance:construct-infrastructure [infras old-config]
+  
+  recall-nw-config old-config
+  distances:update-effective-matrices
+  
+  
+  
+  foreach infras [
+    
+    infra ->
+    
+    if infra != [] [
+      
+      verbose (word "constructing : " infra)
+      
+      let constructed-link network:new-infra infra true false
+    
+      ; update matrices
+      if constructed-link != nobody [
+        distances:update-network constructed-link
+      ]
+    
+      distances:update-effective-matrices
+    
+    ]
+  ]
+  
+  
+  ; then correct the network by planarization if intersecting links.
+  ; Beware, has to be done AFTER updating matrices, as nw updating needs footprint of the link (fastest way to get patches newly connected to the network
+  ;  but planarizing before would kill the entire links, cutting it into smaller
+  ;
+  ;  !!! this architecture is difficult to apprehend from an external point of view (duality nw-patches/nw-links) !!! -> refactorize / precise ?
+  ;
+  utils:network:planarize-network transportation-nodes transportation-links
+  ;network:simplify-network
+  
+  network:update-network-age (last old-config)
+  
+end
+
+
+
+;;
+;
+to governance:manual-infrastructure-construction
+if mouse-down? [
+  if length global:to-construct < 2[
+    set global:to-construct lput (list mouse-xcor mouse-ycor) global:to-construct
+  ]
+  if length global:to-construct = 2[
+    governance:construct-infrastructure (list global:to-construct) save-nw-config
+    accessibilities:compute-patches-variables
+    display:update-display
+    set global:to-construct []
+    verbose (word "mean-travel-distance : " indicators:mean-travel-distance)
+    stop
+  ]
+  wait 0.2
+  
+]
+end
+
+
+
+
+
+
+
+
