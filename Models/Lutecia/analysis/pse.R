@@ -36,10 +36,10 @@ ggsave(filename = paste0(figdir,'scatterplot_colorrelocationRate.png'),width=40,
 ###
 # Convergence
 
-pops = read.csv(paste0('explo/',pseresdir,'/counts.csv',sep=';'))
+pops = read.csv(paste0('explo/',pseresdir,'/counts.csv'),sep=';')
 names(pops)=c("pop","time")
 summary(lm(data=pops,pop~time))
-plot(pops[,2],pops[,1],type='l')
+plot(pops[,2],pops[,1])
 
 
 
