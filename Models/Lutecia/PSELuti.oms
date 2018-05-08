@@ -85,7 +85,8 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
 
 val modelFixedParams = model set (lambdaAcc := 0.005, networkSpeed := 5.0)
 
-val purpose = "PSE"
+//val purpose = "PSE"
+val purpose = "TEST"
 
 val evolution =
   SteadyStateEvolution(
@@ -107,15 +108,18 @@ val evolution =
       stochastic = Stochastic(seed = replication)
     ),
     evaluation = modelFixedParams,
-    termination = 30 minutes
+    //termination = 30 minutes
+    termination = 5 minutes
   )
 
-val island = IslandEvolution(evolution, parallelism = 1000,termination=24 hours)
+val island = IslandEvolution(evolution, parallelism = 500,termination=1 hours)
 
 val savePopulationHook = SavePopulationHook(island, workDirectory /  "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmm")).format(new Date()))+"_"+purpose)
 
 val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val local = LocalEnvironment(50)
 
 val run = (island on grid hook savePopulationHook)
+//val run = (evolution on local hook savePopulationHook)
 
 run
