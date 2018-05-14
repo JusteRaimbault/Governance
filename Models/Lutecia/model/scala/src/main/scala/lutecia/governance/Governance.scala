@@ -7,8 +7,9 @@ import lutecia.network._
 object Governance {
 
 
-  def evolveNetwork(world: World): Network = {
-    world.network
+  def evolveNetwork(world: World): World = {
+    // static network
+    world
   }
 
 }

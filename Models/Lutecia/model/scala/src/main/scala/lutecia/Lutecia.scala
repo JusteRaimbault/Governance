@@ -2,6 +2,9 @@
 package lutecia
 
 import lutecia.core._
+import lutecia.governance.Governance
+import lutecia.luti.Luti
+import lutecia.transportation.Transportation
 
 trait Lutecia {
 
@@ -41,16 +44,36 @@ trait Lutecia {
   def gammaE: Double
 
 
+  /**
+    * Current world of the model
+    */
+  def world: World
+
+  /**
+    * Initial state
+    */
+  def initialWorld: World
+
+
+
+  /**
+    * main loop
+    * @param world
+    * @return
+    */
+  def nextState(world: World): World = {
+    Governance.evolveNetwork(Luti.evolveLandUse(Transportation.assignTransportation(world)))
+  }
+
+
+  def states = Iterator.iterate(initialWorld)(nextState)
+
 
 }
 
 
 
 object Lutecia {
-
-  def nextState(world: World): World = {
-
-  }
 
 }
 
