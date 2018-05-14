@@ -10,16 +10,20 @@ library(GGally)
 
 source(paste0(Sys.getenv('CS_HOME'),'/CityNetwork/Models/Utils/R/plots.R'))
 
-pseresdir='20180425_1511_PSE'
-res <- as.tbl(read.csv('explo/20180425_1511_PSE/population1655.csv'))
+#pseresdir='20180425_1511_PSE'
+pseresdir='20180430_2049_PSE'
+res <- as.tbl(read.csv('explo/20180430_2049_PSE/population7955.csv'))
+#res=res[res$evolution.samples>5,]
 
-figdir = paste0(Sys.getenv('CS_HOME'),'/Governance/Results/Luti/',pseresdir,'/');dir.create(resdir)
+figdir = paste0(Sys.getenv('CS_HOME'),'/Governance/Results/Luti/',pseresdir,'/');dir.create(figdir)
+
 
 
 ###
 # scatterplots of outputs
 
-indicators=c("corAccessDev","corAccessEmployments","corAccessTimeWeighted","corAccessTimeUnweighted")
+#indicators=c("corAccessDev","corAccessEmployments","corAccessTimeWeighted","corAccessTimeUnweighted")
+indicators=c("relativeAccessibility","relativeCongestion")
 
 res$relocationRate = cut(res$relocationRate,6)
 ggpairs(data=res,columns = indicators,
@@ -32,10 +36,10 @@ ggsave(filename = paste0(figdir,'scatterplot_colorrelocationRate.png'),width=40,
 ###
 # Convergence
 
-pops = read.csv('counts.csv',sep=';')
+pops = read.csv(paste0('explo/',pseresdir,'/counts.csv'),sep=';')
 names(pops)=c("pop","time")
 summary(lm(data=pops,pop~time))
-plot(pops[,2],pops[,1],type='l')
+plot(pops[,2],pops[,1])
 
 
 
