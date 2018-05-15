@@ -16,6 +16,11 @@ case class Cell(
 
 object Cell {
 
+  /**
+    * basic constructor with number only
+    */
+  def apply(n: Int): Cell = Cell(n,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+
   //def apply(n: Int,a: Double,e: Double) = Cell(n,a,e,0.0,0.0,0.0,0.0,0.0)
   //def apply(cell: Cell) = cell
 

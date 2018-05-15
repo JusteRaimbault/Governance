@@ -5,13 +5,25 @@ import lutecia.core._
 import lutecia.governance.Governance
 import lutecia.luti.Luti
 import lutecia.transportation.Transportation
+import scala.util.Random
 
 trait Lutecia {
+  /**
+    * random number generator
+    */
+  val rng = new Random
+
+  val lutecia: Lutecia = this
 
   /**
     * size of the grid
     */
-  def worldSize: Int
+  def worldSize: Int = 20
+
+  /**
+    * number of territories
+    */
+  def numberTerritories: Int = 3
 
 
   /**
@@ -44,10 +56,11 @@ trait Lutecia {
   def gammaE: Double
 
 
-  /**
-    * Current world of the model
-    */
-  def world: World
+
+
+
+  //Current world of the model -> not needed, immutable
+  //def world: World
 
   /**
     * Initial state
@@ -62,7 +75,7 @@ trait Lutecia {
     * @return
     */
   def nextState(world: World): World = {
-    Governance.evolveNetwork(Luti.evolveLandUse(Transportation.assignTransportation(world)))
+    Governance.evolveNetwork(Luti.evolveLandUse(Transportation.assignTransportation(world),lutecia))
   }
 
 

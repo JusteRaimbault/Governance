@@ -568,8 +568,8 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 572
 18
-1000
-447
+1010
+457
 -1
 -1
 28.666666666666668

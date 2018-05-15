@@ -1,6 +1,7 @@
 
 package lutecia.core
 
+import lutecia.Lutecia
 import lutecia.luti.Luti
 import lutecia.network._
 
@@ -17,9 +18,9 @@ object World {
     * @param world
     * @return
     */
-  def apply(world: World): World = {
+  def apply(world: World,lutecia: Lutecia): World = {
     // compute accessibilities and utilities
-    val compCells = Luti.computeUtilities(Luti.computeAccessibilities(world.cells,world.network))
+    val compCells = Luti.computeUtilities(Luti.computeAccessibilities(world.cells,world.network,lutecia),lutecia)
     World(compCells,world.network)
   }
 

@@ -11,8 +11,8 @@ case class Grid(
 
 object Grid {
 
-    def apply(flatCells: Seq[Cell])(implicit lutecia: Lutecia): Grid = {
-      Grid(flatCells.sliding(lutecia.worldSize,lutecia.worldSize).toSeq)
+    def apply(flatCells: Seq[Cell],worldSize: Int): Grid = {
+      Grid(flatCells.sliding(worldSize,worldSize).toSeq)
     }
 }
 
