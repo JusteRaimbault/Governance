@@ -9,8 +9,11 @@ import scala.util.Random
 case class Network(
                   nodes: Seq[Node],
                   links: Seq[Link],
-                  distances: Seq[Seq[Double]], /** distance matrix within the network */
-                  patchesDistances: Seq[Seq[Double]] /** distance matrix between all patches */
+                  paths: Map[(Node,Node),Path],
+                  distancesMap: Map[(Node,Node),Double], /** distance map from node k1 (== patch k1) to node k2*/
+                  distances: Seq[Seq[Double]] /** distance matrix */
+                  //distances: Seq[Seq[Double]] /** distance matrix within the network */
+                  //patchesDistances: Seq[Seq[Double]] /** distance matrix between all patches */
                   )
 
 
@@ -21,17 +24,43 @@ object Network {
     * @param n
     * @param l
     */
-  def apply(n: Seq[Node],l: Seq[Link]): Network = Network(n,l,Seq.empty,Seq.empty)
+  def apply(n: Seq[Node],l: Seq[Link]): Network = {
+    // compute shortest paths
+    val network = Network(n,l,Map.empty,Map.empty,Seq.empty)
+    val paths = GraphAlgorithm.allPairsShortestPath(network)
+    //println(paths.keySet.size)
+    //println(n.size*n.size)
+    val distMap = paths.mapValues{case p => p.cost}
+    val distMat = Seq.tabulate(n.size,n.size){case(i,j)=>distMap((n(i),n(j)))} // note : no issue here as the network is necessarily connected
+    Network(n,l,paths,distMap,distMat)
+  }
 
   /**
     * Constructor adding a single link
     *   TODO: question here, should we still use the dynamical programming as in the NetLogo implementation - heavy and maybe not useful
     *     -> do first speed tests
+    *
+    *     Note : DO NOT add nodes, new infrastructures should snap to existing, consistent with snappingThreshold
+    *
     * @param previousNetwork
     * @param l
     * @return
     */
-  def apply(previousNetwork: Network,l: Link): Network = {previousNetwork}
+  def apply(previousNetwork: Network,l: Link): Network = {
+    Network(previousNetwork.nodes,previousNetwork.links++Seq(l))
+  }
+
+
+  /**
+    * convert a path object to a distance matrix
+    *  -- not needed --
+    * @param paths
+    * @return
+    */
+  /*def shortestPathsToDistanceMatrix(paths: Map[(Node,Node),Path]):Seq[Seq[Double]] = {
+    Seq.fill(1,1)(0.0)
+  }*/
+
 
 
   def testShortestPaths(): Unit = {
@@ -50,8 +79,8 @@ object Network {
     //val predefined = RandomGraph.tinyConnectedIntDi(Graph)
     object sparse_Int extends RandomGraph.IntFactory {
       //val rng = new Random
-      val order = 100
-      val nodeDegrees = NodeDegreeRange(1,8)
+      val order = 200
+      val nodeDegrees = NodeDegreeRange(1,5)
       //val weightFactory = () => rng.nextLong()
       override def connected = false
     }
@@ -76,8 +105,9 @@ object Network {
     }
     val allpaths1 = pathsdijkstra.toMap
 
-    val test: (Node,Node) = (Node(g.nodes.toSeq(0).value),Node(g.nodes.toSeq(90).value))
-    println(allpaths1(test))
+    //val test: (Node,Node) = (Node(g.nodes.toSeq(0).value),Node(g.nodes.toSeq(9).value))
+    //println(allpaths1(test))
+    println(allpaths1)
     println("Dijsktra : "+(System.currentTimeMillis()-t)/1000.0)
 
     t = System.currentTimeMillis()
@@ -85,7 +115,8 @@ object Network {
     val linkseq: Seq[Link] = g.edges.map{case e=>Link(e._1.value,e._2.value,rng.nextDouble())}.toSeq
     val nw = Network(nodeseq,linkseq)
     val allpaths2 = GraphAlgorithm.allPairsShortestPath(nw)
-    println(allpaths2(test))
+    //println(allpaths2(test))
+    println(allpaths2)
     println("Floid : "+(System.currentTimeMillis()-t)/1000.0)
 
     println(allpaths1==allpaths2)

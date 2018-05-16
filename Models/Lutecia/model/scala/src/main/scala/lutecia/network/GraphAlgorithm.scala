@@ -20,13 +20,16 @@ object GraphAlgorithm {
     *       or more simply a set of Paths (include o/d) but Map is better -> can directly retrieve paths
     */
   def allPairsShortestPath(network: Network): Map[(Node,Node),Path] = {
+    println("computing shortest paths for network of size : |V|="+network.nodes.size+" ; |E|="+network.links.size)
     // nodes: Set[Int], links: Map[Int, Set[Int]]
     val nodenames = network.nodes.map{_.id}
     val nodeids: Map[Int,Int] = nodenames.zipWithIndex.toMap
-    val revnodeids: Map[Int,Int] = nodenames.zipWithIndex.map{case(oid,ind)=>(ind,oid)}.toMap
+    //val revnodeids: Map[Int,Int] = nodenames.zipWithIndex.map{case(oid,ind)=>(ind,oid)}.toMap
+    val revnodes: Map[Int,Node] = network.nodes.zipWithIndex.map{case(n,i)=>(i,n)}.toMap
     val nodes = nodeids.keySet //not necessary, for clarity
     val mlinks = mutable.Map[Int, Set[Int]]()
     val mlinkweights = mutable.Map[(Int,Int),Double]()
+    val links = mutable.Map
     for(link <- network.links){
       if(!mlinks.keySet.contains(nodeids(link.e1.id))) mlinks(nodeids(link.e1.id))=Set.empty[Int]
       if(!mlinks.keySet.contains(nodeids(link.e2.id))) mlinks(nodeids(link.e2.id))=Set.empty[Int]
@@ -34,6 +37,7 @@ object GraphAlgorithm {
       mlinks(nodeids(link.e1.id))+=nodeids(link.e2.id)
       mlinks(nodeids(link.e2.id))+=nodeids(link.e1.id)
       mlinkweights((nodeids(link.e1.id),nodeids(link.e2.id)))=link.weight
+      mlinkweights((nodeids(link.e2.id),nodeids(link.e1.id)))=link.weight
     }
 
     val links = mlinks.toMap
@@ -41,7 +45,8 @@ object GraphAlgorithm {
     val linkweights = mlinkweights.toMap
     //println(linkweights.keySet==mlinkweights.keySet)
     //println(links)
-    println(linkweights.keySet)
+    //println(linkweights.keySet)
+    //println(mlinkweights.keySet)
 
     val n = nodes.size
     val inf = Int.MaxValue
@@ -72,7 +77,7 @@ object GraphAlgorithm {
       val k = ns(i)(j)
       if (k != -1) {
         extractPath(path, i, k)
-        path.append(Node(revnodeids(k)))
+        path.append(revnodes(k))
         extractPath(path, k, j)
       }
     }
@@ -86,12 +91,12 @@ object GraphAlgorithm {
         if (ds(i)(j) != inf) {
           //val p = new ArrayBuffer[Int]()
           val currentPath = new ArrayBuffer[Node]()
-          currentPath.append(Node(revnodeids(i)))
+          currentPath.append(revnodes(i))
           if (i != j) {
             extractPath(currentPath, i, j)
-            currentPath.append(Node(revnodeids(j)))
+            currentPath.append(revnodes(j))
           }
-          paths((Node(revnodeids(i)),Node(revnodeids(j)))) = Path(Node(revnodeids(i)),Node(revnodeids(j)),currentPath.toList)
+          paths((revnodes(i),revnodes(j))) = Path(revnodes(i),revnodes(j),currentPath.toList)
         }
     }
 

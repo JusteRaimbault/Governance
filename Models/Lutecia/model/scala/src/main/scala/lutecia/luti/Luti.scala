@@ -20,10 +20,30 @@ object Luti {
       * - compute form factors
       * - compute utilities
       *    -> all done at world creation
-      * - relocate : done here
+      * - relocate : done here - and recompute access
       */
-    world
+    World(relocations(world,lutecia),lutecia)
   }
+
+  /**
+    * Relocations
+    * @param world
+    * @param lutecia
+    * @return
+    */
+  def relocations(world: World,lutecia: Lutecia): World = {
+    val cells = world.cells.cells
+    val aitot = cells.flatten.map{_.actives}.sum
+    val euia = cells.flatten.map{case c => math.exp(-lutecia.beta*c.aUtility)}
+    val euiatot = euia.sum
+    val newactives = euia.map{_*lutecia.alpha*aitot/euiatot}
+    val eitot = cells.flatten.map{_.employments}.sum
+    val euie = cells.flatten.map{case c => math.exp(-lutecia.beta*c.eUtility)}
+    val euietot = euie.sum
+    val newemployments = euie.map{_*lutecia.alpha*eitot/euietot}
+    World(Grid.updateValues(cells.flatten,newactives,newemployments,lutecia.worldSize),world.network,world.time)
+  }
+
 
   /**
     *
@@ -31,6 +51,7 @@ object Luti {
     * @return
     */
   def computeUtilities(cells: Grid,lutecia: Lutecia): Grid = {
+    //println("Computing utilities...")
     val gammaA = lutecia.gammaA
     val gammaE = lutecia.gammaE
     val aFormFactors = cells.cells.flatten.map(aFormFactor).map{Math.pow(_,1-gammaA)}
@@ -50,9 +71,10 @@ object Luti {
     * @return
     */
   def computeAccessibilities(cells: Grid,network: Network,lutecia: Lutecia): Grid = {
+    //println("Computing accessibilities...")
     val lambda = lutecia.lambda
-    val aAccess = cells.cells.flatten.map{case c => c.actives*(network.patchesDistances(c.number).map{case d => Math.exp(-lambda*d)}.zip(cells.cells.flatten.map{_.employments}).map{case(x1,x2)=>x1*x2}.sum)}
-    val eAccess = cells.cells.flatten.map{case c => c.employments*(network.patchesDistances(c.number).map{case d => Math.exp(-lambda*d)}.zip(cells.cells.flatten.map{_.actives}).map{case(x1,x2)=>x1*x2}.sum)}
+    val aAccess = cells.cells.flatten.map{case c => c.actives*(network.distances(c.number).map{case d => Math.exp(-lambda*d)}.zip(cells.cells.flatten.map{_.employments}).map{case(x1,x2)=>x1*x2}.sum)}
+    val eAccess = cells.cells.flatten.map{case c => c.employments*(network.distances(c.number).map{case d => Math.exp(-lambda*d)}.zip(cells.cells.flatten.map{_.actives}).map{case(x1,x2)=>x1*x2}.sum)}
     //val access = aAccess.zip(eAccess).map{case (a,e) => a+e}
     Grid(flatCells = cells.cells.flatten.zip(aAccess.zip(eAccess)).map{case (c,(aa,ae))=>Cell(c,(aa,ae),"accessibilities")},lutecia.worldSize)
   }

@@ -4,6 +4,8 @@ package lutecia.core
 
 case class Cell(
                  number: Int,
+                 x: Double,
+                 y: Double,
                  actives:Double,
                  employments: Double,
                  atoeAccessibility: Double,
@@ -19,7 +21,9 @@ object Cell {
   /**
     * basic constructor with number only
     */
-  def apply(n: Int): Cell = Cell(n,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+  def apply(n: Int): Cell = Cell(n,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
+
+  def apply(n: Int, x: Double, y: Double): Cell = Cell(n,x,y,0.0,0.0,0.0,0.0,0.0,0.0,0.0)
 
   //def apply(n: Int,a: Double,e: Double) = Cell(n,a,e,0.0,0.0,0.0,0.0,0.0)
   //def apply(cell: Cell) = cell

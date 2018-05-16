@@ -2,8 +2,10 @@
 package lutecia.setup
 
 import lutecia.core.{Cell, Grid, World}
-import lutecia.network.Network
+import lutecia.network.{Link, Network, Node}
 
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 /**
@@ -11,11 +13,19 @@ import scala.util.Random
   */
 trait SyntheticSetup extends Setup {
 
-  def initialNetwork: Network
-
   def initialGrid: Grid
 
-  override def initialWorld: World = World(initialGrid,initialNetwork)
+  /**
+    * The network will generally depends on the grid
+    * @param grid
+    * @return
+    */
+  def initialNetwork(grid: Grid): Network
+
+  override def initialWorld: World = {
+    val grid = initialGrid
+    World(World(grid,initialNetwork(grid),0),this)
+  }
 
 }
 
@@ -75,7 +85,7 @@ trait ExponentialMixture extends SyntheticSetup {
     * @param kernelRadius
     * @return
     */
-  def expMixture(worldSize: Int,centers: Either[Int,Seq[Seq[Int]]], maxValue: Double,kernelRadius: Double): Seq[Double] = {
+  def expMixture(worldSize: Int,centers: Either[Int,Seq[Seq[Int]]], maxValue: Double,kernelRadius: Double): Seq[Seq[(Double,(Int,Int))]] = {
     //val vals = Seq.fill(worldSize,worldSize)(0.0)
     val vals = Array.fill(worldSize,worldSize)(0.0)
     val coords = centers match {
@@ -88,7 +98,7 @@ trait ExponentialMixture extends SyntheticSetup {
       }
     }
     //array to seq
-    Seq.tabulate(worldSize,worldSize){(i:Int,j:Int)=>vals(i)(j)}.flatten
+    Seq.tabulate(worldSize,worldSize){(i:Int,j:Int)=>(vals(i)(j),(i,j))}
   }
 
   /**
@@ -99,9 +109,12 @@ trait ExponentialMixture extends SyntheticSetup {
     val centers = Seq.fill(numberTerritories,2){rng.nextInt(worldSize)}
     // TODO : not close to border and minimal radius between centers
 
-    val actives = expMixture(worldSize,Right(centers),maxValueActives,kernelRadiusActives)
-    val employments = expMixture(worldSize,Right(centers),maxValueEmployments,kernelRadiusEmployments)
-    Grid(flatCells = actives.zip(employments).zipWithIndex.map{case ((a,e),i)=>{val c = Cell(i);Cell(c,(a,e),"values")}},worldSize)
+    val activesWithCoords = expMixture(worldSize,Right(centers),maxValueActives,kernelRadiusActives)
+    val actives = activesWithCoords.map{case c=>c.map{_._1}}.flatten
+    val employmentsWithCoords = expMixture(worldSize,Right(centers),maxValueEmployments,kernelRadiusEmployments)
+    val employments = employmentsWithCoords.map{case c=>c.map{_._1}}.flatten
+    val coords = activesWithCoords.map{case c=>c.map{_._2}}.flatten
+    Grid(flatCells = actives.zip(employments).zip(coords).zipWithIndex.map{case (((a,e),(i,j)),k)=>{val c = Cell(k,i.toDouble,j.toDouble);Cell(c,(a,e),"values")}},worldSize)
   }
 
   override def initialGrid: Grid = expMixtureGrid
@@ -125,9 +138,40 @@ trait EmptyNetwork extends SyntheticSetup {
     */
   def emptyNetwork(): Network = Network(Seq.empty,Seq.empty)
 
-  override def initialNetwork: Network = emptyNetwork()
+  override def initialNetwork(grid: Grid): Network = emptyNetwork()
 
 }
+
+
+/**
+  * Grid network
+  */
+trait GridNetwork extends SyntheticSetup {
+
+
+  /**
+    *
+    * @param grid
+    * @return
+    */
+  def gridNetwork(grid: Grid): Network = {
+    // create nodes
+    val nodes: Seq[Seq[Node]] = grid.cells.map{case r => r.map{case c => Node(c)}}
+    // create edges
+    val edges = ArrayBuffer[Link]()
+    //dirty
+    for (i <- 0 to nodes.size - 1 ; j <- 0 to nodes(0).size - 1) {
+      if(i-1>0){if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i-1)(j-1)))};edges.append(Link(nodes(i)(j),nodes(i-1)(j)));if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i-1)(j+1)))}}
+      if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i)(j-1)))};if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i)(j+1)))}
+      if(i+1<nodes.size){if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i+1)(j-1)))};edges.append(Link(nodes(i)(j),nodes(i+1)(j)));if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i+1)(j+1)))}}
+    }
+    Network(nodes.flatten,edges)
+  }
+
+  override def initialNetwork(grid: Grid): Network = gridNetwork(grid)
+
+}
+
 
 
 /**

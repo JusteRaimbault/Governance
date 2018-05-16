@@ -1,6 +1,8 @@
 
 package lutecia.network
 
+import lutecia.core.Cell
+
 case class Node(
                  /**
                    * position
@@ -17,5 +19,7 @@ case class Node(
 object Node {
 
   def apply(n:Int): Node = Node(0.0,0.0,n)
+
+  def apply(c: Cell): Node = Node(c.x,c.y,c.number)
 
 }
