@@ -2,12 +2,14 @@
 package lutecia.core
 
 import lutecia.Lutecia
+import lutecia.governance.Mayor
 import lutecia.luti.Luti
 import lutecia.network._
 
 case class World(
                 cells: Grid,
                 network: Network,
+                mayors: Set[Mayor],
                 time: Int
                 )
 
@@ -28,7 +30,7 @@ object World {
   def apply(world: World,lutecia: Lutecia,t: Int): World = {
     // compute accessibilities and utilities
     val compCells = Luti.computeUtilities(Luti.computeAccessibilities(world.cells,world.network,lutecia),lutecia)
-    World(compCells,world.network,t)
+    World(compCells,world.network,world.mayors,t)
   }
 
   /**

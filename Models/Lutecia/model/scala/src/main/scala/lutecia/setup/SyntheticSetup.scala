@@ -2,7 +2,8 @@
 package lutecia.setup
 
 import lutecia.core.{Cell, Grid, World}
-import lutecia.network.{Link, Network, Node}
+import lutecia.governance.Mayor
+import lutecia.network.{Link, Network, Node, SlimeMould}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -13,18 +14,23 @@ import scala.util.Random
   */
 trait SyntheticSetup extends Setup {
 
-  def initialGrid: Grid
+  /**
+    * Initial grid takes no arguments
+    * @return the Grid and the set of mayors
+    */
+  def initialGrid: (Grid,Set[Mayor])
 
   /**
-    * The network will generally depends on the grid
-    * @param grid
+    * The network will generally depends on the world (since also includes mayors)
+    * @param world temporary world without network
     * @return
     */
-  def initialNetwork(grid: Grid): Network
+  def initialNetwork(world: World): Network
 
   override def initialWorld: World = {
-    val grid = initialGrid
-    World(World(grid,initialNetwork(grid),0),this)
+    val (grid,mayors) = initialGrid
+    val tempWorld = World(grid,EmptyNetwork.emptyNetwork(),mayors,0)
+    World(World(grid,initialNetwork(tempWorld),mayors,0),this)
   }
 
 }
@@ -45,15 +51,23 @@ trait RandomGrid extends SyntheticSetup {
     * grid with random values
     * @param size
     */
-  def randomCells(size: Int): Grid = {
-    Grid(flatCells = Seq.tabulate[Cell](size*size){case i => {val c = Cell(i);Cell(c,(rng.nextDouble(),rng.nextDouble()),"values")}},worldSize)
+  def randomCells(size: Int): (Grid,Set[Mayor]) = {
+    (Grid(flatCells = Seq.tabulate[Cell](size*size){case i => {val c = Cell(i);Cell(c,(rng.nextDouble(),rng.nextDouble()),"values")}},worldSize),Set.empty)
   }
 
-  override def initialGrid: Grid = randomCells(worldSize)
+
+  override def initialGrid: (Grid,Set[Mayor]) = randomCells(worldSize)
+
+}
+
+object RandomGrid {
 
 }
 
 
+/**
+  * Grid based on exponential mixtures
+  */
 trait ExponentialMixture extends SyntheticSetup {
 
   /**
@@ -104,7 +118,7 @@ trait ExponentialMixture extends SyntheticSetup {
   /**
     * Grid from exponential mixture with fixed number of centers
     */
-  def expMixtureGrid(): Grid = {
+  def expMixtureGrid(): (Grid,Set[Mayor]) = {
     // coordinates of centers
     val centers = Seq.fill(numberTerritories,2){rng.nextInt(worldSize)}
     // TODO : not close to border and minimal radius between centers
@@ -114,10 +128,23 @@ trait ExponentialMixture extends SyntheticSetup {
     val employmentsWithCoords = expMixture(worldSize,Right(centers),maxValueEmployments,kernelRadiusEmployments)
     val employments = employmentsWithCoords.map{case c=>c.map{_._1}}.flatten
     val coords = activesWithCoords.map{case c=>c.map{_._2}}.flatten
-    Grid(flatCells = actives.zip(employments).zip(coords).zipWithIndex.map{case (((a,e),(i,j)),k)=>{val c = Cell(k,i.toDouble,j.toDouble);Cell(c,(a,e),"values")}},worldSize)
+    val flatCells =  actives.zip(employments).zip(coords).zipWithIndex.map{case (((a,e),(i,j)),k)=>{val c = Cell(k,i.toDouble,j.toDouble);Cell(c,(a,e),"values")}}
+    val mayors: Set[Mayor] = coords.map{
+      case(x,y)=>{
+        val dists = flatCells.map{case c => math.abs(c.x - x)+math.abs(c.y - y)}
+        val mind = dists.min
+        Mayor(flatCells(dists.indexWhere(_==mind)))
+      }
+    }.toSet
+    (Grid(flatCells =flatCells,worldSize),mayors)
   }
 
-  override def initialGrid: Grid = expMixtureGrid
+  override def initialGrid: (Grid,Set[Mayor]) = expMixtureGrid
+
+}
+
+
+object ExponentialMixture {
 
 }
 
@@ -132,14 +159,16 @@ trait ExponentialMixture extends SyntheticSetup {
   */
 trait EmptyNetwork extends SyntheticSetup {
 
+  override def initialNetwork(world: World): Network = EmptyNetwork.emptyNetwork()
+
+}
+
+object EmptyNetwork {
   /**
     * Empty network
     * @return
     */
   def emptyNetwork(): Network = Network(Seq.empty,Seq.empty)
-
-  override def initialNetwork(grid: Grid): Network = emptyNetwork()
-
 }
 
 
@@ -179,6 +208,18 @@ trait GridNetwork extends SyntheticSetup {
   */
 trait SlimeMouldNetwork extends SyntheticSetup {
 
+  /**
+    * gamma
+    * @return
+    */
+  def gammaSlimeMould: Double
+
+  def initialDiameterSlimeMould: Double = 1.0
+
+  def inputFlowSlimeMould: Double = 1.0
+
+  // rq here : impose nw generation to depend on the whole world
+  override def initialNetwork(world: World): Network = SlimeMould.generateSlimeMould(world,this)
 
 
 }
