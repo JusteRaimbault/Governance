@@ -92,8 +92,9 @@ trait Lutecia {
     * @return
     */
   def timeStep(world: World): World = {
-    Indicators.computeStateIndicators(world)
-    World(world,world.time+1)
+    val nextWorld = World(world,world.time+1)
+    Indicators.computeStateIndicators(nextWorld)
+    nextWorld
   }
 
   //def states = Iterator.iterate(initialWorld)(nextState)
@@ -118,9 +119,11 @@ object RunModel {
     // run the simulation in time
     val states = ArrayBuffer[World]()
     states.append(model.initialWorld)
+    Indicators.computeStateIndicators(states(0))
     for(t <- 0 to model.finalTime - 1){
       //println(t)
       states.append(model.nextState(states.last))
+      Indicators.computeStatesIndicators(states)
     }
 
     Result(states,model)

@@ -29,7 +29,7 @@ object GraphAlgorithm {
     val nodes = nodeids.keySet //not necessary, for clarity
     val mlinks = mutable.Map[Int, Set[Int]]()
     val mlinkweights = mutable.Map[(Int,Int),Double]()
-    val links = mutable.Map
+    val linksMap = mutable.Map[(Int,Int),Link]()
     for(link <- network.links){
       if(!mlinks.keySet.contains(nodeids(link.e1.id))) mlinks(nodeids(link.e1.id))=Set.empty[Int]
       if(!mlinks.keySet.contains(nodeids(link.e2.id))) mlinks(nodeids(link.e2.id))=Set.empty[Int]
@@ -38,6 +38,8 @@ object GraphAlgorithm {
       mlinks(nodeids(link.e2.id))+=nodeids(link.e1.id)
       mlinkweights((nodeids(link.e1.id),nodeids(link.e2.id)))=link.weight
       mlinkweights((nodeids(link.e2.id),nodeids(link.e1.id)))=link.weight
+      linksMap((nodeids(link.e2.id),nodeids(link.e1.id)))=link
+      linksMap((nodeids(link.e1.id),nodeids(link.e2.id)))=link
     }
 
     val links = mlinks.toMap
@@ -72,13 +74,16 @@ object GraphAlgorithm {
       }
 
     // Helper function to carve out paths from the next vertex matrix.
-    def extractPath(path: ArrayBuffer[Node], i: Int, j: Int) {
+    def extractPath(path: ArrayBuffer[Node],pathLinks: ArrayBuffer[Link], i: Int, j: Int) {
       if (ds(i)(j) == inf) return
       val k = ns(i)(j)
       if (k != -1) {
-        extractPath(path, i, k)
+        extractPath(path,pathLinks, i, k)
         path.append(revnodes(k))
-        extractPath(path, k, j)
+        extractPath(path,pathLinks, k, j)
+      }else {
+        // otherwise k is the next node, can add the link
+        pathLinks.append(linksMap(revnodes(i).id,revnodes(j).id))
       }
     }
 
@@ -91,12 +96,13 @@ object GraphAlgorithm {
         if (ds(i)(j) != inf) {
           //val p = new ArrayBuffer[Int]()
           val currentPath = new ArrayBuffer[Node]()
+          val currentPathLinks = new ArrayBuffer[Link]()
           currentPath.append(revnodes(i))
           if (i != j) {
-            extractPath(currentPath, i, j)
+            extractPath(currentPath,currentPathLinks, i, j)
             currentPath.append(revnodes(j))
           }
-          paths((revnodes(i),revnodes(j))) = Path(revnodes(i),revnodes(j),currentPath.toList)
+          paths((revnodes(i),revnodes(j))) = Path(revnodes(i),revnodes(j),currentPath.toList,currentPathLinks.toList)
         }
     }
 

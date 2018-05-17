@@ -100,7 +100,7 @@ object Network {
       //def randomWeight(e:g.EdgeT) = rng.nextLong()
       //val path = o.shortestPathTo(d,randomWeight)
       val path = o.shortestPathTo(d)
-      if (path != None) pathsdijkstra((Node(o.value),Node(d.value))) = Path(path.get.nodes.map{case n => Node(n.value)}.toList)
+      if (path != None) pathsdijkstra((Node(o.value),Node(d.value))) = Path(path.get.nodes.map{case n => Node(n.value)}.toList,Seq.empty)
       //println(path)
     }
     val allpaths1 = pathsdijkstra.toMap

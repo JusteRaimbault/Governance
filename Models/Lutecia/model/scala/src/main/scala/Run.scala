@@ -16,6 +16,7 @@ object Run extends App{
 
   val model = new Lutecia with SyntheticSetup with ExponentialMixture with GridNetwork {
     //override def worldSize = 30
+    override def finalTime: Int = 10
     //define parameters
     override def lambda: Double = 0.05
     override def beta: Double = 1.8
