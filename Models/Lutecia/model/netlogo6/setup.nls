@@ -376,7 +376,7 @@ end
 ;  Done AFTER nw distance caching ; updates
 to setup:setup-initial-network
   
-  if global:initial-nw? != false [
+  if global:initial-nw? != false and global:initial-nw-random-type != "no-network" [
   
     if global:setup-type = "random" [
       ;;

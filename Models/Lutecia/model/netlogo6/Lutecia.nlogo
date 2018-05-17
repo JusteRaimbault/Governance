@@ -601,7 +601,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-5.0
+3.0
 1
 1
 NIL
@@ -1400,8 +1400,8 @@ CHOOSER
 118
 global:initial-nw-random-type
 global:initial-nw-random-type
-"tree-skeleton" "slime-mould" "full"
-1
+"tree-skeleton" "slime-mould" "full" "no-network"
+3
 
 MONITOR
 1516

@@ -21,7 +21,7 @@ object Path {
     * @param links
     * @return
     */
-  def apply(o:Node,d:Node,nodes:Seq[Node],links: Seq[Link]): Path = Path(o,d,nodes,links,links.map{_.length}.sum)
+  def apply(o:Node,d:Node,nodes:Seq[Node],links: Seq[Link]): Path = Path(o,d,nodes,links,links.map{case l => l.length/l.speed}.sum)
 
   /**
     *

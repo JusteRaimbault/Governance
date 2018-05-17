@@ -19,6 +19,11 @@ trait Lutecia {
   val lutecia: Lutecia = this
 
   /**
+    * Meta-parameters
+    */
+
+
+  /**
     * size of the grid
     */
   def worldSize: Int = 15 //20
@@ -32,6 +37,11 @@ trait Lutecia {
     * Final time
     */
   def finalTime: Int = 200
+
+  /**
+    *
+    */
+  def euclidianPace: Double = 5.0
 
 
   /**

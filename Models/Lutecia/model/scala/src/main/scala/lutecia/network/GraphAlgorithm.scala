@@ -36,8 +36,8 @@ object GraphAlgorithm {
       // links assumed undirected in our case
       mlinks(nodeids(link.e1.id))+=nodeids(link.e2.id)
       mlinks(nodeids(link.e2.id))+=nodeids(link.e1.id)
-      mlinkweights((nodeids(link.e1.id),nodeids(link.e2.id)))=link.weight
-      mlinkweights((nodeids(link.e2.id),nodeids(link.e1.id)))=link.weight
+      mlinkweights((nodeids(link.e1.id),nodeids(link.e2.id)))=link.cost
+      mlinkweights((nodeids(link.e2.id),nodeids(link.e1.id)))=link.cost
       linksMap((nodeids(link.e2.id),nodeids(link.e1.id)))=link
       linksMap((nodeids(link.e1.id),nodeids(link.e2.id)))=link
     }
