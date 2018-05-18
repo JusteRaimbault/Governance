@@ -62,7 +62,7 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,scenario,replication),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,scenario,replication),
   netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibility),
-  netLogoOutputs += ("indicators:mean-congestion",relativeCongestion),
+  netLogoOutputs += ("indicators:relative-congestion",relativeCongestion),
   netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
   netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
   netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
@@ -84,7 +84,7 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
   networkSpeed := 5.0
 )
 
-val purpose = "NSGA2"
+val purpose = "NSGA2_LOCAL"
 
 
 val oppositeRelativeAccessibility = Val[Double]
@@ -101,7 +101,7 @@ val post = ScalaTask("""
 val evolution =
   SteadyStateEvolution(
     algorithm = NSGA2(
-      mu = 500,
+      mu = 50,
       genome = Seq(
         relocationRate in (0.0 to 1.0 by 0.1),
         gammaCDA in (0.0 to 1.0 by 0.1),
@@ -113,18 +113,24 @@ val evolution =
       stochastic = Stochastic(seed = replication)
     ),
     evaluation = model -- post,
-    termination = 1 hours
+    termination = 15 minutes //1 hours
   )
 
 val island =
   IslandEvolution(
     island = evolution,
-    parallelism = 500,
-    termination = 100000
+    parallelism = 50,
+    termination = 10000
   )
 
 val savePopulationHook = SavePopulationHook(island, workDirectory /  "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmm")).format(new Date()))+"_"+purpose)
 
-val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val local = LocalEnvironment(15)
 
-island on grid hook savePopulationHook
+//island on grid hook savePopulationHook
+island on local hook savePopulationHook
+
+
+
+
