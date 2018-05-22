@@ -4,7 +4,7 @@ package lutecia.network
 
 
 import lutecia.core.World
-import lutecia.setup.SlimeMouldNetwork
+import lutecia.setup.{SlimeMouldNetwork, GridNetwork}
 import org.apache.commons.math3.linear.{SingularMatrixException, _}
 
 import scala.util.Random
@@ -21,22 +21,42 @@ object SlimeMould {
     */
   def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork): Network = {
     var nw = world.network
-    if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid)} //
+    if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid,slimeMould)} //
     val pMat = networkToPaceMatrix(nw)
-    val diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
+    var diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
+
+    // iterate
+    for(t <- 0 to (slimeMould.timeStepsSlimeMould - 1)){
+      diameters = iterationSlimeMould(world,pMat,diameters,slimeMould)
+    }
+
+    // extract the strong links
+    val strongLinks: Seq[Link] = diameters.map{_.zipWithIndex}.zipWithIndex.map{case(row,i)=> row.map{case(d,j)=> (d,(i,j))}}.flatten.filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(Node(i),Node(j))}.toSeq
+
+    // keep the largest connected components and add them to network
+    //Network.largestConnectedComponent(Network(nw,strongLinks))
+
+
 
   }
 
 
 
   /**
-    * An iteration of the slime mould
+    * An iteration of the slime mould : given pace matrix and current diameters, computes next diameters.
     * @param world
     * @param P
     * @param D
     * @return
     */
-  def iterationSlimeMould(world: World,P:Array[Array[Double]],D:Array[Array[Double]]): Array[Array[Double]] = {
+  def iterationSlimeMould(world: World,P:Array[Array[Double]],D:Array[Array[Double]],slimeMould: SlimeMouldNetwork): Array[Array[Double]] = {
+    // get od
+    val (o,d)=chooseOD(world)
+    // io flows
+    val ioflows = getIOFlows(o,d,D,slimeMould.inputFlowSlimeMould)
+    // flows
+    val flows = getFlowMatrix(D,P)
+    // solve system
 
   }
 

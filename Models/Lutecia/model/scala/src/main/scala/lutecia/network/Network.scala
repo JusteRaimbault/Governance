@@ -5,6 +5,12 @@ import lutecia.Lutecia
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import scalax.collection.{Graph, GraphEdge}
+import scalax.collection.edge.Implicits._
+import scalax.collection.GraphPredef._
+import scalax.collection.GraphEdge._
+import scalax.collection.edge.WUnDiEdge
+
 
 case class Network(
                   nodes: Seq[Node],
@@ -54,6 +60,44 @@ object Network {
 
 
   /**
+    * Add a set of links to a network
+    *   Note : the added links only are planarized ? NO as tunnel effect not taken into account in the original implementation.
+    *   (could be an option ?)
+    * @param previousNetwork
+    * @param links
+    * @return
+    */
+  def apply(previousNetwork: Network, links: Seq[Link]): Network = {
+    // TODO : planarize links
+    Network(previousNetwork.nodes,previousNetwork.links++links)
+  }
+
+
+  /**
+    * convert a Network to a Graph object
+    * @param network
+    * @return
+    */
+  def networkToGraph(network: Network): Graph[Int,WUnDiEdge] = {
+    var linklist = ArrayBuffer[WUnDiEdge[Int]]()
+    for(link <- network.links){linklist.append(link.e1.id~link.e2.id % link.cost)}
+    Graph.from(linklist.flatten,linklist.toList)
+  }
+
+
+  /**
+    * extract connected components
+    * @param network
+    * @return
+    */
+  def connectedComponents(network: Network): Seq[Network] = {
+    val graph = networkToGraph(network)
+    
+  }
+
+
+
+  /*
     * convert a path object to a distance matrix
     *  -- not needed --
     * @param paths
@@ -64,15 +108,16 @@ object Network {
   }*/
 
 
-
+  /**
+    * test shortest paths algorithms
+    */
   def testShortestPaths(): Unit = {
     // example from tuto scala graph
     import scalax.collection.edge.WDiEdge
-    import scalax.collection.edge.Implicits._
-    import scalax.collection.GraphPredef._, scalax.collection.GraphEdge._
-    import scalax.collection.Graph
 
-    //val g = Graph(1~2 % 4, 2~3 % 2, 1~>3 % 5, 1~5  % 3, 3~5 % 2, 3~4 % 1, 4~>4 % 1, 4~>5 % 0)
+
+
+    val g = Graph(1~2 % 4, 2~3 % 2, 1~>3 % 5, 1~5  % 3, 3~5 % 2, 3~4 % 1, 4~>4 % 1, 4~>5 % 0)
     //def n(outer: Int): g.NodeT = g.get(outer)
     //println(g.get(1).shortestPathTo(g.get(5)))
 

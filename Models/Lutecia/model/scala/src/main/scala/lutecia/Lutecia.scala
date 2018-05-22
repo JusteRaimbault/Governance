@@ -124,6 +124,12 @@ object Lutecia {
 
 object RunModel {
 
+
+  /**
+    * Run the model
+    * @param model
+    * @return
+    */
   def run(model: Lutecia): Result = {
 
     // run the simulation in time
