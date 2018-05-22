@@ -39,6 +39,7 @@ object Test {
   def testSlimeMould() = {
     val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with SlimeMouldNetwork {
       override def gammaSlimeMould: Double = 1.8
+      override def thresholdSlimeMould: Double = 0.25
       override def withGridNetwork: Boolean = false
     }
     //val world = model.initialWorld

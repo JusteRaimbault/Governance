@@ -435,11 +435,24 @@ to setup:setup-initial-network
       if global:initial-nw-type = "from-file" [
         let nodes file:read-file (word global:setup-file-prefix "networkNodes.csv")
         let edges file:read-file (word global:setup-file-prefix "networkLinks.csv")
-        foreach nodes [r -> let vals map read-from-string string:explode ";" r create-ghost-transportation-nodes 1 [setxy item 1 vals item 2 vals set ghost-transportation-node:id item 0 vals]]
-        foreach edges [r -> let vals map read-from-string string:explode ";" r ask one-of ghost-transportation-nodes with [ghost-transportation-node:id = item 0 vals] [create-ghost-transportation-link-with one-of other ghost-transportation-nodes with [ghost-transportation-node:id = item 1 vals]]]
+        foreach but-first nodes [
+          r ->
+          let vals map read-from-string string:explode ";" r
+          create-ghost-transportation-nodes 1 [
+            setxy item 1 vals item 2 vals set ghost-transportation-node:id item 0 vals
+          ]
+        ]
+        foreach but-first edges [
+          r -> let vals map read-from-string string:explode ";" r
+          ask one-of ghost-transportation-nodes with [ghost-transportation-node:id = item 0 vals] [
+            create-ghost-transportation-link-with one-of other ghost-transportation-nodes with [ghost-transportation-node:id = item 1 vals]
+          ]
+        ]
+        ;show length but-first edges
       ]    
       
-      ;show network:ghost-network-as-infra-list
+      ;show count ghost-transportation-links
+      ;show length network-ghost:ghost-network-as-infra-list
       
       governance:construct-infrastructure network-ghost:ghost-network-as-infra-list save-nw-config
       network-ghost:kill-ghost-network

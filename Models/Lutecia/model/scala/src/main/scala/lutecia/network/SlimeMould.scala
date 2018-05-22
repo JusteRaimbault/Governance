@@ -26,21 +26,27 @@ object SlimeMould {
     val pMat = networkToPaceMatrix(nw)
     var diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
 
+    val nodeMap: Map[Int,Node] = nw.nodes.map{(n: Node)=>(n.id,n)}.toMap
+
     // iterate
     for(t <- 0 to (slimeMould.timeStepsSlimeMould - 1)){
       if(t%200==0){println(" ... it "+t);println("   avg diam = "+diameters.map{case r =>r.sum/r.length}.sum/diameters.length)}
       diameters = iterationSlimeMould(world,pMat,diameters,slimeMould)
     }
 
+    println(diameters.map(_.max).max)
     // extract the strong links
+    //  !! reconstruct links -> issue with node coordinates
     val strongLinks: Seq[Link] = diameters.map{_.zipWithIndex}.zipWithIndex.map{case(row,i)=> row.map{case(d,j)=> (d,(i,j))}}.flatten
-      .filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(Node(i),Node(j))}.toSeq
+      .filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(nodeMap(i),nodeMap(j))}.toSeq
 
+
+    //println(strongLinks)
     // keep the largest connected components and add them to network
     //Network.largestConnectedComponent(Network(nw,strongLinks))
     // and simplify the network
     val res = Network.simplifyNetwork(Network.largestConnectedComponent(Network(strongLinks,false)))
-    if(withBaseGrid) Network(nw,res.links) else Network(res.links,false)
+    if(withBaseGrid) Network(nw,res.links) else Network(res.links,nodeMap,false)
   }
 
 

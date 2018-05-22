@@ -532,6 +532,9 @@ undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 
 breed[ghost-transportation-nodes ghost-transportation-node]
 
+ghost-transportation-nodes-own [
+  ghost-transportation-node:id
+]
 
 
 ;;
@@ -1395,14 +1398,14 @@ TEXTBOX
 1
 
 CHOOSER
-333
-73
-521
-118
-global:initial-nw-random-type
-global:initial-nw-random-type
-"tree-skeleton" "slime-mould" "full" "no-network"
-3
+372
+72
+560
+117
+global:initial-nw-type
+global:initial-nw-type
+"tree-skeleton" "slime-mould" "full" "no-network" "from-file"
+4
 
 MONITOR
 1516

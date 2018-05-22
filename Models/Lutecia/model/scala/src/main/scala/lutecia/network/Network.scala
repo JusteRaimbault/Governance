@@ -62,9 +62,23 @@ object Network {
     * @param links
     */
   def apply(links: Seq[Link],computeDist: Boolean): Network = {
-    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq
-    Network(nodes.map{Node(_)},links,computeDist)
+    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq.map{(i: Int) =>Node(i)}
+    Network(nodes,links,computeDist)
   }
+
+
+  /**
+    * idem with existing nodes
+    * @param links
+    * @param nodeMap
+    * @param computeDist
+    * @return
+    */
+  def apply(links: Seq[Link],nodeMap: Map[Int,Node],computeDist: Boolean): Network = {
+    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq.map{nodeMap(_)}
+    Network(nodes,links,computeDist)
+  }
+
 
   /**
     * @param links
@@ -109,10 +123,10 @@ object Network {
     * @param network
     * @return
     */
-  def networkToGraph(network: Network): Graph[Int,WUnDiEdge] = {
+  def networkToGraph(network: Network): (Graph[Int,WUnDiEdge],Map[Int,Node]) = {
     var linklist = ArrayBuffer[WUnDiEdge[Int]]()
     for(link <- network.links){linklist.append(link.e1.id~link.e2.id % link.cost)}
-    Graph.from(linklist.flatten,linklist.toList)
+    (Graph.from(linklist.flatten,linklist.toList),network.nodes.map{(n:Node)=>(n.id,n)}.toMap)
   }
 
   /**
@@ -120,11 +134,12 @@ object Network {
     * @param graph
     * @return
     */
-  def graphToNetwork(graph: Graph[Int,WUnDiEdge]): Network = {
+  def graphToNetwork(graph: Graph[Int,WUnDiEdge],nodeMap: Map[Int,Node]): Network = {
     val links = ArrayBuffer[Link]();val nodes = ArrayBuffer[Node]()
     for(edge <-graph.edges){
-      links.append(Link(edge._1,edge._2,edge.weight))
-      nodes.append(Node(edge._1),Node(edge._2))
+      //links.append(Link(edge._1,edge._2,edge.weight))
+      nodes.append(nodeMap(edge._1),nodeMap(edge._2))
+      links.append(Link(nodeMap(edge._1),nodeMap(edge._2),edge.weight))
     }
     Network(nodes.toSet.toSeq,links,false)
   }
@@ -136,10 +151,10 @@ object Network {
     * @return
     */
   def connectedComponents(network: Network): Seq[Network] = {
-    val graph = networkToGraph(network)
+    val (graph,nodeMap) = networkToGraph(network)
     val components: Seq[graph.Component] = graph.componentTraverser().toSeq
     //val components: Seq[Int] = for (component <- graph.componentTraverser()) yield 0 /: component.nodes
-    components.map{case c => graphToNetwork(c.toGraph)}
+    components.map{case c => graphToNetwork(c.toGraph,nodeMap)}
   }
 
   /**

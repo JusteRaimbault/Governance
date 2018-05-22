@@ -126,7 +126,7 @@ trait SlimeMouldNetwork extends SyntheticNetwork {
   /**
     * threshold to discard links
     */
-  def thresholdSlimeMould: Double = 0.05
+  def thresholdSlimeMould: Double = 0.1
 
   /**
     * initial diameter
