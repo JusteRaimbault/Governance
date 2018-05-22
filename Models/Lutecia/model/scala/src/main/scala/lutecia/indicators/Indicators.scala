@@ -46,7 +46,7 @@ object Indicators {
     * @return
     */
   def averageCellValue(fun:Cell=>Double)(world: World): Double = {
-    val flatvals = world.cells.cells.flatten.map(fun)
+    val flatvals = world.grid.cells.flatten.map(fun)
     flatvals.sum/flatvals.size
   }
 
@@ -56,17 +56,17 @@ object Indicators {
     * @return
     */
   def averageAccessibility(world: World): Double = {
-    val flataccess =world.cells.cells.flatten.map{_.accessibility}
+    val flataccess =world.grid.cells.flatten.map{_.accessibility}
     flataccess.sum/flataccess.size
   }
 
   def averageActives(world: World): Double = {
-    val flatactives = world.cells.cells.flatten.map{_.actives}
+    val flatactives = world.grid.cells.flatten.map{_.actives}
     flatactives.sum/flatactives.size
   }
 
   def averageEmployments(world: World): Double = {
-    val flatemployments = world.cells.cells.flatten.map(_.employments)
+    val flatemployments = world.grid.cells.flatten.map(_.employments)
     flatemployments.sum/flatemployments.size
   }
 
@@ -76,7 +76,7 @@ object Indicators {
     * @return
     */
   def diffActives(states: Seq[World]): Double = {
-    Grid.absGridDiff(states(states.size-1).cells,states(states.size-2).cells,_.actives)
+    Grid.absGridDiff(states(states.size-1).grid,states(states.size-2).grid,_.actives)
   }
 
 
@@ -86,7 +86,7 @@ object Indicators {
     * @return
     */
   def totalDiffActives(result: Result): Double = {
-    result.states.sliding(2,1).toSeq.map{case s=>Grid.absGridDiff(s(0).cells,s(1).cells,_.actives)}.sum
+    result.states.sliding(2,1).toSeq.map{case s=>Grid.absGridDiff(s(0).grid,s(1).grid,_.actives)}.sum
   }
 
 }

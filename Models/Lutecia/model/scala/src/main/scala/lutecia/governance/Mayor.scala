@@ -14,7 +14,7 @@ case class Mayor(
 
 object Mayor {
 
-  def apply(c: Cell) = Mayor(c,Set.empty,0.0)
+  def apply(c: Cell): Mayor = Mayor(c,Set.empty,0.0)
 
 }
 

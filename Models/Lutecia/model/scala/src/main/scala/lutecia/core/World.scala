@@ -1,6 +1,8 @@
 
 package lutecia.core
 
+import java.io.FileWriter
+
 import lutecia.Lutecia
 import lutecia.governance.Mayor
 import lutecia.luti.Luti
@@ -48,6 +50,48 @@ object World {
     * @return
     */
   def apply(world: World,t: Int): World = world.copy(time=t)
+
+
+  /**
+    *
+    * @param world
+    * @param pathPrefix
+    */
+  def exportWorld(world: World,
+                  pathPrefix: String,
+                  format: String = "csv"): Unit = {
+    format match {
+      case "csv" => {
+        // dump params
+        println("Exporting world with : Network |V| = "+world.network.nodes.size+" |V| = "+world.network.links.size+ " ; "+world.mayors.size+" mayors")
+
+        // write cells
+        val writer: FileWriter = new FileWriter(pathPrefix + "_grid.csv")
+        writer.write("id;x;y;actives;employments\n")
+        world.grid.cells.flatten.foreach {
+          (c: Cell) => writer.write(Seq(c.number, c.x, c.y, c.actives, c.employments).mkString(";") + "\n")
+        }
+        writer.close()
+
+        // write mayors
+        val writerMayors: FileWriter = new FileWriter(pathPrefix + "_mayors.csv")
+        world.mayors.foreach { (m: Mayor) => writerMayors.write(m.position.number + "\n") }
+        writerMayors.close()
+        // write network
+        val writerNetworkNodes: FileWriter = new FileWriter(pathPrefix + "_networkNodes.csv")
+        writerNetworkNodes.write("id;x;y\n")
+        world.network.nodes.foreach { (n: Node) => writerNetworkNodes.write(Seq(n.id, n.x, n.y).mkString(";") + "\n") }
+        writerNetworkNodes.close()
+        val writerNetworkLinks: FileWriter = new FileWriter(pathPrefix + "_networkLinks.csv")
+        writerNetworkLinks.write("id1;id2;speed")
+        world.network.links.foreach { (l: Link) => writerNetworkLinks.write(Seq(l.e1.id,l.e2.id,l.speed).mkString(";") + "\n") }
+        writerNetworkLinks.close()
+      }
+
+      case "" => ()
+    }
+  }
+
 
 
 }

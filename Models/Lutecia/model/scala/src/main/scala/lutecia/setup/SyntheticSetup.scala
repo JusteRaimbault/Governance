@@ -18,7 +18,7 @@ trait SyntheticSetup extends Setup {
     * Initial grid takes no arguments
     * @return the Grid and the set of mayors
     */
-  def initialGrid: (Grid,Set[Mayor])
+  def initialGrid: (Grid,Seq[Mayor])
 
   /**
     * The network will generally depends on the world (since also includes mayors)

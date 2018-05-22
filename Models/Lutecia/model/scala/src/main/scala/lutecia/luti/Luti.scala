@@ -32,7 +32,7 @@ object Luti {
     * @return
     */
   def relocations(world: World,lutecia: Lutecia): World = {
-    val cells = world.cells.cells
+    val cells = world.grid.cells
     val aitot = cells.flatten.map{_.actives}.sum
     val maxau = cells.flatten.map{_.aUtility}.max
     val euia = cells.flatten.map{case c => math.exp(lutecia.beta*c.aUtility/maxau)}
@@ -43,7 +43,7 @@ object Luti {
     val euie = cells.flatten.map{case c => math.exp(lutecia.beta*c.eUtility/maxeu)}
     val euietot = euie.sum
     val newemployments = euie.map{_*lutecia.alpha*eitot/euietot}
-    World(Grid.updateValues(cells.flatten,newactives,newemployments,lutecia.worldSize),world.network,world.time)
+    World(Grid.updateValues(cells.flatten,newactives,newemployments,lutecia.worldSize),world.network,world.mayors,world.time)
   }
 
 

@@ -64,7 +64,7 @@ trait ExponentialMixtureGrid extends SyntheticGrid {
 
 
 
-  override def initialGrid: (Grid,Set[Mayor]) = ExponentialMixtureGrid.expMixtureGrid(this)
+  override def initialGrid: (Grid,Seq[Mayor]) = ExponentialMixtureGrid.expMixtureGrid(this)
 
 }
 
@@ -97,7 +97,7 @@ object ExponentialMixtureGrid {
   /**
     * Grid from exponential mixture with fixed number of centers
     */
-  def expMixtureGrid(model: ExponentialMixtureGrid): (Grid,Set[Mayor]) = {
+  def expMixtureGrid(model: ExponentialMixtureGrid): (Grid,Seq[Mayor]) = {
     val rng = model.rng
     val numberTerritories = model.numberTerritories
     val worldSize = model.worldSize
@@ -116,13 +116,13 @@ object ExponentialMixtureGrid {
     val employments = employmentsWithCoords.map{case c=>c.map{_._1}}.flatten
     val coords = activesWithCoords.map{case c=>c.map{_._2}}.flatten
     val flatCells =  actives.zip(employments).zip(coords).zipWithIndex.map{case (((a,e),(i,j)),k)=>{val c = Cell(k,i.toDouble,j.toDouble);Cell(c,(a,e),"values")}}
-    val mayors: Set[Mayor] = coords.map{
-      case(x,y)=>{
-        val dists = flatCells.map{case c => math.abs(c.x - x)+math.abs(c.y - y)}
+    val mayors: Seq[Mayor] = centers.map{
+      case coords=>{
+        val dists = flatCells.map{case c => math.abs(c.x - coords(0))+math.abs(c.y - coords(1))}
         val mind = dists.min
         Mayor(flatCells(dists.indexWhere(_==mind)))
       }
-    }.toSet
+    }
     (Grid(flatCells =flatCells,worldSize),mayors)
   }
 }

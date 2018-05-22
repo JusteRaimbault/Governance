@@ -9,6 +9,7 @@ import scalax.collection.{Graph, GraphEdge}
 import scalax.collection.edge.Implicits._
 import scalax.collection.GraphPredef._
 import scalax.collection.GraphEdge._
+import scalax.collection.GraphTraversal._
 import scalax.collection.edge.WUnDiEdge
 
 
@@ -32,16 +33,47 @@ object Network {
     * @param n
     * @param l
     */
-  def apply(n: Seq[Node],l: Seq[Link]): Network = {
-    // compute shortest paths
-    val network = Network(n,l,Map.empty,Map.empty,Seq.empty)
-    val paths = GraphAlgorithm.allPairsShortestPath(network)
-    //println(paths.keySet.size)
-    //println(n.size*n.size)
-    val distMap = paths.mapValues{case p => p.cost}
-    val distMat = Seq.tabulate(n.size,n.size){case(i,j)=>distMap((n(i),n(j)))} // note : no issue here as the network is necessarily connected
-    Network(n,l,paths,distMap,distMat)
+  def apply(n: Seq[Node],l: Seq[Link],computeDist: Boolean): Network = {
+    if(computeDist) {
+      // compute shortest paths
+      val network = Network(n, l, Map.empty, Map.empty, Seq.empty)
+      val paths = GraphAlgorithm.allPairsShortestPath(network)
+      //println(paths.keySet.size)
+      //println(n.size*n.size)
+      val distMap = paths.mapValues { case p => p.cost }
+      val distMat = Seq.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
+      Network(n, l, paths, distMap, distMat)
+    }else{
+      Network(n,l,Map.empty,Map.empty,Seq.empty)
+    }
   }
+
+  /**
+    * construct and compute distances
+    * @param n
+    * @param l
+    * @return
+    */
+  def apply(n: Seq[Node], l:Seq[Link]): Network = Network(n,l,true)
+
+
+  /**
+    * construct from links only
+    * @param links
+    */
+  def apply(links: Seq[Link],computeDist: Boolean): Network = {
+    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq
+    Network(nodes.map{Node(_)},links,computeDist)
+  }
+
+  /**
+    * @param links
+    * @return
+    */
+  def apply(links: Seq[Link]): Network = {
+    Network(links,true)
+  }
+
 
   /**
     * Constructor adding a single link
@@ -84,6 +116,20 @@ object Network {
     Graph.from(linklist.flatten,linklist.toList)
   }
 
+  /**
+    *
+    * @param graph
+    * @return
+    */
+  def graphToNetwork(graph: Graph[Int,WUnDiEdge]): Network = {
+    val links = ArrayBuffer[Link]();val nodes = ArrayBuffer[Node]()
+    for(edge <-graph.edges){
+      links.append(Link(edge._1,edge._2,edge.weight))
+      nodes.append(Node(edge._1),Node(edge._2))
+    }
+    Network(nodes.toSet.toSeq,links)
+  }
+
 
   /**
     * extract connected components
@@ -92,9 +138,21 @@ object Network {
     */
   def connectedComponents(network: Network): Seq[Network] = {
     val graph = networkToGraph(network)
-    
+    val components: Seq[graph.Component] = graph.componentTraverser().toSeq
+    //val components: Seq[Int] = for (component <- graph.componentTraverser()) yield 0 /: component.nodes
+    components.map{case c => graphToNetwork(c.toGraph)}
   }
 
+  /**
+    * get largest connected component
+    * @param network
+    * @return
+    */
+  def largestConnectedComponent(network: Network): Network = {
+    val components = connectedComponents(network)
+    val largestComp = components.sortWith{case(n1,n2)=>n1.nodes.size>=n2.nodes.size}(0)
+    largestComp
+  }
 
 
   /*
@@ -117,7 +175,7 @@ object Network {
 
 
 
-    val g = Graph(1~2 % 4, 2~3 % 2, 1~>3 % 5, 1~5  % 3, 3~5 % 2, 3~4 % 1, 4~>4 % 1, 4~>5 % 0)
+    //val g = Graph(1~2 % 4, 2~3 % 2, 1~>3 % 5, 1~5  % 3, 3~5 % 2, 3~4 % 1, 4~>4 % 1, 4~>5 % 0)
     //def n(outer: Int): g.NodeT = g.get(outer)
     //println(g.get(1).shortestPathTo(g.get(5)))
 

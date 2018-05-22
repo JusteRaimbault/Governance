@@ -35,9 +35,8 @@ object SlimeMould {
 
     // keep the largest connected components and add them to network
     //Network.largestConnectedComponent(Network(nw,strongLinks))
-
-
-
+    val nwLargestComponent = Network.largestConnectedComponent(Network(strongLinks,false))
+    Network(nw,nwLargestComponent.links)
   }
 
 
@@ -57,7 +56,7 @@ object SlimeMould {
     // flows
     val flows = getFlowMatrix(D,P)
     // solve system
-
+    D
   }
 
 
@@ -91,7 +90,7 @@ object SlimeMould {
     * @return
     */
   def getFlowMatrix(D: Array[Array[Double]],P: Array[Array[Double]]): Array[Array[Double]] = {
-    val prod = D.flatten.zip(P.flatten).map{case(d,p)=> - d*p}.sliding(D.size,D.size).toArray
+    val prod = D.flatten.toSeq.zip(P.flatten.toSeq).map{case(d,p)=> - d*p}.toArray.sliding(D.size,D.size).toArray
     for(i <- 0 to D.size - 1){prod(i)(i)= prod(i).sum}
     prod
   }
@@ -106,7 +105,7 @@ object SlimeMould {
   def getIOFlows(origin: Int,destinations: Seq[Int],D: Array[Array[Double]],originFlow: Double): Array[Double] = {
     val res = Array.fill[Double](D.size)(0.0)
     res(origin)= originFlow
-    for(d <- destinations){res(destinations) = - originFlow / destinations.size}
+    for(d <- destinations){res(d) = - originFlow / destinations.size}
     res
   }
 
@@ -119,7 +118,7 @@ object SlimeMould {
   def chooseOD(world: World): (Int,Seq[Int]) = {
      val omayor = Random.shuffle(world.mayors).take(1).toSeq(0)
      val o = omayor.position.number
-     val dests = world.mayors.-(omayor).map{_.position.number}.toSeq
+     val dests = world.mayors.toSet.-(omayor).map{_.position.number}.toSeq
     (o,dests)
   }
 
