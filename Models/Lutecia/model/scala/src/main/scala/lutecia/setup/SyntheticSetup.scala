@@ -168,7 +168,9 @@ object EmptyNetwork {
     * Empty network
     * @return
     */
-  def emptyNetwork(): Network = Network(Seq.empty,Seq.empty)
+  //def emptyNetwork(): Network = Network(Seq.empty,Seq.empty)
+  def emptyNetwork(): Network = Network.empty
+
 }
 
 
@@ -217,6 +219,8 @@ trait SlimeMouldNetwork extends SyntheticSetup {
   def initialDiameterSlimeMould: Double = 1.0
 
   def inputFlowSlimeMould: Double = 1.0
+
+  def
 
   // rq here : impose nw generation to depend on the whole world
   override def initialNetwork(world: World): Network = SlimeMould.generateSlimeMould(world,this)

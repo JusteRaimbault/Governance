@@ -19,6 +19,8 @@ case class Network(
 
 object Network {
 
+    val empty = Network(Seq.empty,Seq.empty,Map.empty,Map.empty,Seq.empty)
+
   /**
     * Constructor for an initial network
     * @param n

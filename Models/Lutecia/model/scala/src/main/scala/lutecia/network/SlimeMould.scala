@@ -14,11 +14,16 @@ object SlimeMould {
 
   /**
     *
-    * @param world
+    * @param world : this world is assumed to have an empty network if slime mould is used for network generation
+    *   (test it !)
     * @param slimeMould
     * @return
     */
   def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork): Network = {
+    var nw = world.network
+    if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid)} //
+    val pMat = networkToPaceMatrix(nw)
+    val diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
 
   }
 
