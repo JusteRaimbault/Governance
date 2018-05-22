@@ -228,6 +228,7 @@ globals[
   global:positions-file
   global:ext-file
 
+
   ;; GIS setup
   global:gis-network-file
   global:gis-extent-file
@@ -582,10 +583,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+14
+0
+14
 0
 0
 1
@@ -1087,12 +1088,12 @@ HORIZONTAL
 CHOOSER
 206
 72
-332
+369
 117
 global:setup-type
 global:setup-type
-"random" "from-file" "gis-synthetic" "gis"
-0
+"random" "gis-synthetic" "gis" "from-file-mayors" "from-file"
+4
 
 BUTTON
 454
@@ -1537,6 +1538,17 @@ false
 PENS
 "default" 1.0 0 -13403783 true "" "if ticks > 0 [plot indicators:relative-accessibility]"
 "pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
+
+INPUTBOX
+1524
+24
+1738
+84
+global:setup-file-prefix
+setup/test/gridnw_
+1
+0
+String
 
 @#$#@#$#@
 ## Context

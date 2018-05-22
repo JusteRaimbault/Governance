@@ -75,7 +75,8 @@ object World {
 
         // write mayors
         val writerMayors: FileWriter = new FileWriter(pathPrefix + "_mayors.csv")
-        world.mayors.foreach { (m: Mayor) => writerMayors.write(m.position.number + "\n") }
+        writerMayors.write("position;x;y\n")
+        world.mayors.foreach { (m: Mayor) => writerMayors.write(Seq(m.position.number,m.position.x,m.position.y).mkString(";")+ "\n") }
         writerMayors.close()
         // write network
         val writerNetworkNodes: FileWriter = new FileWriter(pathPrefix + "_networkNodes.csv")
