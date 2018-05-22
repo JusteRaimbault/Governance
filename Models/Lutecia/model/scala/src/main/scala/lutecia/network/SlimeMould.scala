@@ -5,7 +5,7 @@ package lutecia.network
 
 import lutecia.core.World
 import lutecia.setup.{SlimeMouldNetwork, GridNetwork}
-import org.apache.commons.math3.linear.{SingularMatrixException, _}
+import org.apache.commons.math3.linear._
 
 import scala.util.Random
 
@@ -19,7 +19,8 @@ object SlimeMould {
     * @param slimeMould
     * @return
     */
-  def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork): Network = {
+  def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork,withBaseGrid: Boolean): Network = {
+    println("Generating slime mould nw with gamma = "+slimeMould.gammaSlimeMould+" ; withGridNetwork = "+slimeMould.withGridNetwork)
     var nw = world.network
     if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid,slimeMould)} //
     val pMat = networkToPaceMatrix(nw)
@@ -27,16 +28,19 @@ object SlimeMould {
 
     // iterate
     for(t <- 0 to (slimeMould.timeStepsSlimeMould - 1)){
+      if(t%200==0){println(" ... it "+t);println("   avg diam = "+diameters.map{case r =>r.sum/r.length}.sum/diameters.length)}
       diameters = iterationSlimeMould(world,pMat,diameters,slimeMould)
     }
 
     // extract the strong links
-    val strongLinks: Seq[Link] = diameters.map{_.zipWithIndex}.zipWithIndex.map{case(row,i)=> row.map{case(d,j)=> (d,(i,j))}}.flatten.filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(Node(i),Node(j))}.toSeq
+    val strongLinks: Seq[Link] = diameters.map{_.zipWithIndex}.zipWithIndex.map{case(row,i)=> row.map{case(d,j)=> (d,(i,j))}}.flatten
+      .filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(Node(i),Node(j))}.toSeq
 
     // keep the largest connected components and add them to network
     //Network.largestConnectedComponent(Network(nw,strongLinks))
-    val nwLargestComponent = Network.largestConnectedComponent(Network(strongLinks,false))
-    Network(nw,nwLargestComponent.links)
+    // and simplify the network
+    val res = Network.simplifyNetwork(Network.largestConnectedComponent(Network(strongLinks,false)))
+    if(withBaseGrid) Network(nw,res.links) else Network(res.links,false)
   }
 
 
@@ -56,8 +60,33 @@ object SlimeMould {
     // flows
     val flows = getFlowMatrix(D,P)
     // solve system
-    D
+    val pressures = solveSystem(flows,ioflows)
+    updateDiameters(D,P,pressures,slimeMould)
   }
+
+
+  /**
+    * update diameters
+    * @param previousDiameters
+    * @param pressures
+    * @return
+    */
+  def updateDiameters(previousDiameters: Array[Array[Double]],paceMatrix:Array[Array[Double]],pressures: Option[Array[Double]],slimeMould: SlimeMouldNetwork): Array[Array[Double]] = {
+    pressures match {
+      case None => previousDiameters
+      case Some(press) =>
+        // compute link flows
+        previousDiameters.toSeq.zipWithIndex.map { case (r, i) => r.toSeq.zipWithIndex
+          .map { case (v, j) => (v, (i, j)) }
+        }.flatten
+          .zip(paceMatrix.flatten.toSeq)
+          .map { case ((d, (i, j)), p) =>
+            val flow = math.pow(math.abs(d * p * (press(i) - press(j))), slimeMould.gammaSlimeMould)
+            val deltad = flow / (1 + flow)
+            deltad * slimeMould.deltatSlimeMould + (1 - slimeMould.deltatSlimeMould) * d
+          }.toArray.sliding(previousDiameters.size, previousDiameters.size).toArray
+      }
+    }
 
 
 
@@ -132,14 +161,17 @@ object SlimeMould {
     * @param B
     * @return
     */
-  def solveSystem(M: Array[Array[Double]],B: Array[Double]): Array[Double] = {
-    // convert the objects to math3 objects
-    val matrix: RealMatrix = MatrixUtils.createRealMatrix(M)
-    //ensure the matrix is invertible by perturbating it if necessary
-    val inv = MatrixUtils.inverse(matrix)
-    //try{}catch SingularMatrixException {}
-    val res: RealVector = inv.operate(MatrixUtils.createRealVector(B))
-    res.toArray
+  def solveSystem(M: Array[Array[Double]],B: Array[Double]): Option[Array[Double]] = {
+    try{
+      // convert the objects to math3 objects
+      val matrix: RealMatrix = MatrixUtils.createRealMatrix(M)
+      //should ensure the matrix is invertible by perturbating it if necessary
+      val inv = MatrixUtils.inverse(matrix)
+      val res: RealVector = inv.operate(MatrixUtils.createRealVector(B))
+      Some(res.toArray)
+    } catch {
+      case e: SingularMatrixException => None
+    }
   }
 
 

@@ -388,9 +388,9 @@ end
 ;  Done AFTER nw distance caching ; updates
 to setup:setup-initial-network
   
-  if global:initial-nw? != false and global:initial-nw-random-type != "no-network" [
+  if global:initial-nw? != false and global:initial-nw-type != "no-network" [
   
-    if global:setup-type = "random" [
+    if global:setup-type = "random" or global:setup-type = "from-file" [
       ;;
       ; Possible options :
       ; try a radioconcentric network ? or use slime mould ?
@@ -398,7 +398,7 @@ to setup:setup-initial-network
     
       ; strategy : setup a ghost network ; construct infras then
     
-      if global:initial-nw-random-type = "tree-skeleton" [
+      if global:initial-nw-type = "tree-skeleton" [
          ask mayors with [self != global:regional-authority] [
            hatch-ghost-transportation-nodes 1 ;[show self]
          ]
@@ -423,15 +423,21 @@ to setup:setup-initial-network
       ]
       
       
-      if global:initial-nw-random-type = "slime-mould" [
+      if global:initial-nw-type = "slime-mould" [
           network-biological:grow-network
       ]
       
-      if global:initial-nw-random-type = "full" [
+      if global:initial-nw-type = "full" [
          ask mayors with [self != global:regional-authority] [hatch-ghost-transportation-nodes 1]
          ask ghost-transportation-nodes [ask ((other ghost-transportation-nodes) with [not link-neighbor? myself]) [create-ghost-transportation-link-with myself]]
       ]
-      
+  
+      if global:initial-nw-type = "from-file" [
+        let nodes file:read-file (word global:setup-file-prefix "networkNodes.csv")
+        let edges file:read-file (word global:setup-file-prefix "networkLinks.csv")
+        foreach nodes [r -> let vals map read-from-string string:explode ";" r create-ghost-transportation-nodes 1 [setxy item 1 vals item 2 vals set ghost-transportation-node:id item 0 vals]]
+        foreach edges [r -> let vals map read-from-string string:explode ";" r ask one-of ghost-transportation-nodes with [ghost-transportation-node:id = item 0 vals] [create-ghost-transportation-link-with one-of other ghost-transportation-nodes with [ghost-transportation-node:id = item 1 vals]]]
+      ]    
       
       ;show network:ghost-network-as-infra-list
       
@@ -440,6 +446,7 @@ to setup:setup-initial-network
     
     ]
   
+    
   
     if global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
       ; construct network from gis file

@@ -104,7 +104,6 @@ object Network {
     Network(previousNetwork.nodes,previousNetwork.links++links)
   }
 
-
   /**
     * convert a Network to a Graph object
     * @param network
@@ -127,7 +126,7 @@ object Network {
       links.append(Link(edge._1,edge._2,edge.weight))
       nodes.append(Node(edge._1),Node(edge._2))
     }
-    Network(nodes.toSet.toSeq,links)
+    Network(nodes.toSet.toSeq,links,false)
   }
 
 
@@ -153,6 +152,18 @@ object Network {
     val largestComp = components.sortWith{case(n1,n2)=>n1.nodes.size>=n2.nodes.size}(0)
     largestComp
   }
+
+
+  /**
+    * simplify a network
+    * @param network
+    * @return
+    */
+  def simplifyNetwork(network: Network): Network = {
+    network
+  }
+
+
 
 
   /*

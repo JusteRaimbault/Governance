@@ -120,7 +120,7 @@ trait SlimeMouldNetwork extends SyntheticNetwork {
     * gamma
     * @return
     */
-  def gammaSlimeMould: Double
+  def gammaSlimeMould: Double = 1.8
 
 
   /**
@@ -144,10 +144,18 @@ trait SlimeMouldNetwork extends SyntheticNetwork {
     * number of time steps to generate the network
     * @return
     */
-  def timeStepsSlimeMould: Int = 1000
+  def timeStepsSlimeMould: Int = 500
+
+  def deltatSlimeMould: Double = 0.05
+
+  /**
+    * construct a background grid network ?
+    * @return
+    */
+  def withGridNetwork: Boolean = true
 
   // rq here : impose nw generation to depend on the whole world
-  override def initialNetwork(world: World): Network = SlimeMould.generateSlimeMould(world,this)
+  override def initialNetwork(world: World): Network = SlimeMould.generateSlimeMould(world,this,withGridNetwork)
 
 
 }
