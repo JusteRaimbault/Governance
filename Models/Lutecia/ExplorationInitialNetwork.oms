@@ -75,13 +75,14 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
   arraysOnSingleRow := true
 )
 
-//val env = LocalEnvironment(2)
+//val env = LocalEnvironment(60)
 val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (model on env by 20 hook indics_hook),
+   evaluation = (model on env by 10 hook indics_hook),
+   //evaluation = (model on env hook indics_hook),
    seed = replication,
    replications = 100
 )
@@ -92,8 +93,8 @@ val exploration =
     evaluation = replications,
     sampling =
    ((LHS (
-      2000
-      ,centerNumber in Range(1.0,6.999)
+      500
+      ,centerNumber in Range(2.0,6.999)
       ,gammaSlimeMould in Range(0.5,2.5)
     ) withIndex id) x (nwType in (0 to 2 by 1)) )
   )
