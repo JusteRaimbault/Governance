@@ -601,8 +601,8 @@ SLIDER
 global:#-initial-territories
 global:#-initial-territories
 0
-5
-5
+10
+6
 1
 1
 NIL
@@ -891,7 +891,7 @@ CHOOSER
 global:log-level
 global:log-level
 "DEBUG" "VERBOSE" "DEFAULT"
-1
+2
 
 SLIDER
 14
@@ -1424,8 +1424,8 @@ global:network-biological-gamma
 global:network-biological-gamma
 0
 10
-1.4
-0.1
+1.8
+0.05
 1
 NIL
 HORIZONTAL
@@ -1538,6 +1538,23 @@ false
 PENS
 "default" 1.0 0 -13403783 true "" "if ticks > 0 [plot indicators:relative-accessibility]"
 "pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
+
+BUTTON
+270
+193
+353
+226
+reset nw
+setup:reset-network\nnetwork:cache-nw-measures\nshow (word \"length = \" network-indicators:relative-nw-length)\nshow (word \"perf = \" network-indicators:mean-relative-speed)\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## Context

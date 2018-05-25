@@ -682,6 +682,18 @@ to setup:setup-headless-vars
 end
 
 
+;;
+; procedure keeping urban structure, generating a new network
+to setup:reset-network
+  ask transportation-links [die] ask transportation-nodes [die]
+  setup:setup-initial-network
+  setup:setup-display
+end
+
+
+
+
+
 
 
 
