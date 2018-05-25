@@ -3,7 +3,7 @@
 import scala.util.Random
 import lutecia._
 import lutecia.core.World
-import lutecia.setup.{EmptyNetwork, ExponentialMixture, GridNetwork, SyntheticSetup}
+import lutecia.setup._
 import lutecia.network._
 import lutecia.indicators._
 
@@ -14,7 +14,7 @@ object Run extends App{
   val t = System.currentTimeMillis()
   //implicit val rng = new Random
 
-  val model = new Lutecia with SyntheticSetup with ExponentialMixture with GridNetwork {
+  val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {
     //override def worldSize = 30
     override def finalTime: Int = 10
     //define parameters
@@ -43,17 +43,4 @@ object Run extends App{
 
 
 
-object Test {
-
-  def testGridNetwork(model: Lutecia) = {
-    val world = model.initialWorld
-  }
-
-
-  def testNetwork() = {
-    Network.testShortestPaths()
-  }
-
-
-}
 

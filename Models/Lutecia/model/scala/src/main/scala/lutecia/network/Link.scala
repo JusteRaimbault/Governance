@@ -1,6 +1,8 @@
 
 package lutecia.network
 
+import lutecia.core.Cell
+
 case class Link(
                e1: Node, /** origin node */
                e2: Node, /** destination node */
@@ -44,6 +46,25 @@ object Link {
     Link(e1,e2,d,s,d/s,1.0,1.0)
   }
 
+
+  /**
+    * link from cells
+    * @param c1
+    * @param c2
+    * @return
+    */
+  def apply(c1: Cell, c2: Cell): Link = {
+    Link(Node(c1),Node(c2))
+  }
+
+  /**
+    * idem with speed
+    */
+  def apply(c1: Cell, c2: Cell, s: Double): Link = {
+    Link(Node(c1),Node(c2),s)
+  }
+
+
   /**
     * note : with node numbers only link is not localized
     * @param n1
@@ -60,5 +81,8 @@ object Link {
     * @return
     */
   def apply(n1:Int,n2:Int, w: Double): Link = Link(Node(n1),Node(n2),w)
+
+
+
 
 }

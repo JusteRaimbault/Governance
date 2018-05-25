@@ -4,8 +4,8 @@ package lutecia.network
 
 
 import lutecia.core.World
-import lutecia.setup.SlimeMouldNetwork
-import org.apache.commons.math3.linear.{SingularMatrixException, _}
+import lutecia.setup.{SlimeMouldNetwork, GridNetwork}
+import org.apache.commons.math3.linear._
 
 import scala.util.Random
 
@@ -19,26 +19,80 @@ object SlimeMould {
     * @param slimeMould
     * @return
     */
-  def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork): Network = {
+  def generateSlimeMould(world: World,slimeMould: SlimeMouldNetwork,withBaseGrid: Boolean): Network = {
+    println("Generating slime mould nw with gamma = "+slimeMould.gammaSlimeMould+" ; withGridNetwork = "+slimeMould.withGridNetwork)
     var nw = world.network
-    if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid)} //
+    if(nw==Network.empty){nw = GridNetwork.gridNetwork(world.grid,slimeMould)} //
     val pMat = networkToPaceMatrix(nw)
-    val diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
+    var diameters = initialDiameterMatrix(nw,slimeMould.initialDiameterSlimeMould)
 
+    val nodeMap: Map[Int,Node] = nw.nodes.map{(n: Node)=>(n.id,n)}.toMap
+
+    // iterate
+    for(t <- 0 to (slimeMould.timeStepsSlimeMould - 1)){
+      if(t%200==0){println(" ... it "+t);println("   avg diam = "+diameters.map{case r =>r.sum/r.length}.sum/diameters.length)}
+      diameters = iterationSlimeMould(world,pMat,diameters,slimeMould)
+    }
+
+    println(diameters.map(_.max).max)
+    // extract the strong links
+    //  !! reconstruct links -> issue with node coordinates
+    val strongLinks: Seq[Link] = diameters.map{_.zipWithIndex}.zipWithIndex.map{case(row,i)=> row.map{case(d,j)=> (d,(i,j))}}.flatten
+      .filter{case(d,_)=>d>slimeMould.thresholdSlimeMould}.map{case(_,(i,j))=>Link(nodeMap(i),nodeMap(j))}.toSeq
+
+
+    //println(strongLinks)
+    // keep the largest connected components and add them to network
+    //Network.largestConnectedComponent(Network(nw,strongLinks))
+    // and simplify the network
+    val res = Network.simplifyNetwork(Network.largestConnectedComponent(Network(strongLinks,false)))
+    if(withBaseGrid) Network(nw,res.links) else Network(res.links,nodeMap,false)
   }
 
 
 
   /**
-    * An iteration of the slime mould
+    * An iteration of the slime mould : given pace matrix and current diameters, computes next diameters.
     * @param world
     * @param P
     * @param D
     * @return
     */
-  def iterationSlimeMould(world: World,P:Array[Array[Double]],D:Array[Array[Double]]): Array[Array[Double]] = {
-
+  def iterationSlimeMould(world: World,P:Array[Array[Double]],D:Array[Array[Double]],slimeMould: SlimeMouldNetwork): Array[Array[Double]] = {
+    // get od
+    val (o,d)=chooseOD(world)
+    // io flows
+    val ioflows = getIOFlows(o,d,D,slimeMould.inputFlowSlimeMould)
+    // flows
+    val flows = getFlowMatrix(D,P)
+    // solve system
+    val pressures = solveSystem(flows,ioflows)
+    updateDiameters(D,P,pressures,slimeMould)
   }
+
+
+  /**
+    * update diameters
+    * @param previousDiameters
+    * @param pressures
+    * @return
+    */
+  def updateDiameters(previousDiameters: Array[Array[Double]],paceMatrix:Array[Array[Double]],pressures: Option[Array[Double]],slimeMould: SlimeMouldNetwork): Array[Array[Double]] = {
+    pressures match {
+      case None => previousDiameters
+      case Some(press) =>
+        // compute link flows
+        previousDiameters.toSeq.zipWithIndex.map { case (r, i) => r.toSeq.zipWithIndex
+          .map { case (v, j) => (v, (i, j)) }
+        }.flatten
+          .zip(paceMatrix.flatten.toSeq)
+          .map { case ((d, (i, j)), p) =>
+            val flow = math.pow(math.abs(d * p * (press(i) - press(j))), slimeMould.gammaSlimeMould)
+            val deltad = flow / (1 + flow)
+            deltad * slimeMould.deltatSlimeMould + (1 - slimeMould.deltatSlimeMould) * d
+          }.toArray.sliding(previousDiameters.size, previousDiameters.size).toArray
+      }
+    }
 
 
 
@@ -71,7 +125,7 @@ object SlimeMould {
     * @return
     */
   def getFlowMatrix(D: Array[Array[Double]],P: Array[Array[Double]]): Array[Array[Double]] = {
-    val prod = D.flatten.zip(P.flatten).map{case(d,p)=> - d*p}.sliding(D.size,D.size).toArray
+    val prod = D.flatten.toSeq.zip(P.flatten.toSeq).map{case(d,p)=> - d*p}.toArray.sliding(D.size,D.size).toArray
     for(i <- 0 to D.size - 1){prod(i)(i)= prod(i).sum}
     prod
   }
@@ -86,7 +140,7 @@ object SlimeMould {
   def getIOFlows(origin: Int,destinations: Seq[Int],D: Array[Array[Double]],originFlow: Double): Array[Double] = {
     val res = Array.fill[Double](D.size)(0.0)
     res(origin)= originFlow
-    for(d <- destinations){res(destinations) = - originFlow / destinations.size}
+    for(d <- destinations){res(d) = - originFlow / destinations.size}
     res
   }
 
@@ -99,7 +153,7 @@ object SlimeMould {
   def chooseOD(world: World): (Int,Seq[Int]) = {
      val omayor = Random.shuffle(world.mayors).take(1).toSeq(0)
      val o = omayor.position.number
-     val dests = world.mayors.-(omayor).map{_.position.number}.toSeq
+     val dests = world.mayors.toSet.-(omayor).map{_.position.number}.toSeq
     (o,dests)
   }
 
@@ -113,14 +167,17 @@ object SlimeMould {
     * @param B
     * @return
     */
-  def solveSystem(M: Array[Array[Double]],B: Array[Double]): Array[Double] = {
-    // convert the objects to math3 objects
-    val matrix: RealMatrix = MatrixUtils.createRealMatrix(M)
-    //ensure the matrix is invertible by perturbating it if necessary
-    val inv = MatrixUtils.inverse(matrix)
-    //try{}catch SingularMatrixException {}
-    val res: RealVector = inv.operate(MatrixUtils.createRealVector(B))
-    res.toArray
+  def solveSystem(M: Array[Array[Double]],B: Array[Double]): Option[Array[Double]] = {
+    try{
+      // convert the objects to math3 objects
+      val matrix: RealMatrix = MatrixUtils.createRealMatrix(M)
+      //should ensure the matrix is invertible by perturbating it if necessary
+      val inv = MatrixUtils.inverse(matrix)
+      val res: RealVector = inv.operate(MatrixUtils.createRealVector(B))
+      Some(res.toArray)
+    } catch {
+      case e: SingularMatrixException => None
+    }
   }
 
 

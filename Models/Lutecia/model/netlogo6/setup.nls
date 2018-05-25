@@ -140,7 +140,8 @@ to setup:setup-world
   if global:seed != 0 [random-seed global:seed]
   
   ; resize world if needed
-  resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
+  ;resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
+  resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
   set-patch-size 430 / global:world-size
   
 end
@@ -261,7 +262,7 @@ end
 ; population distribution
 to setup:setup-population-distribution
    
-   if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+   if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
      let centers [patch-here] of mayors with [self != global:regional-authority]
      foreach centers [
       ? ->
@@ -269,6 +270,15 @@ to setup:setup-population-distribution
        ifelse [mayor:population] of current-mayor = 0 [set current-pop global:actives-max][set current-pop [mayor:population] of current-mayor]
        apply-monocentric-kernel "poisson" global:actives-spatial-dispersion current-pop "patch:actives" ?
      ]
+   ]
+  
+   if global:setup-type = "from-file" [
+      let patchvals file:read-file (word global:setup-file-prefix "grid.csv")
+      foreach but-first patchvals [
+        r ->
+          let vals map read-from-string string:explode ";" r 
+      ask patch (floor item 1 vals) (floor item 2 vals) [set patch:number (item 0 vals) set patch:actives (item 3 vals) set patch:employments (item 4 vals)]
+      ]
    ]
    
    if global:setup-type = "gis" [
@@ -286,7 +296,7 @@ end
 ; employments distribution
 to setup:setup-employment-distribution
   
-  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+  if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
     let centers [patch-here] of mayors with [self != global:regional-authority]
     foreach centers [
       ? ->
@@ -295,6 +305,8 @@ to setup:setup-employment-distribution
       apply-monocentric-kernel "poisson" global:employments-spatial-dispersion current-emp "patch:employments" ?
     ]
   ]
+  
+  ; or global:setup-type = "from-file"  -> already done with actives
   
   if global:setup-type = "gis" [
     let economic-dataset gis:load-dataset global:gis-economic-areas-file
@@ -344,7 +356,7 @@ to setup:setup-externalities
       set ext-patch one-of patches with [abs (distance item 0 m - distance item 1 m) < sqrt 2 and pxcor < max-pxcor and pxcor > min-pxcor and pycor < max-pycor and pycor > min-pycor ]
     ][ set ext-patch one-of patches]
   ] 
-  if global:setup-type = "from-file" [
+  if global:setup-type = "from-file-mayors" [
     set ext-patch patch first global:ext-position last global:ext-position
   ]
     
@@ -376,9 +388,9 @@ end
 ;  Done AFTER nw distance caching ; updates
 to setup:setup-initial-network
   
-  if global:initial-nw? != false and global:initial-nw-random-type != "no-network" [
+  if global:initial-nw? != false and global:initial-nw-type != "no-network" [
   
-    if global:setup-type = "random" [
+    if global:setup-type = "random" or global:setup-type = "from-file" [
       ;;
       ; Possible options :
       ; try a radioconcentric network ? or use slime mould ?
@@ -386,7 +398,7 @@ to setup:setup-initial-network
     
       ; strategy : setup a ghost network ; construct infras then
     
-      if global:initial-nw-random-type = "tree-skeleton" [
+      if global:initial-nw-type = "tree-skeleton" [
          ask mayors with [self != global:regional-authority] [
            hatch-ghost-transportation-nodes 1 ;[show self]
          ]
@@ -411,23 +423,43 @@ to setup:setup-initial-network
       ]
       
       
-      if global:initial-nw-random-type = "slime-mould" [
+      if global:initial-nw-type = "slime-mould" [
           network-biological:grow-network
       ]
       
-      if global:initial-nw-random-type = "full" [
+      if global:initial-nw-type = "full" [
          ask mayors with [self != global:regional-authority] [hatch-ghost-transportation-nodes 1]
          ask ghost-transportation-nodes [ask ((other ghost-transportation-nodes) with [not link-neighbor? myself]) [create-ghost-transportation-link-with myself]]
       ]
+  
+      if global:initial-nw-type = "from-file" [
+        let nodes file:read-file (word global:setup-file-prefix "networkNodes.csv")
+        let edges file:read-file (word global:setup-file-prefix "networkLinks.csv")
+        foreach but-first nodes [
+          r ->
+          let vals map read-from-string string:explode ";" r
+          create-ghost-transportation-nodes 1 [
+            setxy item 1 vals item 2 vals set ghost-transportation-node:id item 0 vals
+          ]
+        ]
+        foreach but-first edges [
+          r -> let vals map read-from-string string:explode ";" r
+          ask one-of ghost-transportation-nodes with [ghost-transportation-node:id = item 0 vals] [
+            create-ghost-transportation-link-with one-of other ghost-transportation-nodes with [ghost-transportation-node:id = item 1 vals]
+          ]
+        ]
+        ;show length but-first edges
+      ]    
       
-      
-      ;show network:ghost-network-as-infra-list
+      ;show count ghost-transportation-links
+      ;show length network-ghost:ghost-network-as-infra-list
       
       governance:construct-infrastructure network-ghost:ghost-network-as-infra-list save-nw-config
       network-ghost:kill-ghost-network
     
     ]
   
+    
   
     if global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
       ; construct network from gis file
@@ -571,13 +603,13 @@ to setup:setup-mayor-characteristics
   set global:mayors-coordinates [] set global:mayors-populations [] set global:mayors-employments [] set global:mayors-names []
   set global:ext-position []
   
-  if global:setup-type = "from-file"[
+  if global:setup-type = "from-file-mayors"[
     let lines file:read-file global:positions-file
   
     foreach but-first but-first lines [
       ? -> 
       let p []
-      foreach string:explode ";" ? [set p lput read-from-string ? p]
+      foreach string:explode ";" ? [?2 -> set p lput read-from-string ?2 p]
       set global:mayors-coordinates lput p global:mayors-coordinates
     ]
   
@@ -586,6 +618,15 @@ to setup:setup-mayor-characteristics
       ? ->
        set global:ext-position lput read-from-string ? global:ext-position
     ]
+  ]
+  
+  if global:setup-type = "from-file" [
+    let lines file:read-file (word global:setup-file-prefix "mayors.csv")
+    foreach but-first lines [? -> let vals map read-from-string string:explode ";" ? set global:mayors-coordinates lput (list item 1 vals item 2 vals) global:mayors-coordinates]
+    ;show global:mayors-coordinates
+    set global:mayors-populations list:rep 0 length global:mayors-coordinates
+    set global:mayors-employments list:rep 0 length global:mayors-coordinates
+    set global:mayors-names list:rep "" length global:mayors-coordinates
   ]
   
   

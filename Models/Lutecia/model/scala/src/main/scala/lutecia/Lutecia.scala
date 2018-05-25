@@ -51,27 +51,27 @@ trait Lutecia {
   /**
     * Cost of energy
     */
-  def lambda: Double
+  def lambda: Double = 0.05
 
   /**
     * Discrete choices relocation
     */
-  def beta: Double
+  def beta: Double = 1.8
 
   /**
     * Relocation rate
     */
-  def alpha: Double
+  def alpha: Double = 0.1
 
   /**
     * Cobb douglas actives
     */
-  def gammaA: Double
+  def gammaA: Double = 0.9
 
   /**
     * Cobb douglas employments
     */
-  def gammaE: Double
+  def gammaE: Double = 0.8
 
 
 
@@ -124,6 +124,12 @@ object Lutecia {
 
 object RunModel {
 
+
+  /**
+    * Run the model
+    * @param model
+    * @return
+    */
   def run(model: Lutecia): Result = {
 
     // run the simulation in time

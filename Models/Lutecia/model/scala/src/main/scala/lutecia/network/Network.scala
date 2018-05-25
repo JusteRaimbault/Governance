@@ -5,6 +5,13 @@ import lutecia.Lutecia
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import scalax.collection.{Graph, GraphEdge}
+import scalax.collection.edge.Implicits._
+import scalax.collection.GraphPredef._
+import scalax.collection.GraphEdge._
+import scalax.collection.GraphTraversal._
+import scalax.collection.edge.WUnDiEdge
+
 
 case class Network(
                   nodes: Seq[Node],
@@ -26,16 +33,61 @@ object Network {
     * @param n
     * @param l
     */
-  def apply(n: Seq[Node],l: Seq[Link]): Network = {
-    // compute shortest paths
-    val network = Network(n,l,Map.empty,Map.empty,Seq.empty)
-    val paths = GraphAlgorithm.allPairsShortestPath(network)
-    //println(paths.keySet.size)
-    //println(n.size*n.size)
-    val distMap = paths.mapValues{case p => p.cost}
-    val distMat = Seq.tabulate(n.size,n.size){case(i,j)=>distMap((n(i),n(j)))} // note : no issue here as the network is necessarily connected
-    Network(n,l,paths,distMap,distMat)
+  def apply(n: Seq[Node],l: Seq[Link],computeDist: Boolean): Network = {
+    if(computeDist) {
+      // compute shortest paths
+      val network = Network(n, l, Map.empty, Map.empty, Seq.empty)
+      val paths = GraphAlgorithm.allPairsShortestPath(network)
+      //println(paths.keySet.size)
+      //println(n.size*n.size)
+      val distMap = paths.mapValues { case p => p.cost }
+      val distMat = Seq.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
+      Network(n, l, paths, distMap, distMat)
+    }else{
+      Network(n,l,Map.empty,Map.empty,Seq.empty)
+    }
   }
+
+  /**
+    * construct and compute distances
+    * @param n
+    * @param l
+    * @return
+    */
+  def apply(n: Seq[Node], l:Seq[Link]): Network = Network(n,l,true)
+
+
+  /**
+    * construct from links only
+    * @param links
+    */
+  def apply(links: Seq[Link],computeDist: Boolean): Network = {
+    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq.map{(i: Int) =>Node(i)}
+    Network(nodes,links,computeDist)
+  }
+
+
+  /**
+    * idem with existing nodes
+    * @param links
+    * @param nodeMap
+    * @param computeDist
+    * @return
+    */
+  def apply(links: Seq[Link],nodeMap: Map[Int,Node],computeDist: Boolean): Network = {
+    val nodes = links.map{case l =>Seq(l.e1.id,l.e2.id)}.flatten.toSet.toSeq.map{nodeMap(_)}
+    Network(nodes,links,computeDist)
+  }
+
+
+  /**
+    * @param links
+    * @return
+    */
+  def apply(links: Seq[Link]): Network = {
+    Network(links,true)
+  }
+
 
   /**
     * Constructor adding a single link
@@ -54,6 +106,82 @@ object Network {
 
 
   /**
+    * Add a set of links to a network
+    *   Note : the added links only are planarized ? NO as tunnel effect not taken into account in the original implementation.
+    *   (could be an option ?)
+    * @param previousNetwork
+    * @param links
+    * @return
+    */
+  def apply(previousNetwork: Network, links: Seq[Link]): Network = {
+    // TODO : planarize links
+    Network(previousNetwork.nodes,previousNetwork.links++links)
+  }
+
+  /**
+    * convert a Network to a Graph object
+    * @param network
+    * @return
+    */
+  def networkToGraph(network: Network): (Graph[Int,WUnDiEdge],Map[Int,Node]) = {
+    var linklist = ArrayBuffer[WUnDiEdge[Int]]()
+    for(link <- network.links){linklist.append(link.e1.id~link.e2.id % link.cost)}
+    (Graph.from(linklist.flatten,linklist.toList),network.nodes.map{(n:Node)=>(n.id,n)}.toMap)
+  }
+
+  /**
+    *
+    * @param graph
+    * @return
+    */
+  def graphToNetwork(graph: Graph[Int,WUnDiEdge],nodeMap: Map[Int,Node]): Network = {
+    val links = ArrayBuffer[Link]();val nodes = ArrayBuffer[Node]()
+    for(edge <-graph.edges){
+      //links.append(Link(edge._1,edge._2,edge.weight))
+      nodes.append(nodeMap(edge._1),nodeMap(edge._2))
+      links.append(Link(nodeMap(edge._1),nodeMap(edge._2),edge.weight))
+    }
+    Network(nodes.toSet.toSeq,links,false)
+  }
+
+
+  /**
+    * extract connected components
+    * @param network
+    * @return
+    */
+  def connectedComponents(network: Network): Seq[Network] = {
+    val (graph,nodeMap) = networkToGraph(network)
+    val components: Seq[graph.Component] = graph.componentTraverser().toSeq
+    //val components: Seq[Int] = for (component <- graph.componentTraverser()) yield 0 /: component.nodes
+    components.map{case c => graphToNetwork(c.toGraph,nodeMap)}
+  }
+
+  /**
+    * get largest connected component
+    * @param network
+    * @return
+    */
+  def largestConnectedComponent(network: Network): Network = {
+    val components = connectedComponents(network)
+    val largestComp = components.sortWith{case(n1,n2)=>n1.nodes.size>=n2.nodes.size}(0)
+    largestComp
+  }
+
+
+  /**
+    * simplify a network
+    * @param network
+    * @return
+    */
+  def simplifyNetwork(network: Network): Network = {
+    network
+  }
+
+
+
+
+  /*
     * convert a path object to a distance matrix
     *  -- not needed --
     * @param paths
@@ -64,13 +192,14 @@ object Network {
   }*/
 
 
-
+  /**
+    * test shortest paths algorithms
+    */
   def testShortestPaths(): Unit = {
     // example from tuto scala graph
     import scalax.collection.edge.WDiEdge
-    import scalax.collection.edge.Implicits._
-    import scalax.collection.GraphPredef._, scalax.collection.GraphEdge._
-    import scalax.collection.Graph
+
+
 
     //val g = Graph(1~2 % 4, 2~3 % 2, 1~>3 % 5, 1~5  % 3, 3~5 % 2, 3~4 % 1, 4~>4 % 1, 4~>5 % 0)
     //def n(outer: Int): g.NodeT = g.get(outer)

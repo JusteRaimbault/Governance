@@ -30,14 +30,14 @@ to experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC l
   set global:initial-nw? true
   
   ; dirty scenarios selection (difficult to do otherwise : \gamma = f(centers) is eyeball validated..)
-  if scenario = 0 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 3]
-  if scenario = 1 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 5]
-  if scenario = 2 [set global:initial-nw-random-type "full" set global:#-initial-territories 3]
-  if scenario = 3 [set global:initial-nw-random-type "full" set global:#-initial-territories 5]
-  if scenario = 4 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.2]
-  if scenario = 5 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.1]
-  if scenario = 6 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.8]
-  if scenario = 7 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.8]
+  if scenario = 0 [set global:initial-nw-type "tree-skeleton" set global:#-initial-territories 3]
+  if scenario = 1 [set global:initial-nw-type "tree-skeleton" set global:#-initial-territories 5]
+  if scenario = 2 [set global:initial-nw-type "full" set global:#-initial-territories 3]
+  if scenario = 3 [set global:initial-nw-type "full" set global:#-initial-territories 5]
+  if scenario = 4 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.2]
+  if scenario = 5 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.1]
+  if scenario = 6 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.8]
+  if scenario = 7 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.8]
   
   ;;
   ; run parameters
@@ -81,7 +81,7 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
   set global:stopping-type "time"
   set global:initial-nw? true
   
-  if networkType = 0 [set global:initial-nw-random-type "tree-skeleton"] if networkType = 1 [set global:initial-nw-random-type "full"] if networkType = 2 [set global:initial-nw-random-type "slime-mould"]
+  if networkType = 0 [set global:initial-nw-type "tree-skeleton"] if networkType = 1 [set global:initial-nw-type "full"] if networkType = 2 [set global:initial-nw-type "slime-mould"]
   set global:#-initial-territories (floor centers)
   set global:network-biological-gamma bioGamma
   
