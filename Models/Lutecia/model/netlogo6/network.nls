@@ -214,6 +214,8 @@ end
 ;  network indicators : cache variables for different measures for efficiency
 to network:cache-nw-measures
   
+  output-print "...caching network measures"
+  
   ;simplify-network
   
   ; caching shortest paths and measures

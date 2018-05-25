@@ -228,6 +228,7 @@ globals[
   global:positions-file
   global:ext-file
 
+
   ;; GIS setup
   global:gis-network-file
   global:gis-extent-file
@@ -531,6 +532,9 @@ undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 
 breed[ghost-transportation-nodes ghost-transportation-node]
 
+ghost-transportation-nodes-own [
+  ghost-transportation-node:id
+]
 
 
 ;;
@@ -568,8 +572,8 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 572
 18
-1000
-447
+1010
+457
 -1
 -1
 28.666666666666668
@@ -582,10 +586,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+14
+0
+14
 0
 0
 1
@@ -601,7 +605,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-5.0
+3.0
 1
 1
 NIL
@@ -1087,12 +1091,12 @@ HORIZONTAL
 CHOOSER
 206
 72
-332
+369
 117
 global:setup-type
 global:setup-type
-"random" "from-file" "gis-synthetic" "gis"
-0
+"random" "gis-synthetic" "gis" "from-file-mayors" "from-file"
+4
 
 BUTTON
 454
@@ -1394,14 +1398,14 @@ TEXTBOX
 1
 
 CHOOSER
-333
-73
-521
-118
-global:initial-nw-random-type
-global:initial-nw-random-type
-"tree-skeleton" "slime-mould" "full"
-1
+372
+72
+560
+117
+global:initial-nw-type
+global:initial-nw-type
+"tree-skeleton" "slime-mould" "full" "no-network" "from-file"
+4
 
 MONITOR
 1516
@@ -1537,6 +1541,17 @@ false
 PENS
 "default" 1.0 0 -13403783 true "" "if ticks > 0 [plot indicators:relative-accessibility]"
 "pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
+
+INPUTBOX
+1524
+24
+1738
+84
+global:setup-file-prefix
+setup/test/gridnw_
+1
+0
+String
 
 @#$#@#$#@
 ## Context

@@ -1,2 +1,4 @@
 .Rhistory
+*.tmp.nlogo
+.DS_Store
 
