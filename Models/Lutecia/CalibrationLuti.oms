@@ -84,7 +84,8 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
   networkSpeed := 5.0
 )
 
-val purpose = "NSGA2_LOCAL"
+//val purpose = "NSGA2_LOCAL"
+val purpose = "NSGA2"
 
 
 val oppositeRelativeAccessibility = Val[Double]
@@ -130,7 +131,3 @@ val local = LocalEnvironment(15)
 
 //island on grid hook savePopulationHook
 island on local hook savePopulationHook
-
-
-
-

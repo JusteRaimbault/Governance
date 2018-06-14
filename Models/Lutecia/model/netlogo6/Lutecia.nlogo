@@ -1548,7 +1548,7 @@ INPUTBOX
 1738
 84
 global:setup-file-prefix
-setup/test/gridnw_
+setup/test/slimemould_
 1
 0
 String
