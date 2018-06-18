@@ -6,7 +6,10 @@ import lutecia.Lutecia
 
 case class Grid(
                cells: Seq[Seq[Cell]]
-               )
+               ){
+
+  override def toString: String = "Grid(w="+cells.size+",h="+cells(0).size+")"
+}
 
 
 object Grid {

@@ -13,7 +13,11 @@ case class World(
                 network: Network,
                 mayors: Seq[Mayor],
                 time: Int
-                )
+                ) {
+
+  //override def toString: String
+
+}
 
 
 object World {
@@ -63,7 +67,7 @@ object World {
     format match {
       case "csv" => {
         // dump params
-        println("Exporting world with : Network |V| = "+world.network.nodes.size+" |V| = "+world.network.links.size+ " ; "+world.mayors.size+" mayors")
+        println("Exporting world with : Network |V| = "+world.network.nodes.size+" |E| = "+world.network.links.size+ " ; "+world.mayors.size+" mayors")
 
         // write cells
         val writer: FileWriter = new FileWriter(pathPrefix + "_grid.csv")

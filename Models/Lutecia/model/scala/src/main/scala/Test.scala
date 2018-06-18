@@ -26,7 +26,8 @@ object RunTest extends App {
   //Test.testNetwork()
   //Test.testGridNetwork(model)
   //Test.testNetworkExport(model)
-  Test.testSlimeMould()
+  //Test.testSlimeMould()
+  Test.testRun(model)
 
   println("Ellapsed Time : "+(System.currentTimeMillis()-t)/1000.0)
 }
@@ -36,9 +37,15 @@ object RunTest extends App {
 object Test {
 
 
+  def testRun(model: Lutecia) = {
+    println(RunModel.run(model))
+  }
+
+
+
   def testSlimeMould() = {
     val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with SlimeMouldNetwork {
-      override def gammaSlimeMould: Double = 1.8
+      override def gammaSlimeMould: Double = 1.2
       override def thresholdSlimeMould: Double = 0.25
       override def withGridNetwork: Boolean = false
     }

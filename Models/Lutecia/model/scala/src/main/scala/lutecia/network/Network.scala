@@ -21,7 +21,9 @@ case class Network(
                   distances: Seq[Seq[Double]] /** distance matrix */
                   //distances: Seq[Seq[Double]] /** distance matrix within the network */
                   //patchesDistances: Seq[Seq[Double]] /** distance matrix between all patches */
-                  )
+                  ) {
+  override def toString: String = "Network(|V|="+nodes.size+",|E|="+links.size+")"
+}
 
 
 object Network {
