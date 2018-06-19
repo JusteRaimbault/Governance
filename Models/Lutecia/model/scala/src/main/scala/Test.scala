@@ -38,7 +38,8 @@ object Test {
 
 
   def testRun(model: Lutecia) = {
-    println(RunModel.run(model))
+    val result = RunModel.run(model)
+    println(result)
   }
 
 

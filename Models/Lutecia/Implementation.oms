@@ -13,6 +13,8 @@ val gammaCDE=Val[Double]
 val betaDC=Val[Double]
 val relocationRate=Val[Double]
 
+val finalTime = Val[Double]
+
 val id = Val[Int]
 val replication = Val[Int]
 
@@ -60,16 +62,28 @@ val corAccessTimeUnweightedNL6=Val[Double]
 
 val totaldiff = Val[Double]
 
+// fixed parameters
+val tf = 20
+
+
+// full trajectory of models
+val activesTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
+val employmentsTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
+val activesTrajectoriesScala = Val[Array[Array[Array[Double]]]]
+val employmentsTrajectoriesScala = Val[Array[Array[Array[Double]]]]
+
+
+
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
 val cmds = List(
-  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} ${finalTime} ${replication}",
   "experiments-luti:run-experiment-luti"
 )
 
 
 val model5 = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
-  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,finalTime,replication,id),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,tinalTime,replication,id),
   netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibilityNL5),
   netLogoOutputs += ("indicators:relative-congestion",nwCongestionNL5),
   netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLengthNL5),
@@ -109,6 +123,26 @@ val model6 = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo
   netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmploymentsNL6),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeightedNL6),
   netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweightedNL6)
+)
+
+val modelscala = ScalaTask("""
+    |import lutecia._
+    |
+    |val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {
+    |  //override def worldSize = 30
+    |  override def finalTime: Int = 10
+    |  override def lambda: Double = input.lambdaAcc
+    |  override def beta: Double = input.betaDC
+    |  override def alpha: Double = input.relocationRate
+    |  override def gammaA: Double = 0.9
+    |  override def gammaE: Double = 0.8
+    |}
+    |
+    |val result = RunModel.run(model)""".stripMargin
+) set (
+   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,finalTime,replication,id),
+   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,finalTime,replication,id),
+   outputs += (activesTrajectories,employmentsTrajectories)
 )
 
 
