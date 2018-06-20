@@ -11,15 +11,23 @@ object RunTest extends App {
 
   val t = System.currentTimeMillis()
 
-  val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {
-    //override def worldSize = 30
-    override def finalTime: Int = 10
-    //define parameters
-    override def lambda: Double = 0.05
-    override def beta: Double = 1.8
-    override def alpha: Double = 0.1
-    override def gammaA: Double = 0.9
-    override def gammaE: Double = 0.8
+  val model = new Lutecia with SyntheticSetup
+      //with ExponentialMixtureGrid
+    with ExternalGrid
+    with GridNetwork {
+       //override def worldSize = 30
+        override def finalTime: Int = 10
+        //define parameters
+        override def lambda: Double = 0.05
+        override def beta: Double = 1.8
+        override def alpha: Double = 0.1
+        override def gammaA: Double = 0.9
+        override def gammaE: Double = 0.8
+
+      // test for external grid with a random setup here
+    override def actives = Array.tabulate(worldSize,worldSize){(i,j) => rng.nextDouble()}
+    override def employments= Array.tabulate(worldSize,worldSize){(i,j) => rng.nextDouble()}
+
   }
 
 
