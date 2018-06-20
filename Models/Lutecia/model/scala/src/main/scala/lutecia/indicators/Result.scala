@@ -1,8 +1,8 @@
 
 package lutecia.indicators
 
-import lutecia.Lutecia
-import lutecia.core.World
+import lutecia.{Lutecia, RasterLayer}
+import lutecia.core.{Cell, World}
 
 
 case class Result(
@@ -19,7 +19,12 @@ case class Result(
 
 object Result {
 
+  def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives).toArray
+  def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments).toArray
 
+  def getTrajectories(result: Result,proj: Cell=>Double): Seq[RasterLayer] = {
+    result.states.map{_.grid.cells.toArray.map{case row => row.toArray.map{proj(_)}}}
+  }
 
 
 }

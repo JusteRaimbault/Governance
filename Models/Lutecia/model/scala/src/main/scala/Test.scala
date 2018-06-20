@@ -23,6 +23,7 @@ object RunTest extends App {
         override def alpha: Double = 0.1
         override def gammaA: Double = 0.9
         override def gammaE: Double = 0.8
+      override def euclidianPace: Double = 5.0
 
       // test for external grid with a random setup here
     override def actives = Array.tabulate(worldSize,worldSize){(i,j) => rng.nextDouble()}
