@@ -154,12 +154,48 @@ to-report indicators:patches-employments
   report list:order-by-last-element ([(list patch:employments patch:number)] of patches)
 end
 
+;;
+;
+to-report indicators:employments-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor) [
+      ask patch x y [set row lputz(' row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
 
+  
 ;;
 ;
 to-report indicators:patches-alltimes-employments
+  ;
   report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-employments"
+  
 end
+
+
+
+;;
+;
+to-report indicators:patches-employments
+  report list:order-by-last-element ([(list patch:employments patch:number)] of patches)
+end
+
+
+;;
+;
+to-report indicators:patches-alltimes-actives
+  report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-actives"
+end
+
+
 
 
 ;;

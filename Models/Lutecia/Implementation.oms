@@ -127,21 +127,39 @@ val model6 = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo
 
 val modelscala = ScalaTask("""
     |import lutecia._
+    |import lutecia.setup._
+    |import lutecia.network._
+    |import lutecia.indicators._
     |
-    |val model = new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {
-    |  //override def worldSize = 30
-    |  override def finalTime: Int = 10
+    |val model = new Lutecia with SyntheticSetup 
+    |   //with ExponentialMixtureGrid
+    |   with ExternalGrid
+    |   with GridNetwork {
+    |  
+    |  override def worldSize = 20
+    |  override def finalTime: Int = input.finalTime.toInt
     |  override def lambda: Double = input.lambdaAcc
     |  override def beta: Double = input.betaDC
     |  override def alpha: Double = input.relocationRate
-    |  override def gammaA: Double = 0.9
-    |  override def gammaE: Double = 0.8
+    |  override def gammaA: Double = input.gammaCDA
+    |  override def gammaE: Double = input.gammaCDE
+    |  override def euclidianPace: Double = input.networkSpeed
+    |  
+    |  override def actives = input.actives
+    |  override def employments= input.employments
     |}
     |
-    |val result = RunModel.run(model)""".stripMargin
+    |val result = RunModel.run(model)
+    |val activesTrajectories = Result.getActivesTrajectories(result)
+    |val employmentsTrajectories = Result.getEmploymentsTrajectories(result)
+    |//val activesTrajectories = Result.getTrajectories(result,_.actives).toArray
+    |//val employmentsTrajectories = Result.getTrajectories(result,_.employments).toArray
+    |""".stripMargin
 ) set (
-   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,finalTime,replication,id),
-   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,finalTime,replication,id),
+   plugins += pluginsOf(lutecia.Lutecia),
+   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,replication,id),
+   inputs += (actives,employments),
+   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,replication,id),
    outputs += (activesTrajectories,employmentsTrajectories)
 )
 

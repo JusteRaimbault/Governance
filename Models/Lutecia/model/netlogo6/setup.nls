@@ -116,9 +116,21 @@ to setup:setup-globals
   set global:link-distance-function "distance-projection"
   
   ; indicators tracked in time
-  set global:tracked-indicators (list "indicators:overall-mean-accessibility" "indicators:mean-travel-distance" 
-    "indicators:morphology:moran-actives" "indicators:morphology:entropy-actives" "indicators:morphology:slope-actives" "indicators:morphology:slope-rsquared-actives" "indicators:morphology:mean-distance-actives" ; morphology actives
-    "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments" ; morphology employments
+  set global:tracked-indicators (list
+    "indicators:overall-mean-accessibility"
+    "indicators:mean-travel-distance" 
+    ; morphology actives
+    "indicators:morphology:moran-actives"
+    "indicators:morphology:entropy-actives"
+    "indicators:morphology:slope-actives"
+    "indicators:morphology:slope-rsquared-actives"
+    "indicators:morphology:mean-distance-actives" 
+     ; morphology employments
+    "indicators:morphology:moran-employments"
+    "indicators:morphology:entropy-employments"
+    "indicators:morphology:slope-employments"
+    "indicators:morphology:slope-rsquared-employments"
+    "indicators:morphology:mean-distance-employments"
     "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
     "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
     "global:rel-diff-actives" "global:rel-diff-employments" ; convergence

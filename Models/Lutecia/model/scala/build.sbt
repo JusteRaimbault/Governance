@@ -10,7 +10,7 @@ OsgiKeys.exportPackage := Seq("lutecia.*")
 
 OsgiKeys.importPackage := Seq("*;resolution:=optional")
 
-OsgiKeys.privatePackage := Seq("*")
+OsgiKeys.privatePackage := Seq("!scala.*,*")
 
 OsgiKeys.requireCapability := """osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))""""
 

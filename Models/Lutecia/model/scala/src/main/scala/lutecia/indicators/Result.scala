@@ -19,8 +19,8 @@ case class Result(
 
 object Result {
 
-  def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives).toArray
-  def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments).toArray
+  def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives)//.toArray
+  def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments)//.toArray
 
   def getTrajectories(result: Result,proj: Cell=>Double): Seq[RasterLayer] = {
     result.states.map{_.grid.cells.toArray.map{case row => row.toArray.map{proj(_)}}}

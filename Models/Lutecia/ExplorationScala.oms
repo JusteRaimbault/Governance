@@ -38,7 +38,7 @@ val model = ScalaTask("""
     |   with ExternalGrid
     |   with GridNetwork {
     |  
-    |  override def worldSize = 15
+    |  override def worldSize = 20
     |  override def finalTime: Int = input.finalTime.toInt
     |  override def lambda: Double = input.lambdaAcc
     |  override def beta: Double = input.betaDC
@@ -114,7 +114,7 @@ val exploration =
       ,relocationRate in Range(0.0,1.0)
       ) withIndex id) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) x (finalTime is 20.0) x 
     ExponentialMixtureSpatialSampling(
-        gridSize = Left(15),
+        gridSize = Left(20),
         centersNumber = 3,
         maxValue = Left(500.0),
         kernelRadius = Right(Seq(1.0,0.8)),

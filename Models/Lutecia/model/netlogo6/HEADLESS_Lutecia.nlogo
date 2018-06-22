@@ -376,6 +376,10 @@ globals[
   global:network-biological-gamma
   global:bio-ticks
 
+  global:setup-file-prefix
+  global:initial-nw-type
+
+
 ]
 
 
@@ -499,7 +503,9 @@ undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 breed[ghost-transportation-nodes ghost-transportation-node]
 
 
-
+ghost-transportation-nodes-own [
+  ghost-transportation-node:id
+]
 
 
 
@@ -551,10 +557,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+14
+0
+14
 0
 0
 1
