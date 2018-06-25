@@ -110,6 +110,9 @@ trait Lutecia {
   //def states = Iterator.iterate(initialWorld)(nextState)
 
 
+  override def toString: String = "Lutecia model with worldSize = "+worldSize+
+    " ; numberTerritories = "+numberTerritories+" ; finalTime = "+finalTime
+
 }
 
 

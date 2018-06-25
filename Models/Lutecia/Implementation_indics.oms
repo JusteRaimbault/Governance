@@ -26,6 +26,40 @@ val gammaSlimeMould=Val[Double]
 
 
 // reporters
+val relativeAccessibilityNL5 = Val[Double]
+val nwCongestionNL5 = Val[Double]
+val nwRelativeLengthNL5 = Val[Double]
+val nwRelativeSpeedNL5 = Val[Double]
+val moranActivesNL5=Val[Double]
+val meanDistanceActivesNL5=Val[Double]
+val slopeActivesNL5=Val[Double]
+val entropyActivesNL5=Val[Double]
+val moranEmploymentsNL5=Val[Double]
+val meanDistanceEmploymentsNL5=Val[Double]
+val slopeEmploymentsNL5=Val[Double]
+val entropyEmploymentsNL5=Val[Double]
+val corAccessDevNL5=Val[Double]
+val corAccessEmploymentsNL5=Val[Double]
+val corAccessTimeWeightedNL5=Val[Double]
+val corAccessTimeUnweightedNL5=Val[Double]
+
+val relativeAccessibilityNL6 = Val[Double]
+val nwCongestionNL6 = Val[Double]
+val nwRelativeLengthNL6 = Val[Double]
+val nwRelativeSpeedNL6 = Val[Double]
+val moranActivesNL6=Val[Double]
+val meanDistanceActivesNL6=Val[Double]
+val slopeActivesNL6=Val[Double]
+val entropyActivesNL6=Val[Double]
+val moranEmploymentsNL6=Val[Double]
+val meanDistanceEmploymentsNL6=Val[Double]
+val slopeEmploymentsNL6=Val[Double]
+val entropyEmploymentsNL6=Val[Double]
+val corAccessDevNL6=Val[Double]
+val corAccessEmploymentsNL6=Val[Double]
+val corAccessTimeWeightedNL6=Val[Double]
+val corAccessTimeUnweightedNL6=Val[Double]
+
 val totaldiff = Val[Double]
 
 // fixed parameters
@@ -33,10 +67,10 @@ val tf = 20
 
 
 // full trajectory of models
-val activesTrajectoriesNL6 = Val[Seq[RasterLayer]]
-val employmentsTrajectoriesNL6 = Val[Seq[RasterLayer]]
-val activesTrajectoriesScala = Val[Seq[RasterLayer]]
-val employmentsTrajectoriesScala = Val[Seq[ResterLayer]]
+val activesTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
+val employmentsTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
+val activesTrajectoriesScala = Val[Array[Array[Array[Double]]]]
+val employmentsTrajectoriesScala = Val[Array[Array[Array[Double]]]]
 
 
 
