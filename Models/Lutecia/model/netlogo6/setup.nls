@@ -281,7 +281,6 @@ to setup:setup-population-distribution
   if global:setup-type = "external" [
     let i 0 let j 0 let k 0
     foreach global:setup:actives [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:actives a set patch:number k]  set j j + 1 set k k + 1] set i i + 1]
-    set i 0 set j 0 foreach global:setup:employments [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:employments a]  set j j + 1] set i i + 1] 
   ]
   
   
@@ -318,6 +317,10 @@ to setup:setup-employment-distribution
          repeat 1000 [ask one-of eco-area-patches [set patch:employments patch:employments + current-employment / 1000]]
        ] 
     ]
+  ]
+  
+  if global:setup-type = "external" [
+    let i 0 let j 0 foreach global:setup:employments [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:employments a]  set j j + 1] set i i + 1]  
   ]
   
 end

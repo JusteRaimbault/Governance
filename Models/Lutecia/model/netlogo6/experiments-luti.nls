@@ -127,7 +127,7 @@ to experiments-luti:test-external
   set global:setup:actives ractives
   set global:setup:employments remployments
   
-  experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 4 20 15 "external" 0
+  experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 4 2 15 "external" 0
   
   ;experiments-luti:run-experiment-luti
   
@@ -138,6 +138,7 @@ to experiments-luti:test-external
 
   show matrix:cumabsdiff ractives indicators:actives-raster
   show matrix:cumabsdiff remployments indicators:employments-raster
+  show sum map sum indicators:distance-matrix
 end
 
 

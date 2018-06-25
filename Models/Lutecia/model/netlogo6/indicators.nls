@@ -114,6 +114,7 @@ to-report indicators:get-tracked-indicators
     ; grid
     "indicators:actives-raster"
     "indicators:employments-raster"  
+    "indicators:distance-matrix"
   )
 end
 
@@ -168,6 +169,15 @@ to-report indicators:target-network-distance
   ;report network:network-distances transportation-links with [status = "initial"] transportation-links with [status = "ghost"]
   report network:network-distances transportation-links ghost-transportation-links
 end
+
+
+
+;;
+;
+to-report indicators:distance-matrix
+  let i 0 let j 0 let res [] repeat count patches [let row [] set j 0 repeat count patches [ set row lput matrix:get global:effective-distance-matrix i j row set j j + 1] set res lput row res] report res 
+end
+
 
 
 

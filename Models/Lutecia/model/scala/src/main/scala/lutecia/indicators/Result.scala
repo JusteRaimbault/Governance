@@ -41,6 +41,9 @@ object Result {
   }
 
 
+  def getDistanceMatrices(result: Result): Seq[Array[Array[Double]]] = result.states.map{_.network.distances}
+
+
 }
 
 

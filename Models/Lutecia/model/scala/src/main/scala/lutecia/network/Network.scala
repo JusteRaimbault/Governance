@@ -18,7 +18,7 @@ case class Network(
                   links: Seq[Link],
                   paths: Map[(Node,Node),Path],
                   distancesMap: Map[(Node,Node),Double], /** distance map from node k1 (== patch k1) to node k2*/
-                  distances: Seq[Seq[Double]] /** distance matrix */
+                  distances: Array[Array[Double]] /** distance matrix */
                   //distances: Seq[Seq[Double]] /** distance matrix within the network */
                   //patchesDistances: Seq[Seq[Double]] /** distance matrix between all patches */
                   ) {
@@ -28,7 +28,7 @@ case class Network(
 
 object Network {
 
-    val empty = Network(Seq.empty,Seq.empty,Map.empty,Map.empty,Seq.empty)
+    val empty = Network(Seq.empty,Seq.empty,Map.empty,Map.empty,Array.empty)
 
   /**
     * Constructor for an initial network
@@ -38,15 +38,15 @@ object Network {
   def apply(n: Seq[Node],l: Seq[Link],computeDist: Boolean): Network = {
     if(computeDist) {
       // compute shortest paths
-      val network = Network(n, l, Map.empty, Map.empty, Seq.empty)
+      val network = Network(n, l, Map.empty, Map.empty, Array.empty)
       val paths = GraphAlgorithm.allPairsShortestPath(network)
       //println(paths.keySet.size)
       //println(n.size*n.size)
       val distMap = paths.mapValues { case p => p.cost }
-      val distMat = Seq.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
+      val distMat = Array.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
       Network(n, l, paths, distMap, distMat)
     }else{
-      Network(n,l,Map.empty,Map.empty,Seq.empty)
+      Network(n,l,Map.empty,Map.empty,Array.empty)
     }
   }
 
