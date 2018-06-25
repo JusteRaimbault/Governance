@@ -6,7 +6,14 @@ import lutecia.core.{Cell, World}
 
 
 case class Result(
+                   /**
+                     * Successive states of the model
+                     */
                  states: Seq[World],
+
+                   /**
+                     * Model corresponding to this result
+                     */
                  model: Lutecia
                  ) {
 
@@ -20,8 +27,8 @@ case class Result(
 object Result {
 
 
-  def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives)//.toArray
-  def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments)//.toArray
+  def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives)
+  def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments)
 
   /**
     * Get cells trajectories given a projection from a Cell

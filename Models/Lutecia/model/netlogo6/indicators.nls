@@ -59,6 +59,68 @@ to indicators:compute-network-indicators
 end
 
 
+
+
+to-report indicators:get-tracked-indicators
+  report (list
+    "indicators:overall-mean-accessibility"
+    "indicators:mean-travel-distance" 
+    
+    ; morphology actives
+    "indicators:morphology:moran-actives"
+    "indicators:morphology:entropy-actives"
+    "indicators:morphology:slope-actives"
+    "indicators:morphology:slope-rsquared-actives"
+    "indicators:morphology:mean-distance-actives" 
+    
+    ; morphology employments
+    "indicators:morphology:moran-employments"
+    "indicators:morphology:entropy-employments"
+    "indicators:morphology:slope-employments"
+    "indicators:morphology:slope-rsquared-employments"
+    "indicators:morphology:mean-distance-employments"
+    
+    ; stylized
+    "indicators:mean-distance-to-centre-actives"
+    "indicators:mean-distance-to-centre-employments"
+    "indicators:center-actives-prop"
+    "indicators:center-employments-prop"
+    "indicators:max-accessibility"
+    "indicators:min-accessibility"
+    "indicators:stability"
+    "indicators:mean-flow"
+    "indicators:min-flow"
+    "indicators:max-flow"
+    
+    ; convergence
+    "global:rel-diff-actives"
+    "global:rel-diff-employments"
+    "indicators:mean-congestion" ; congestion
+    "indicators:mean-accessibility-balance"
+    
+    ; timely correlations
+    "indicators-stylized:cor-access-dev"
+    "indicators-stylized:cor-access-employments"
+    "indicators-stylized:cor-access-time true"
+    "indicators-stylized:cor-access-time false" 
+    
+    ; patch vars for overall correlations
+    "indicators:patches-accessibilities"
+    "indicators:patches-delta-actives"
+    "indicators:patches-employments"
+    "indicators:patches-unweighted-access-time"
+    "indicators:patches-weighted-access-time" 
+    
+    ; grid
+    "indicators:actives-raster"
+    "indicators:employments-raster"  
+  )
+end
+
+
+
+
+
 ;;
 ; TS indicators
 to-report indicators:ts-indicator [indic]
@@ -148,21 +210,16 @@ to-report indicators:patches-alltimes-delta-actives
 end
 
 
-;;
-;
-to-report indicators:patches-employments
-  report list:order-by-last-element ([(list patch:employments patch:number)] of patches)
-end
 
 ;;
-;
-to-report indicators:employments-raster
+; employments as a nested list (RasterLayer)
+to-report indicators:actives-raster
   let res [] 
   let x min-pxcor
-  repeat (max-pxcor - min-pxcor) [
+  repeat (max-pxcor - min-pxcor + 1) [
     let row [] let y min-pycor
-    repeat (max-pycor - min-pycor) [
-      ask patch x y [set row lputz(' row]
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:actives row]
       set y y + 1
     ]
     set res lput row res
@@ -171,6 +228,31 @@ to-report indicators:employments-raster
   report res
 end
 
+
+
+
+
+;;
+; employments as a nested list (RasterLayer)
+to-report indicators:employments-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:employments row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:employments-raster-alltimes
+  report indicators:ts-indicator "indicators:employments-raster"
+end
   
 ;;
 ;
@@ -195,6 +277,11 @@ to-report indicators:patches-alltimes-actives
   report reduce [[?1 ?2] -> list:concatenate (list ?1 ?2)] indicators:ts-indicator "indicators:patches-actives"
 end
 
+
+to-report indicators:actives-raster-alltimes
+  report indicators:ts-indicator "indicators:actives-raster"
+end
+  
 
 
 

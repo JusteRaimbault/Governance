@@ -110,3 +110,23 @@ to-report matrix:mean [m]
   let dim matrix:dimensions m
   report  (matrix:sum m) / ((first dim) * (last dim))
 end
+
+
+
+to-report matrix:cumabsdiff [m1 m2]
+  let res 0
+  let i 0 let j 0
+  foreach m1 [
+    row1 -> 
+      set j 0
+      foreach row1 [
+       x1 ->
+        let x2 item j item i m2
+        set res res + (x1 - x2)*(x1 - x2) 
+      set j j + 1
+    ]
+    set i i + 1
+  ]
+  report res
+end
+  

@@ -287,6 +287,9 @@ globals[
   ; setup
   global:setup-type
 
+  global:setup:actives
+  global:setup:employments
+
   global:actives-max
   global:employments-max
   global:#-initial-territories
@@ -643,6 +646,23 @@ BUTTON
 272
 all scenarios
 experiments-luti:all-scenarios
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+364
+188
+514
+221
+test luti external
+clear-all\nexperiments-luti:test-external
 NIL
 1
 T

@@ -114,34 +114,7 @@ to setup:setup-globals
   set global:gis-population-raster-file "setup/gis/guangdong/pop2010_wgs84_georef.asc"
   
   set global:link-distance-function "distance-projection"
-  
-  ; indicators tracked in time
-  set global:tracked-indicators (list
-    "indicators:overall-mean-accessibility"
-    "indicators:mean-travel-distance" 
-    ; morphology actives
-    "indicators:morphology:moran-actives"
-    "indicators:morphology:entropy-actives"
-    "indicators:morphology:slope-actives"
-    "indicators:morphology:slope-rsquared-actives"
-    "indicators:morphology:mean-distance-actives" 
-     ; morphology employments
-    "indicators:morphology:moran-employments"
-    "indicators:morphology:entropy-employments"
-    "indicators:morphology:slope-employments"
-    "indicators:morphology:slope-rsquared-employments"
-    "indicators:morphology:mean-distance-employments"
-    "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
-    "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "global:rel-diff-actives" "global:rel-diff-employments" ; convergence
-    "indicators:mean-congestion" ; congestion
-    "indicators:mean-accessibility-balance"
-    "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments""indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false" ; timely correlations
-    "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
-    )
-  
-  
-  
+ 
 end
 
 
@@ -225,7 +198,7 @@ end
 ;  setup governance areas
 to setup:setup-governance-areas
  
-  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" or global:setup-type = "external"[
     ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
   ]
   
@@ -284,6 +257,7 @@ to setup:setup-population-distribution
      ]
    ]
   
+  ;; text files
    if global:setup-type = "from-file" [
       let patchvals file:read-file (word global:setup-file-prefix "grid.csv")
       foreach but-first patchvals [
@@ -292,7 +266,8 @@ to setup:setup-population-distribution
       ask patch (floor item 1 vals) (floor item 2 vals) [set patch:number (item 0 vals) set patch:actives (item 3 vals) set patch:employments (item 4 vals)]
       ]
    ]
-   
+  
+  ;; real/synthetic gis setup 
    if global:setup-type = "gis" [
       let gis-population-raster gis:load-dataset global:gis-population-raster-file
       gis:apply-raster gis-population-raster patch:actives
@@ -301,6 +276,15 @@ to setup:setup-population-distribution
         if not (patch:actives < 0 or patch:actives > 0)[set patch:actives 0]
       ]
    ]
+  
+  ;; direct raster setting
+  if global:setup-type = "external" [
+    let i 0 let j 0 let k 0
+    foreach global:setup:actives [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:actives a set patch:number k]  set j j + 1 set k k + 1] set i i + 1]
+    set i 0 set j 0 foreach global:setup:employments [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:employments a]  set j j + 1] set i i + 1] 
+  ]
+  
+  
    
 end
 
@@ -669,11 +653,15 @@ to setup:setup-mayor-characteristics
     
   ]
   
-  if global:setup-type = "random" [set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories]
+  ifelse global:setup-type = "random" or global:setup-type = "external" [
+    set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories
+  ][
+    ; corresponding number pf territories
+    if global:setup-type != "random" [set global:#-initial-territories length global:mayors-coordinates]
+  ]
   
   
-  ; corresponding number pf territories
-  if global:setup-type != "random" [set global:#-initial-territories length global:mayors-coordinates]
+  
   
 end
 
@@ -682,12 +670,17 @@ end
 ;  tracked indicators already assumed setup
 to setup:setup-indicators
   
+  set global:tracked-indicators indicators:get-tracked-indicators
+  
   set global:history-indicators table:make
   
   foreach global:tracked-indicators [
     ? -> 
     table:put global:history-indicators ? []
   ]
+  
+  ; update indicators to have the initial state in the history
+  indicators:update-indicators
   
 end
 

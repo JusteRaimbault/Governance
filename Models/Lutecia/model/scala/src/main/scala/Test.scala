@@ -15,8 +15,9 @@ object RunTest extends App {
       //with ExponentialMixtureGrid
     with ExternalGrid
     with GridNetwork {
-       //override def worldSize = 30
+        override def worldSize = 15
         override def finalTime: Int = 10
+        override def numberTerritories: Int = 3
         //define parameters
         override def lambda: Double = 0.05
         override def beta: Double = 1.8
