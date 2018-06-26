@@ -44,7 +44,7 @@ val activesTrajectoriesScala = Val[Array[RasterLayer]]
 val employmentsTrajectoriesScala = Val[Array[RasterLayer]]
 val distMatNL6 = Val[Array[Array[Array[Double]]]]
 val distMatScala = Val[Array[Array[Array[Double]]]]
-
+//val distMatScala = Val[Array[Map[(Int,Int),Double]]]
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime worldSize rnd-seed]
 val cmds = List(
@@ -95,6 +95,12 @@ val modelscala = ScalaTask("""
     |val activesTrajectoriesScala = Result.getActivesTrajectories(result).toArray
     |val employmentsTrajectoriesScala = Result.getEmploymentsTrajectories(result).toArray
     |val distMatScala = Result.getDistanceMatrices(result).toArray
+    |//val distMatScala = result.states(result.states.size - 1).network.nodes.map{_.id} // Seq[Int]
+    |//val distMatScala = result.states.map{_.network.distancesMap.map{case ((i,j),d) => Array(i,j,d)}.toArray}
+    | val distMat = result.states.map{_.network.distancesMap.map{case ((n1,n2),d) => ((n1.id,n2.id),d)}}
+    | val stepdiff = distMatNL6.zip(distMat).map{
+    |   case (r,m) => r.map{case Array(i,j,d) => math.abs(d - m((i.toInt,j.toInt)))}.sum
+    | }
     |""".stripMargin
 ) set (
    plugins += pluginsOf(lutecia.Lutecia),
@@ -102,8 +108,9 @@ val modelscala = ScalaTask("""
    inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6),
    inputs += (actives,employments),
    outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-   outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6),
-   outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala)
+   //outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6),
+   //outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala),
+   outputs += stepdiff
 )
 
 
@@ -111,12 +118,17 @@ val comparison = ScalaTask("""
   |/*val stepdiff = activesTrajectoriesNL6.zip(employmentsTrajectoriesNL6).zip(activesTrajectoriesScala).zip(employmentsTrajectoriesScala).map{
   |   case (((a6,e6),a),e) => a6.flatten.toSeq.zip(a.flatten.toSeq).map{case (a1,a2) => (a1 - a2)*(a1 - a2)}.sum + e6.flatten.toSeq.zip(e.flatten.toSeq).map{case (e1,e2) => (e1 - e2)*(e1 - e2)}.sum
   | }*/
-  |/* val stepdiff = distMatNL6.zip(distMatScala).map{
-  |   case (d6,ds) => d6.flatten.toSeq.zip(ds.flatten.toSeq).map{case (d1,d2) => (d1 - d2)*(d1 - d2)}.sum
-  | }*/
+  |/*
   |val stepdiff = distMatNL6.zip(distMatScala).map{
-  |   case (d6,ds) => d6.flatten.toSeq.zip(ds.flatten.toSeq).map{case (d1,d2) => math.abs(d1 - d2)}.max
+  |   case (d6,ds) => d6.flatten.toSeq.zip(ds.flatten.toSeq).map{case (d1,d2) => (d1 - d2)*(d1 - d2)}.sum
   | }
+  |*/
+  |/*val stepdiff = distMatNL6.zip(distMatScala).map{
+  |   case (d6,ds) => d6.zip(ds).map{case (r1,r2) => r1.zip(r2).map{case (d1,d2) => math.abs(d1-d2)}.max}.max
+  | }*/
+  | val stepdiff = distMatScala.zip(distMatNL6).map{
+  |   case (ds,d6) => d6.map{case Array(i,j,d) => math.abs(ds((i.toInt,j.toInt)) - d)}.sum
+  |}
   |val totaldiff = stepdiff.sum
 """
 ) set (
@@ -142,7 +154,8 @@ val env = LocalEnvironment(4)
 val exploration =
   DirectSampling(
     //evaluation = ((model6 on grid by 10) -- comparison hook indics_hook) ,
-    evaluation = (model6 -- modelscala -- comparison hook indics_hook) ,
+    //evaluation = (model6 -- modelscala -- comparison hook indics_hook) ,
+    evaluation = (model6 -- modelscala hook indics_hook) ,
     sampling =
    ((LHS (
       1
@@ -161,7 +174,7 @@ val exploration =
         centersNumber = territs,
         maxValue = Left(500.0),
         kernelRadius = Right(Seq(1.0,0.8)),
-        samples = 4,
+        samples = 1,
         prototypes = Seq(actives,employments)
     ) withIndex replication ) 
    )
