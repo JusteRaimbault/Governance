@@ -62,9 +62,22 @@ object GridNetwork {
     val edges = ArrayBuffer[Link]()
     //dirty
     for (i <- 0 to nodes.size - 1 ; j <- 0 to nodes(0).size - 1) {
-      if(i-1>0){if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i-1)(j-1),1/euclidianPace))};edges.append(Link(nodes(i)(j),nodes(i-1)(j),1/euclidianPace));if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i-1)(j+1),1/euclidianPace))}}
-      if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i)(j-1),1/euclidianPace))};if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i)(j+1),1/euclidianPace))}
-      if(i+1<nodes.size){if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i+1)(j-1),1/euclidianPace))};edges.append(Link(nodes(i)(j),nodes(i+1)(j),1/euclidianPace));if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i+1)(j+1),1/euclidianPace))}}
+      if(i-1>0){
+        if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i-1)(j-1),1/euclidianPace))}
+        edges.append(Link(nodes(i)(j),nodes(i-1)(j),1/euclidianPace))
+        if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i-1)(j+1),1/euclidianPace))}
+      }
+      if(j-1>0){
+        edges.append(Link(nodes(i)(j),nodes(i)(j-1),1/euclidianPace))
+      }
+      if(j+1<nodes(0).size){
+        edges.append(Link(nodes(i)(j),nodes(i)(j+1),1/euclidianPace))
+      }
+      if(i+1<nodes.size){
+        if(j-1>0){edges.append(Link(nodes(i)(j),nodes(i+1)(j-1),1/euclidianPace))}
+        edges.append(Link(nodes(i)(j),nodes(i+1)(j),1/euclidianPace))
+        if(j+1<nodes(0).size){edges.append(Link(nodes(i)(j),nodes(i+1)(j+1),1/euclidianPace))}
+      }
     }
     Network(nodes.flatten,edges)
   }

@@ -1,7 +1,17 @@
 
+
+
+to-report test-distances:unique-effective-distances
+  let dmat list:concatenate indicators:distance-matrix
+  report sort remove-duplicates dmat
+end
+
+
 ;;;;;;;;;;;;;;;;
 ;; Test dynamic programming shortest distance computation
 ;;;;;;;;;;;;;;;;
+
+
 
 
 ;; test effective distance

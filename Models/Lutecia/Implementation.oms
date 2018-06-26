@@ -38,16 +38,12 @@ val stepdiff = Val[Array[Double]]
 
 
 // full trajectory of models
-/*
 val activesTrajectoriesNL6 = Val[Array[RasterLayer]]
 val employmentsTrajectoriesNL6 = Val[Array[RasterLayer]]
 val activesTrajectoriesScala = Val[Array[RasterLayer]]
 val employmentsTrajectoriesScala = Val[Array[RasterLayer]]
-*/
-val activesTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
-val employmentsTrajectoriesNL6 = Val[Array[Array[Array[Double]]]]
-val activesTrajectoriesScala = Val[Array[Array[Array[Double]]]]
-val employmentsTrajectoriesScala = Val[Array[Array[Array[Double]]]]
+val distMatNL6 = Val[Array[Array[Array[Double]]]]
+val distMatScala = Val[Array[Array[Array[Double]]]]
 
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime worldSize rnd-seed]
@@ -64,7 +60,8 @@ val model6 = NetLogo6Task(workDirectory / "netlogo6/HEADLESS_Lutecia.nlogo",cmds
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   outputs += (actives,employments),
   outputs += activesTrajectoriesNL6 mapped "indicators:actives-raster-alltimes",
-  outputs += employmentsTrajectoriesNL6 mapped "indicators:employments-raster-alltimes"
+  outputs += employmentsTrajectoriesNL6 mapped "indicators:employments-raster-alltimes",
+  outputs += distMatNL6 mapped "indicators:distance-matrix-alltimes"
 )
 
 
@@ -94,29 +91,37 @@ val modelscala = ScalaTask("""
     |}
     |
     |val result = RunModel.run(model)
+    |
     |val activesTrajectoriesScala = Result.getActivesTrajectories(result).toArray
     |val employmentsTrajectoriesScala = Result.getEmploymentsTrajectories(result).toArray
+    |val distMatScala = Result.getDistanceMatrices(result).toArray
     |""".stripMargin
 ) set (
    plugins += pluginsOf(lutecia.Lutecia),
    inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-   inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6),
+   inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6),
    inputs += (actives,employments),
    outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-   outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6),
-   outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala)
+   outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6),
+   outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala)
 )
 
 
 val comparison = ScalaTask("""
-  |val stepdiff = activesTrajectoriesNL6.zip(employmentsTrajectoriesNL6).zip(activesTrajectoriesScala).zip(employmentsTrajectoriesScala).map{
+  |/*val stepdiff = activesTrajectoriesNL6.zip(employmentsTrajectoriesNL6).zip(activesTrajectoriesScala).zip(employmentsTrajectoriesScala).map{
   |   case (((a6,e6),a),e) => a6.flatten.toSeq.zip(a.flatten.toSeq).map{case (a1,a2) => (a1 - a2)*(a1 - a2)}.sum + e6.flatten.toSeq.zip(e.flatten.toSeq).map{case (e1,e2) => (e1 - e2)*(e1 - e2)}.sum
+  | }*/
+  |/* val stepdiff = distMatNL6.zip(distMatScala).map{
+  |   case (d6,ds) => d6.flatten.toSeq.zip(ds.flatten.toSeq).map{case (d1,d2) => (d1 - d2)*(d1 - d2)}.sum
+  | }*/
+  |val stepdiff = distMatNL6.zip(distMatScala).map{
+  |   case (d6,ds) => d6.flatten.toSeq.zip(ds.flatten.toSeq).map{case (d1,d2) => math.abs(d1 - d2)}.max
   | }
   |val totaldiff = stepdiff.sum
 """
 ) set (
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-  inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,activesTrajectoriesScala,employmentsTrajectoriesScala),
+  inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   outputs += (totaldiff,stepdiff)
 )

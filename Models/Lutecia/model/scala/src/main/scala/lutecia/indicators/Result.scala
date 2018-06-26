@@ -44,6 +44,13 @@ object Result {
   def getDistanceMatrices(result: Result): Seq[Array[Array[Double]]] = result.states.map{_.network.distances}
 
 
+  def compareDistance(m1: Map[(Int,Int),Double],m2: Map[(Int,Int),Double]) : Double = {
+    m1.keySet.map{case (i,j) => math.abs(m1((i,j)) - m2((i,j)))}.sum
+  }
+
+  def compareDistance(result: Result, mext: Map[(Int,Int),Double]) : Double =
+    result.states.map{case w => compareDistance(w.network.distancesMap.map{case ((n1,n2),d) => ((n1.id,n2.id),d)},mext)}.sum
+
 }
 
 

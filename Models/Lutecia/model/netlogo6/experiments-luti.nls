@@ -136,9 +136,12 @@ to experiments-luti:test-external
   ;show length indicators:actives-raster-alltimes
   ;show length indicators:employments-raster-alltimes
 
-  show matrix:cumabsdiff ractives indicators:actives-raster
-  show matrix:cumabsdiff remployments indicators:employments-raster
-  show sum map sum indicators:distance-matrix
+  ;show matrix:cumabsdiff ractives indicators:actives-raster
+  ;show matrix:cumabsdiff remployments indicators:employments-raster
+  ;show sum map sum indicators:distance-matrix
+  show matrix:max global:effective-distance-matrix
+  show matrix:min global:effective-distance-matrix
+  show matrix:mean global:effective-distance-matrix
 end
 
 

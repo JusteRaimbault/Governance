@@ -546,8 +546,8 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 833
 27
-1268
-463
+1271
+466
 -1
 -1
 28.666666666666668
@@ -606,10 +606,10 @@ NIL
 1
 
 BUTTON
-32
-248
-218
-281
+20
+240
+206
+273
 NIL
 display:display-target-fit
 NIL
@@ -623,11 +623,11 @@ NIL
 1
 
 BUTTON
-264
-190
-351
-223
-test luti
+259
+28
+551
+61
+experiments-luti:test-experiment-luti
 experiments-luti:test-experiment-luti
 NIL
 1
@@ -640,10 +640,10 @@ NIL
 1
 
 BUTTON
-278
-239
-401
-272
+16
+293
+139
+326
 all scenarios
 experiments-luti:all-scenarios
 NIL
@@ -657,11 +657,11 @@ NIL
 1
 
 BUTTON
-364
-188
-514
-221
-test luti external
+259
+70
+502
+103
+experiments-luti:test-external
 clear-all\nexperiments-luti:test-external
 NIL
 1

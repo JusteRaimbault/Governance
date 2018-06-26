@@ -36,7 +36,7 @@ trait Lutecia {
   /**
     * Final time
     */
-  def finalTime: Int = 200
+  def finalTime: Int = 10//200
 
   /**
     *
