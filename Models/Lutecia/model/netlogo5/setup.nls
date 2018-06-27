@@ -127,6 +127,7 @@ to setup:setup-globals
     "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
     "indicators:actives-raster" "indicators:employments-raster" "indicators:accessibilities-raster"
     "indicators:distance-matrix true" "indicators:distance-matrix false"
+    "indicators:a-utilities-raster" "indicators:e-utilities-raster"
     )
   
   

@@ -179,6 +179,49 @@ end
 
 
 
+to-report indicators:a-utilities-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:a-utility row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:a-utilities-raster-alltimes
+   report indicators:ts-indicator "indicators:a-utilities-raster"
+end
+
+
+
+to-report indicators:e-utilities-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:e-utility row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:e-utilities-raster-alltimes
+   report indicators:ts-indicator "indicators:e-utilities-raster"
+end
+
+
 
 
 
