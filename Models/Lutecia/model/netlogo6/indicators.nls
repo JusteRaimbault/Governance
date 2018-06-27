@@ -187,8 +187,8 @@ end
 
 ;;
 ; 
-to-report indicators:distance-matrix-alltimes
-  report indicators:ts-indicator "indicators:distance-matrix"
+to-report indicators:distance-matrix-alltimes [map?]
+  report indicators:ts-indicator (word "indicators:distance-matrix " map?)
 end
 
 

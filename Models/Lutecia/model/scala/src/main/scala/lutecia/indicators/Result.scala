@@ -29,7 +29,7 @@ object Result {
 
   def getActivesTrajectories(result: Result) = getTrajectories(result,_.actives)
   def getEmploymentsTrajectories(result: Result) = getTrajectories(result,_.employments)
-  def getAccessibilities(result: Result) = getTrajectories(result,_.accessibility)
+  def getAccessibilities(result: Result): Seq[RasterLayer] = getTrajectories(result,_.accessibility)
 
   /**
     * Get cells trajectories given a projection from a Cell

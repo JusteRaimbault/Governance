@@ -85,6 +85,105 @@ to-report indicators:time-average [indic]
 end
 
 
+
+
+
+
+
+to-report indicators:accessibilities-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:current-accessibility row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:accessibilities-raster-alltimes
+   report indicators:ts-indicator "indicators:accessibilities-raster"
+end
+
+
+
+to-report indicators:actives-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:actives row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:actives-raster-alltimes
+  report indicators:ts-indicator "indicators:actives-raster"
+end
+  
+  
+to-report indicators:employments-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:employments row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:employments-raster-alltimes
+  report indicators:ts-indicator "indicators:employments-raster"
+end
+  
+
+
+
+
+
+;;
+; Effective distance matrix as nested lists
+to-report indicators:distance-matrix [map?]
+  ifelse not map? [
+  let i 0 let j 0 let res [] repeat count patches [let row [] set j 0 repeat count patches [ set row lput matrix:get global:effective-distance-matrix i j row set j j + 1] set res lput row res] report res 
+  ][
+    let i 0 let j 0 let res [] repeat count patches [set j 0 repeat count patches [set res lput (list i j matrix:get global:effective-distance-matrix i j) res set j j + 1]set i i + 1] report res 
+  ]
+end
+
+
+;;
+; 
+to-report indicators:distance-matrix-alltimes [map?]
+  report indicators:ts-indicator (word "indicators:distance-matrix " map?)
+end
+
+
+
+
+
+
+
+
+
+
 ;;
 ; generic rank size hierarchy
 to-report indicators:rank-size-hierarchy [x]

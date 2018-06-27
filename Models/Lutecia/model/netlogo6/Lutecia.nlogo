@@ -204,6 +204,11 @@ globals[
 
 
 
+  global:setup:actives
+  global:setup:employments
+
+
+
   ;;
   ; externality
 
@@ -605,7 +610,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-3.0
+0.0
 1
 1
 NIL
@@ -667,7 +672,7 @@ global:actives-spatial-dispersion
 global:actives-spatial-dispersion
 0
 10
-1.0
+0.0
 0.1
 1
 NIL
@@ -682,7 +687,7 @@ global:employments-spatial-dispersion
 global:employments-spatial-dispersion
 0
 10
-0.8
+0.0
 0.1
 1
 NIL
@@ -697,7 +702,7 @@ global:actives-max
 global:actives-max
 0
 1000
-500.0
+0.0
 1
 1
 NIL
@@ -712,7 +717,7 @@ global:employments-max
 global:employments-max
 0
 1000
-500.0
+0.0
 1
 1
 NIL
@@ -727,7 +732,7 @@ global:gamma-cobb-douglas-a
 global:gamma-cobb-douglas-a
 0
 1
-0.8
+0.0
 0.01
 1
 NIL
@@ -742,7 +747,7 @@ global:beta-discrete-choices
 global:beta-discrete-choices
 0
 5
-1.8
+0.0
 0.05
 1
 NIL
@@ -905,7 +910,7 @@ global:network-speed
 global:network-speed
 1
 50
-5.0
+0.0
 1
 1
 NIL
@@ -920,7 +925,7 @@ global:road-length
 global:road-length
 1.0
 20
-2.0
+0.0
 1.0
 1
 NIL
@@ -935,7 +940,7 @@ global:#-explorations
 global:#-explorations
 0
 200
-26.0
+0.0
 1
 1
 NIL
@@ -950,7 +955,7 @@ global:lambda-accessibility
 global:lambda-accessibility
 0
 0.01
-0.005
+0.0
 0.0001
 1
 NIL
@@ -982,7 +987,7 @@ global:total-time-steps
 global:total-time-steps
 0
 1000
-50.0
+0.0
 1
 1
 NIL
@@ -1095,7 +1100,7 @@ CHOOSER
 117
 global:setup-type
 global:setup-type
-"random" "gis-synthetic" "gis" "from-file-mayors" "from-file"
+"random" "gis-synthetic" "gis" "from-file-mayors" "from-file" "external"
 4
 
 BUTTON
@@ -1141,7 +1146,7 @@ global:gamma-cobb-douglas-e
 global:gamma-cobb-douglas-e
 0
 1
-0.65
+0.0
 0.05
 1
 NIL
@@ -1181,7 +1186,7 @@ global:world-size
 global:world-size
 0
 50
-15.0
+0.0
 1
 1
 NIL
@@ -1193,7 +1198,7 @@ INPUTBOX
 522
 70
 global:conf-file
-NIL
+0
 1
 0
 String
@@ -1296,7 +1301,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.11
+0.0
 0.01
 1
 NIL
@@ -1321,7 +1326,7 @@ global:total-infrastructure-stock
 global:total-infrastructure-stock
 0
 100
-1.0
+0.0
 1
 1
 NIL
@@ -1427,7 +1432,7 @@ global:network-biological-gamma
 global:network-biological-gamma
 0
 10
-1.4
+0.0
 0.1
 1
 NIL
@@ -1548,7 +1553,7 @@ INPUTBOX
 1738
 84
 global:setup-file-prefix
-setup/test/slimemould_
+0
 1
 0
 String

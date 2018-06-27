@@ -145,7 +145,7 @@ to experiments-luti:test-external
   show matrix:min global:effective-distance-matrix
   show matrix:mean global:effective-distance-matrix
   
-  test-distances:export-dist-map
+  ;test-distances:export-dist-map
 end
 
 
