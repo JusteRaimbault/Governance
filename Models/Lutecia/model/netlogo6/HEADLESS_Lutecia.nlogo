@@ -546,11 +546,11 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 833
 27
-1271
-466
+1268
+463
 -1
 -1
-28.666666666666668
+17.2
 1
 10
 1
@@ -561,9 +561,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-14
+24
 0
-14
+24
 0
 0
 1
@@ -628,7 +628,7 @@ BUTTON
 551
 61
 experiments-luti:test-experiment-luti
-experiments-luti:test-experiment-luti
+clear-all\nexperiments-luti:test-experiment-luti
 NIL
 1
 T

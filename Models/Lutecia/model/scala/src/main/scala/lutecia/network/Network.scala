@@ -43,7 +43,9 @@ object Network {
       //println(paths.keySet.size)
       //println(n.size*n.size)
       val distMap = paths.mapValues { case p => p.cost }
-      val distMat = Array.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
+      //val distMat = Array.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
+      val distMat = Array.fill[Double](n.size,n.size){0.0}
+      for(i <- 0 until n.size - 1;j <- 0 until n.size - 1){distMat(n(i).id)(n(j).id) = distMap((n(i),n(j)))}
       Network(n, l, paths, distMap, distMat)
     }else{
       Network(n,l,Map.empty,Map.empty,Array.empty)

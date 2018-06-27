@@ -1,5 +1,5 @@
 import lutecia.core.World
-import lutecia.{Lutecia, RunModel}
+import lutecia.{Lutecia, RunModel, utils}
 import lutecia.indicators.Result
 import lutecia.network.{Network, SlimeMould}
 import lutecia.setup._
@@ -80,11 +80,23 @@ object Test {
 
 
   def testNetworkDistances() = {
-    val res1 = RunModel.run(new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork)
-    val res2 = RunModel.run(new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork)
+    val res1 = RunModel.run(new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {override def finalTime: Int = 1;override def worldSize = 25})
+
+    //val res2 = RunModel.run(new Lutecia with SyntheticSetup with ExponentialMixtureGrid with GridNetwork {override def finalTime: Int = 1})
     val map1 = res1.states.map{_.network.distancesMap.map{case ((n1,n2),d) => ((n1.id,n2.id),d)}}
-    val map2 = res2.states.map{_.network.distancesMap.map{case ((n1,n2),d) => ((n1.id,n2.id),d)}}
-    println(map1.zip(map2).map{case (m1,m2) => m1.map{case ((i,j),d) => math.abs(d - m2((i,j)))}.sum})
+
+    //val map2 = res2.states.map{_.network.distancesMap.map{case ((n1,n2),d) => ((n1.id,n2.id),d)}}
+
+    //println(map1(0).keySet.size)
+    //println(map1.zip(map2).map{case (m1,m2) => m1.map{case ((i,j),d) => math.abs(d - m2((i,j)))}.sum})
+    //utils.exportCSV(res1.states(0).network.distances,"/home/raimbault/ComplexSystems/Governance/Models/Lutecia/model/netlogo6/res/dmap_sc1.csv")
+    //utils.exportCSV(res2.states(0).network.distances,"/home/raimbault/ComplexSystems/Governance/Models/Lutecia/model/netlogo6/res/dmap_sc2.csv")
+    //utils.exportCSV(map1(0).map{case ((i,j),d) => Array(i.toDouble,j.toDouble,d)}.toArray,"/home/raimbault/ComplexSystems/Governance/Models/Lutecia/model/netlogo6/res/dmap_sc1.csv")
+    //utils.exportCSV(map2(0).map{case ((i,j),d) => Array(i.toDouble,j.toDouble,d)}.toArray,"/home/raimbault/ComplexSystems/Governance/Models/Lutecia/model/netlogo6/res/dmap_sc2.csv")
+
+    val d = map1(0).keySet.map{case (i,j) => Array(i.toDouble,j.toDouble,map1(0)((i,j)))}.toArray
+    //println(d.map{_.length}.min)
+    utils.exportCSV(d,"/home/raimbault/ComplexSystems/Governance/Models/Lutecia/model/netlogo6/res/dmap_sc1.csv")
   }
 
 

@@ -518,10 +518,7 @@ to setup:setup-cached-distances
   let p1 0 let p2 0
   repeat global:#-patches [
      let x1 (floor (p1 / world-width)) + min-pxcor let y1 (p1 - world-width * floor (p1 / world-width)) + min-pycor
-     
-     ; profite of this loop to set correspondance number <-> coordinates ? NO has to be done before !
-     ;ask (patch x1 y1) [set number p1] 
-     
+
      set p2 0
      repeat global:#-patches [
         let x2 (floor (p2 / world-width)) + min-pxcor let y2 (p2 - world-width * floor (p2 / world-width)) + min-pycor

@@ -113,8 +113,10 @@ to-report indicators:get-tracked-indicators
     
     ; grid
     "indicators:actives-raster"
-    "indicators:employments-raster"  
-    "indicators:distance-matrix"
+    "indicators:employments-raster"
+    "indicators:distance-matrix true"
+    "indicators:distance-matrix false"
+    "indicators:accessibilities-raster"
   )
 end
 
@@ -174,9 +176,12 @@ end
 
 ;;
 ; Effective distance matrix as nested lists
-to-report indicators:distance-matrix
-  ;let i 0 let j 0 let res [] repeat count patches [let row [] set j 0 repeat count patches [ set row lput matrix:get global:effective-distance-matrix i j row set j j + 1] set res lput row res] report res 
-  let i 0 let j 0 let res [] repeat count patches [set j 0 repeat count patches [set res lput (list i j matrix:get global:effective-distance-matrix i j) res set j j + 1]set i i + 1] report res 
+to-report indicators:distance-matrix [map?]
+  ifelse not map? [
+  let i 0 let j 0 let res [] repeat count patches [let row [] set j 0 repeat count patches [ set row lput matrix:get global:effective-distance-matrix i j row set j j + 1] set res lput row res] report res 
+  ][
+    let i 0 let j 0 let res [] repeat count patches [set j 0 repeat count patches [set res lput (list i j matrix:get global:effective-distance-matrix i j) res set j j + 1]set i i + 1] report res 
+  ]
 end
 
 
@@ -208,6 +213,29 @@ end
 to-report indicators:patches-accessibilities
   report list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
 end
+
+
+to-report indicators:accessibilities-raster
+  let res [] 
+  let x min-pxcor
+  repeat (max-pxcor - min-pxcor + 1) [
+    let row [] let y min-pycor
+    repeat (max-pycor - min-pycor + 1) [
+      ask patch x y [set row lput patch:current-accessibility row]
+      set y y + 1
+    ]
+    set res lput row res
+    set x x + 1   
+  ] 
+  report res
+end
+
+
+to-report indicators:accessibilities-raster-alltimes
+   report indicators:ts-indicator "indicators:accessibilities-raster"
+end
+
+
 
 ;;
 ; flatmap patches/times access
