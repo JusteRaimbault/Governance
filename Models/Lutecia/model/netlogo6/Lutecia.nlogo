@@ -672,7 +672,7 @@ global:actives-spatial-dispersion
 global:actives-spatial-dispersion
 0
 10
-0.0
+4.2
 0.1
 1
 NIL
@@ -687,7 +687,7 @@ global:employments-spatial-dispersion
 global:employments-spatial-dispersion
 0
 10
-0.0
+4.4
 0.1
 1
 NIL
@@ -702,7 +702,7 @@ global:actives-max
 global:actives-max
 0
 1000
-0.0
+486.0
 1
 1
 NIL
@@ -717,7 +717,7 @@ global:employments-max
 global:employments-max
 0
 1000
-0.0
+481.0
 1
 1
 NIL
@@ -732,7 +732,7 @@ global:gamma-cobb-douglas-a
 global:gamma-cobb-douglas-a
 0
 1
-0.0
+0.78
 0.01
 1
 NIL
@@ -747,7 +747,7 @@ global:beta-discrete-choices
 global:beta-discrete-choices
 0
 5
-0.0
+3.05
 0.05
 1
 NIL
@@ -825,7 +825,7 @@ global:regional-decision-proba
 global:regional-decision-proba
 0
 1
-0.0
+0.05
 0.05
 1
 NIL
@@ -910,7 +910,7 @@ global:network-speed
 global:network-speed
 1
 50
-0.0
+5.0
 1
 1
 NIL
@@ -925,7 +925,7 @@ global:road-length
 global:road-length
 1.0
 20
-0.0
+1.0
 1.0
 1
 NIL
@@ -955,7 +955,7 @@ global:lambda-accessibility
 global:lambda-accessibility
 0
 0.01
-0.0
+0.0052
 0.0001
 1
 NIL
@@ -1146,7 +1146,7 @@ global:gamma-cobb-douglas-e
 global:gamma-cobb-douglas-e
 0
 1
-0.0
+0.8
 0.05
 1
 NIL
@@ -1186,7 +1186,7 @@ global:world-size
 global:world-size
 0
 50
-0.0
+15.0
 1
 1
 NIL
@@ -1198,7 +1198,7 @@ INPUTBOX
 522
 70
 global:conf-file
-0
+NIL
 1
 0
 String
@@ -1301,7 +1301,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.0
+0.14
 0.01
 1
 NIL
@@ -1410,7 +1410,7 @@ CHOOSER
 global:initial-nw-type
 global:initial-nw-type
 "tree-skeleton" "slime-mould" "full" "no-network" "from-file"
-4
+3
 
 MONITOR
 1516
@@ -1553,7 +1553,7 @@ INPUTBOX
 1738
 84
 global:setup-file-prefix
-0
+setup/conf/nl6conf_0_0_
 1
 0
 String

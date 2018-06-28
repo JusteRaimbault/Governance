@@ -384,6 +384,8 @@ globals[
 
   global:initial-nw-type
 
+  global:setup-file-prefix
+
 ]
 
 
@@ -661,7 +663,7 @@ BUTTON
 509
 328
 experiments-luti:test-external
-clear-all\nexperiments-luti:test-external
+clear-all\nexperiments-luti:test-external\n
 NIL
 1
 T

@@ -35,10 +35,10 @@ object RunTest extends App {
 
   //Test.testNetwork()
   //Test.testGridNetwork(model)
-  //Test.testNetworkExport(model)
+  Test.testNetworkExport(model)
   //Test.testSlimeMould()
   //Test.testRun(model)
-  Test.testNetworkDistances()
+  //Test.testNetworkDistances()
 
   println("Ellapsed Time : "+(System.currentTimeMillis()-t)/1000.0)
 }

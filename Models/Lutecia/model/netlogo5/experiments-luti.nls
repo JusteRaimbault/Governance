@@ -31,15 +31,15 @@ to experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC l
   set global:initial-nw? true
   
   ; dirty scenarios selection (difficult to do otherwise : \gamma = f(centers) is eyeball validated..)
-  if scenario = -1 [set global:initial-nw-random-type "no-network" set global:#-initial-territories 3]
-  if scenario = 0 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 3]
-  if scenario = 1 [set global:initial-nw-random-type "tree-skeleton" set global:#-initial-territories 5]
-  if scenario = 2 [set global:initial-nw-random-type "full" set global:#-initial-territories 3]
-  if scenario = 3 [set global:initial-nw-random-type "full" set global:#-initial-territories 5]
-  if scenario = 4 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.2]
-  if scenario = 5 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.1]
-  if scenario = 6 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.8]
-  if scenario = 7 [set global:initial-nw-random-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.8]
+  if scenario = -1 [set global:initial-nw-type "no-network" set global:#-initial-territories 3]
+  if scenario = 0 [set global:initial-nw-type "tree-skeleton" set global:#-initial-territories 3]
+  if scenario = 1 [set global:initial-nw-type "tree-skeleton" set global:#-initial-territories 5]
+  if scenario = 2 [set global:initial-nw-type "full" set global:#-initial-territories 3]
+  if scenario = 3 [set global:initial-nw-type "full" set global:#-initial-territories 5]
+  if scenario = 4 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.2]
+  if scenario = 5 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.1]
+  if scenario = 6 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 3 set global:network-biological-gamma 1.8]
+  if scenario = 7 [set global:initial-nw-type "slime-mould" set global:#-initial-territories 5 set global:network-biological-gamma 1.8]
   
   ;;
   ; run parameters
@@ -101,11 +101,13 @@ to experiments-luti:test-external
   set global:setup:actives ractives
   set global:setup:employments remployments
   
-  experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 4 2 wsize "external" 0
+  experiments-luti:setup-experiment-luti 0.1 0.9 0.8 1.8 0.005 5 4 5 wsize "external" 0
   
   experiments-luti:run-experiment-luti
   
   indicators:compute-indicators
+
+  show length indicators:actives-raster-alltimes
 
   ;show length indicators:actives-raster-alltimes
   ;show length indicators:employments-raster-alltimes

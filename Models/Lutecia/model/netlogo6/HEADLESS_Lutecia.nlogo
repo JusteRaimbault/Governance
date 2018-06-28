@@ -546,8 +546,8 @@ biological-network-links-own [
 GRAPHICS-WINDOW
 833
 27
-1268
-463
+1271
+466
 -1
 -1
 17.2

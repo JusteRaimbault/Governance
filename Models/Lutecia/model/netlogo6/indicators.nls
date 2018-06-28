@@ -326,9 +326,6 @@ to-report indicators:actives-raster
 end
 
 
-
-
-
 ;;
 ; employments as a nested list (RasterLayer)
 to-report indicators:employments-raster
