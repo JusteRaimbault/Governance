@@ -64,6 +64,7 @@ to experiments:setup-experiment [regionalproba lambdaacc nwspeed game coll-cost 
   if setuptype = 0 [set global:setup-type "random"]
   if setuptype = 1 [set global:setup-type "gis-synthetic"]
   if setuptype = 2 [set global:setup-type "gis"]
+  if setuptype = 3 [set global:setup-type "external"]
   
   set global:stopping-type stoptype
 
@@ -81,12 +82,12 @@ end
 to experiments:run-experiment
   ;; run
   
-  carefully[
+  ;carefully[
     while [main:stopping-condition? = false] [
       main:go
     ]
-  ]
-  [show error-message set global:failed 1]
+  ;]
+  ;[show error-message set global:failed 1]
   ; indicators then called from openmole
   
   ; cache network measures first

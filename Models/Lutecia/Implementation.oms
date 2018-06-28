@@ -13,172 +13,289 @@ val gammaCDE=Val[Double]
 val betaDC=Val[Double]
 val relocationRate=Val[Double]
 
+val finalTime = Val[Double]
+val worldSize = Val[Double]
+val numberTerritories = Val[Double]
+
 val id = Val[Int]
 val replication = Val[Int]
 
-// scenarios variables
-val scenario=Val[Int]
-val nwType=Val[String]
-val centerNumber=Val[Double]
-val gammaSlimeMould=Val[Double]
+
+// spatial configurations
+val actives = Val[RasterLayer]
+val employments = Val[RasterLayer]
+
+
+// fixed parameters
+val tf = 3
+val ws = 15
+val territs = 5
 
 
 // reporters
-val relativeAccessibilityNL5 = Val[Double]
-val nwCongestionNL5 = Val[Double]
-val nwRelativeLengthNL5 = Val[Double]
-val nwRelativeSpeedNL5 = Val[Double]
-val moranActivesNL5=Val[Double]
-val meanDistanceActivesNL5=Val[Double]
-val slopeActivesNL5=Val[Double]
-val entropyActivesNL5=Val[Double]
-val moranEmploymentsNL5=Val[Double]
-val meanDistanceEmploymentsNL5=Val[Double]
-val slopeEmploymentsNL5=Val[Double]
-val entropyEmploymentsNL5=Val[Double]
-val corAccessDevNL5=Val[Double]
-val corAccessEmploymentsNL5=Val[Double]
-val corAccessTimeWeightedNL5=Val[Double]
-val corAccessTimeUnweightedNL5=Val[Double]
 
-val relativeAccessibilityNL6 = Val[Double]
-val nwCongestionNL6 = Val[Double]
-val nwRelativeLengthNL6 = Val[Double]
-val nwRelativeSpeedNL6 = Val[Double]
-val moranActivesNL6=Val[Double]
-val meanDistanceActivesNL6=Val[Double]
-val slopeActivesNL6=Val[Double]
-val entropyActivesNL6=Val[Double]
-val moranEmploymentsNL6=Val[Double]
-val meanDistanceEmploymentsNL6=Val[Double]
-val slopeEmploymentsNL6=Val[Double]
-val entropyEmploymentsNL6=Val[Double]
-val corAccessDevNL6=Val[Double]
-val corAccessEmploymentsNL6=Val[Double]
-val corAccessTimeWeightedNL6=Val[Double]
-val corAccessTimeUnweightedNL6=Val[Double]
+// full trajectory of models
 
-val totaldiff = Val[Double]
+val activesTrajectoriesNL5 = Val[Array[RasterLayer]]
+val activesTrajectoriesNL6 = Val[Array[RasterLayer]]
+val activesTrajectoriesScala = Val[Array[RasterLayer]]
 
-// experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime rnd-seed]
+val employmentsTrajectoriesNL5 = Val[Array[RasterLayer]]
+val employmentsTrajectoriesNL6 = Val[Array[RasterLayer]]
+val employmentsTrajectoriesScala = Val[Array[RasterLayer]]
+
+
+val distMatNL5 = Val[Array[Array[Array[Double]]]]
+val distMatNL6 = Val[Array[Array[Array[Double]]]]
+val distMatScala = Val[Array[Array[Array[Double]]]]
+
+val accessibilitiesNL5 = Val[Array[RasterLayer]]
+val accessibilitiesNL6 = Val[Array[RasterLayer]]
+val accessibilitiesScala = Val[Array[RasterLayer]]
+
+val aUtilitiesNL5 = Val[Array[RasterLayer]]
+val aUtilitiesNL6 = Val[Array[RasterLayer]]
+val aUtilitiesScala = Val[Array[RasterLayer]]
+
+val eUtilitiesNL5 = Val[Array[RasterLayer]]
+val eUtilitiesNL6 = Val[Array[RasterLayer]]
+val eUtilitiesScala = Val[Array[RasterLayer]]
+
+
+val avgstepdiffactives56 = Val[Array[Double]]
+val avgstepdiffemployments56  = Val[Array[Double]]
+val avgstepdiffdist56  = Val[Array[Double]]
+val avgstepdiffaccess56  = Val[Array[Double]]
+val avgstepdiffautility56  = Val[Array[Double]]
+val avgstepdiffeutilty56  = Val[Array[Double]]
+val stepdiffactives56  = Val[Array[Double]]
+val stepdiffemployments56 = Val[Array[Double]]
+val stepdiffdist56 = Val[Array[Double]]
+val stepdiffaccess56 = Val[Array[Double]]
+val stepdiffautility56 = Val[Array[Double]]
+val stepdiffeutility56 = Val[Array[Double]]
+val avgstepdiffactives6s = Val[Array[Double]]
+val avgstepdiffemployments6s = Val[Array[Double]]
+val avgstepdiffdist6s = Val[Array[Double]]
+val avgstepdiffaccess6s = Val[Array[Double]]
+val avgstepdiffautility6s = Val[Array[Double]]
+val avgstepdiffeutilty6s = Val[Array[Double]]
+val stepdiffactives6s = Val[Array[Double]]
+val stepdiffemployments6s = Val[Array[Double]]
+val stepdiffdist6s = Val[Array[Double]]
+val stepdiffaccess6s = Val[Array[Double]]
+val stepdiffautility6s = Val[Array[Double]]
+val stepdiffeutility6s = Val[Array[Double]]
+
+
+// NetLogo models
+
+// experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime worldSize rnd-seed]
 val cmds = List(
-  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} ${scenario} 20 ${replication}",
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} -1 ${finalTime} ${worldSize} \"external\" ${replication}",
   "experiments-luti:run-experiment-luti"
 )
 
 
-val model5 = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
-  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibilityNL5),
-  netLogoOutputs += ("indicators:relative-congestion",nwCongestionNL5),
-  netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLengthNL5),
-  netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeedNL5),
-  netLogoOutputs += ("indicators:morphology:moran-actives",moranActivesNL5),
-  netLogoOutputs += ("indicators:morphology:mean-distance-actives",meanDistanceActivesNL5),
-  netLogoOutputs += ("indicators:morphology:slope-actives",slopeActivesNL5),
-  netLogoOutputs += ("indicators:morphology:entropy-actives",entropyActivesNL5),
-  netLogoOutputs += ("indicators:morphology:moran-employments",moranEmploymentsNL5),
-  netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmploymentsNL5),
-  netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmploymentsNL5),
-  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmploymentsNL5),
-  netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDevNL5),
-  netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmploymentsNL5),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeightedNL5),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweightedNL5)
+val model5task = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+  inputs += actives mapped "global:setup:actives",
+  inputs += employments mapped "global:setup:employments",
+  outputs += activesTrajectoriesNL5 mapped "indicators:actives-raster-alltimes",
+  outputs += employmentsTrajectoriesNL5 mapped "indicators:employments-raster-alltimes",
+  outputs += distMatNL5 mapped "indicators:distance-matrix-alltimes true",
+  outputs += accessibilitiesNL5 mapped "indicators:accessibilities-raster-alltimes",
+  outputs += aUtilitiesNL5 mapped "indicators:a-utilities-raster-alltimes",
+  outputs += eUtilitiesNL5 mapped "indicators:e-utilities-raster-alltimes"
 )
+val model5 = Capsule(model5task,strain = true)
 
-val model6 = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
-  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-  inputs += (relativeAccessibilityNL5,nwCongestionNL5,nwRelativeLengthNL5,nwRelativeSpeedNL5,moranActivesNL5,meanDistanceActivesNL5,slopeActivesNL5,entropyActivesNL5,moranEmploymentsNL5,meanDistanceEmploymentsNL5,slopeEmploymentsNL5,entropyEmploymentsNL5,corAccessDevNL5,corAccessEmploymentsNL5,corAccessTimeWeightedNL5,corAccessTimeUnweightedNL5),
-  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-  outputs += (relativeAccessibilityNL5,nwCongestionNL5,nwRelativeLengthNL5,nwRelativeSpeedNL5,moranActivesNL5,meanDistanceActivesNL5,slopeActivesNL5,entropyActivesNL5,moranEmploymentsNL5,meanDistanceEmploymentsNL5,slopeEmploymentsNL5,entropyEmploymentsNL5,corAccessDevNL5,corAccessEmploymentsNL5,corAccessTimeWeightedNL5,corAccessTimeUnweightedNL5),
-  netLogoOutputs += ("indicators:relative-accessibility",relativeAccessibilityNL6),
-  netLogoOutputs += ("indicators:relative-congestion",nwCongestionNL6),
-  netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLengthNL6),
-  netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeedNL6),
-  netLogoOutputs += ("indicators:morphology:moran-actives",moranActivesNL6),
-  netLogoOutputs += ("indicators:morphology:mean-distance-actives",meanDistanceActivesNL6),
-  netLogoOutputs += ("indicators:morphology:slope-actives",slopeActivesNL6),
-  netLogoOutputs += ("indicators:morphology:entropy-actives",entropyActivesNL6),
-  netLogoOutputs += ("indicators:morphology:moran-employments",moranEmploymentsNL6),
-  netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmploymentsNL6),
-  netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmploymentsNL6),
-  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmploymentsNL6),
-  netLogoOutputs += ("indicators-stylized:cor-access-dev-avg",corAccessDevNL6),
-  netLogoOutputs += ("indicators-stylized:cor-access-employments-avg",corAccessEmploymentsNL6),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg true",corAccessTimeWeightedNL6),
-  netLogoOutputs += ("indicators-stylized:cor-access-time-avg false",corAccessTimeUnweightedNL6)
+val model6task = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += actives mapped "global:setup:actives",
+  inputs += employments mapped "global:setup:employments",
+  outputs += activesTrajectoriesNL6 mapped "indicators:actives-raster-alltimes",
+  outputs += employmentsTrajectoriesNL6 mapped "indicators:employments-raster-alltimes",
+  outputs += distMatNL6 mapped "indicators:distance-matrix-alltimes true",
+  outputs += accessibilitiesNL6 mapped "indicators:accessibilities-raster-alltimes",
+  outputs += aUtilitiesNL6 mapped "indicators:a-utilities-raster-alltimes",
+  outputs += eUtilitiesNL6 mapped "indicators:e-utilities-raster-alltimes"
 )
+val model6 = Capsule(model6task,strain = true)
 
 
-val comparison = ScalaTask("""
-  //val totaldiff = (Iterator.from(1, 2).takeWhile(_ < inputs.size).map(inputs(_))).zip(Iterator.from(0, 2).takeWhile(_ < inputs.size).map(inputs(_))).map{
-  //    case (x1,x2) => (x1 - x2)*(x1 - x2)
-  //}.sum
-  val nl5 = Seq(relativeAccessibilityNL5,nwCongestionNL5,nwRelativeLengthNL5,nwRelativeSpeedNL5,moranActivesNL5,meanDistanceActivesNL5,slopeActivesNL5,entropyActivesNL5,moranEmploymentsNL5,meanDistanceEmploymentsNL5,slopeEmploymentsNL5,entropyEmploymentsNL5,corAccessDevNL5,corAccessEmploymentsNL5,corAccessTimeWeightedNL5,corAccessTimeUnweightedNL5)
-  val nl6 = Seq(relativeAccessibilityNL6,nwCongestionNL6,nwRelativeLengthNL6,nwRelativeSpeedNL6,moranActivesNL6,meanDistanceActivesNL6,slopeActivesNL6,entropyActivesNL6,moranEmploymentsNL6,meanDistanceEmploymentsNL6,slopeEmploymentsNL6,entropyEmploymentsNL6,corAccessDevNL6,corAccessEmploymentsNL6,corAccessTimeWeightedNL6,corAccessTimeUnweightedNL6)
-  val totaldiff = nl5.zip(nl6).map{
-     case (x1,x2) => (x1 - x2)
-      //case (x1,x2) => (x1 - x2)*(x1 - x2)
-  }.sum
-"""
+
+val modelscalatask = ScalaTask("""
+    |import lutecia._
+    |import lutecia.setup._
+    |import lutecia.network._
+    |import lutecia.indicators._
+    |
+    |val model = new Lutecia with SyntheticSetup 
+    |   //with ExponentialMixtureGrid
+    |   with ExternalGrid
+    |   with GridNetwork {
+    |  
+    |  override def worldSize = input.worldSize.toInt
+    |  override def finalTime: Int = input.finalTime.toInt
+    |  override def numberTerritories: Int = input.numberTerritories.toInt
+    |  override def lambda: Double = input.lambdaAcc
+    |  override def beta: Double = input.betaDC
+    |  override def alpha: Double = input.relocationRate
+    |  override def gammaA: Double = input.gammaCDA
+    |  override def gammaE: Double = input.gammaCDE
+    |  override def euclidianPace: Double = input.networkSpeed
+    |  
+    |  override def actives = input.actives
+    |  override def employments= input.employments
+    |}
+    |
+    |val result = RunModel.run(model)
+    |
+    |val activesTrajectoriesScala = Result.getActivesTrajectories(result).toArray
+    |val employmentsTrajectoriesScala = Result.getEmploymentsTrajectories(result).toArray
+    |//val distMatScala = Result.getDistanceMatrices(result).toArray
+    |val distMatScala = Result.getDistanceMaps(result).toArray
+    |val accessibilitiesScala = Result.getAccessibilities(result).toArray
+    |val aUtilitiesScala = Result.getTrajectories(result,_.aUtility).toArray
+    |val eUtilitiesScala = Result.getTrajectories(result,_.eUtility).toArray
+    |""".stripMargin
 ) set (
-  inputs += (relativeAccessibilityNL5,relativeAccessibilityNL6,
-    nwCongestionNL5,nwCongestionNL6,
-    nwRelativeLengthNL5,nwRelativeLengthNL6,
-    nwRelativeSpeedNL5,nwRelativeSpeedNL6,
-    moranActivesNL5,moranActivesNL6,
-    meanDistanceActivesNL5,meanDistanceActivesNL6,
-    slopeActivesNL5,slopeActivesNL6,
-    entropyActivesNL5,entropyActivesNL6,
-    moranEmploymentsNL5,moranEmploymentsNL6,
-    meanDistanceEmploymentsNL5,meanDistanceEmploymentsNL6,
-    slopeEmploymentsNL5,slopeEmploymentsNL6,
-    entropyEmploymentsNL5,entropyEmploymentsNL6,
-    corAccessDevNL5,corAccessDevNL6,
-    corAccessEmploymentsNL5,corAccessEmploymentsNL6,
-    corAccessTimeWeightedNL5,corAccessTimeWeightedNL6,
-    corAccessTimeUnweightedNL5,corAccessTimeUnweightedNL6
-    ),
-    inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id),
-    outputs += (totaldiff),
-    outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id)
+   plugins += pluginsOf(lutecia.Lutecia),
+   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+   //inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
+   //inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+   inputs += (actives,employments),
+   //outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+   //outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
+   //outputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+   outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala,accessibilitiesScala,aUtilitiesScala,eUtilitiesScala)
 )
+val modelscala = Capsule(modelscalatask, strain=true)
 
-val purpose = "IMPL"
-
-val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
-  arraysOnSingleRow := true
+val comparisontask = ScalaTask("""
+  |def stepdiff(a1: Array[Array[Array[Double]]],a2: Array[Array[Array[Double]]]) : Array[Double] = a1.zip(a2).map{
+  |     case (r1,r2) => {r1.flatten.toSeq.zip(r2.flatten.toSeq).map{case (x1,x2) => if(x1 + x2 > 0){200 * math.abs(x1 - x2) / (x1 + x2)}else{0.0}}.sum / r1.flatten.length}
+  |  }
+  |
+  |def avgstepdiff(a1: Array[Array[Array[Double]]],a2: Array[Array[Array[Double]]]): Array[Double] = a1.zip(a2).map{
+  |   case (r1,r2) => 200 * r1.flatten.toSeq.zip(r2.flatten.toSeq).map{case (x1,x2) => math.abs(x1 - x2)}.sum / (r1.flatten.sum + r2.flatten.sum)
+  |}
+  |
+  |def stepdiffMap(a1: Array[Array[Array[Double]]],a2: Array[Array[Array[Double]]]) : Array[Double] = a1.zip(a2).map{
+  |     case (m1,m2) => {
+  |        val map1 = m1.map{case Array(i,j,d) => ((i.toInt,j.toInt),d)}.toMap
+  |        val map2 = m2.map{case Array(i,j,d) => ((i.toInt,j.toInt),d)}.toMap
+  |        map1.keySet.map{case key => if (map1(key)+map2(key)> 0) 200 * math.abs(map1(key) - map2(key)) / (map1(key)+map2(key)) else 0.0}.sum / map1.size
+  |     }
+  |  }
+  | def avgstepdiffMap(a1: Array[Array[Array[Double]]],a2: Array[Array[Array[Double]]]) : Array[Double] = a1.zip(a2).map{
+  |     case (m1,m2) => {
+  |        val map1 = m1.map{case Array(i,j,d) => ((i.toInt,j.toInt),d)}.toMap
+  |        val map2 = m2.map{case Array(i,j,d) => ((i.toInt,j.toInt),d)}.toMap
+  |        map1.keySet.map{case key => 200 * math.abs(map1(key) - map2(key))}.sum / (map1.values.sum + map2.values.sum)
+  |     }
+  |  }
+  |
+  |
+  |// avgstepdiff 5 - 6
+  |val avgstepdiffactives56 = avgstepdiff(activesTrajectoriesNL5,activesTrajectoriesNL6)
+  |val avgstepdiffemployments56 = avgstepdiff(employmentsTrajectoriesNL5,employmentsTrajectoriesNL6)
+  |val avgstepdiffdist56 = avgstepdiffMap(distMatNL5,distMatNL6)
+  |val avgstepdiffaccess56 = avgstepdiff(accessibilitiesNL5,accessibilitiesNL6)
+  |val avgstepdiffautility56 = avgstepdiff(aUtilitiesNL5,aUtilitiesNL6)  
+  |val avgstepdiffeutilty56 = avgstepdiff(eUtilitiesNL5,eUtilitiesNL6)  
+  |
+  |// stepdiff 5 - 6
+  |val stepdiffactives56 = stepdiff(activesTrajectoriesNL5,activesTrajectoriesNL6)
+  |val stepdiffemployments56 = stepdiff(employmentsTrajectoriesNL5,employmentsTrajectoriesNL6)
+  |val stepdiffdist56 = stepdiffMap(distMatNL5,distMatNL6)
+  |val stepdiffaccess56 = stepdiff(accessibilitiesNL5,accessibilitiesNL6)
+  |val stepdiffautility56 = stepdiff(aUtilitiesNL5,aUtilitiesNL6)  
+  |val stepdiffeutility56 = stepdiff(eUtilitiesNL5,eUtilitiesNL6)  
+  |
+  |// avgstepdiff 6 - scala
+  |val avgstepdiffactives6s = avgstepdiff(activesTrajectoriesNL6,activesTrajectoriesScala)
+  |val avgstepdiffemployments6s = avgstepdiff(employmentsTrajectoriesNL6,employmentsTrajectoriesScala)
+  |val avgstepdiffdist6s = avgstepdiffMap(distMatNL6,distMatScala)
+  |val avgstepdiffaccess6s = avgstepdiff(accessibilitiesNL6,accessibilitiesScala)
+  |val avgstepdiffautility6s = avgstepdiff(aUtilitiesNL6,aUtilitiesScala)  
+  |val avgstepdiffeutilty6s = avgstepdiff(eUtilitiesNL6,eUtilitiesScala)
+  |
+  |// stepdiff 6 - scala
+  |val stepdiffactives6s = stepdiff(activesTrajectoriesNL6,activesTrajectoriesScala)
+  |val stepdiffemployments6s = stepdiff(employmentsTrajectoriesNL6,employmentsTrajectoriesScala)
+  |val stepdiffdist6s = stepdiffMap(distMatNL6,distMatScala)
+  |val stepdiffaccess6s = stepdiff(accessibilitiesNL6,accessibilitiesScala)
+  |val stepdiffautility6s = stepdiff(aUtilitiesNL6,aUtilitiesScala)  
+  |val stepdiffeutility6s = stepdiff(eUtilitiesNL6,eUtilitiesScala)
+""".stripMargin
+) set (
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+  inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
+  inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+  inputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala,accessibilitiesScala,aUtilitiesScala,eUtilitiesScala),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+  outputs += (avgstepdiffactives56,avgstepdiffemployments56,avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56),
+  outputs += (stepdiffactives56,stepdiffemployments56,stepdiffaccess56,stepdiffautility56,stepdiffeutility56),
+  outputs += (avgstepdiffactives6s,avgstepdiffemployments6s,avgstepdiffaccess6s,avgstepdiffautility6s,avgstepdiffeutilty6s),
+  outputs += (stepdiffactives6s,stepdiffemployments6s,stepdiffaccess6s,stepdiffautility6s,stepdiffeutility6s),
+  outputs += (avgstepdiffdist56,stepdiffdist56,avgstepdiffdist6s,stepdiffdist6s)
 )
+// note : must add explicitely outputs, straining seems not compatible with the MoleTask ?
+val comparison = Capsule(comparisontask,strain=true)
 
-//val env = LocalEnvironment(50)
-val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val task = MoleTask(model5 -- model6 -- modelscala -- comparison)
+
+//val parameters = Seq(relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id)
+//val indicators = Seq(avgstepdiffactives56,avgstepdiffemployments56,avgstepdiffdist56,avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56)
+
+val purpose = "IMPLEMENTATION_TEST"
+//val purpose = "IMPLEMENTATION"
+
+// note : CSVHook does not accept seq of vals ?
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv",
+  relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id,
+  avgstepdiffactives56,avgstepdiffemployments56,
+  avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56,
+  stepdiffactives56,stepdiffemployments56,
+  stepdiffaccess56,stepdiffautility56,stepdiffeutility56,
+  avgstepdiffactives6s,avgstepdiffemployments6s,avgstepdiffaccess6s,avgstepdiffautility6s,avgstepdiffeutilty6s,
+  stepdiffactives6s,stepdiffemployments6s,stepdiffaccess6s,stepdiffautility6s,stepdiffeutility6s,
+  avgstepdiffdist56,stepdiffdist56,avgstepdiffdist6s,stepdiffdist6s
+) set (arraysOnSingleRow := true)
+
+val env = LocalEnvironment(4)
+//val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
-/*
-val replications =
- Replication (
-   evaluation = (model on env hook indics_hook),
-   seed = replication,
-   replications = 1
-)
-*/
 
-//relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
+//relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id
 val exploration =
   DirectSampling(
-    evaluation = ((model5 on grid by 10) -- (model6 on grid by 10) -- comparison hook indics_hook) ,
+    //evaluation = (task on grid by 50 hook indics_hook) ,
+    evaluation = (task hook indics_hook) ,
     sampling =
    ((LHS (
-      50
+      1
       ,lambdaAcc in Range(0.001,0.01)
       ,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)
       ,gammaCDE in Range(0.5,1.0)
       ,betaDC in Range(0.5,2.0)
-      ,relocationRate in Range(0.0,1.0)
-    ) withIndex id) x (scenario in (0 to 7 by 1)) x (replication in (0 to 100 by 1)) )//x (lambdaAcc is 0.005) x (networkSpeed is 5.0) )
+      ,relocationRate in Range(0.0,0.2)
+    ) withIndex id) x
+    (finalTime is tf) x 
+    (worldSize is ws) x
+    (numberTerritories is territs) x
+    (ExponentialMixtureSpatialSampling(
+        gridSize = Left(ws),
+        centersNumber = territs,
+        maxValue = Left(500.0),
+        kernelRadius = Right(Seq(1.0,0.8)),
+        samples = 1,
+        prototypes = Seq(actives,employments)
+    ) withIndex replication ) 
+   )
   )
 
 

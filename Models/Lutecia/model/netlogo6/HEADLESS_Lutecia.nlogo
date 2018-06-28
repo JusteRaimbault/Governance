@@ -287,6 +287,9 @@ globals[
   ; setup
   global:setup-type
 
+  global:setup:actives
+  global:setup:employments
+
   global:actives-max
   global:employments-max
   global:#-initial-territories
@@ -375,6 +378,10 @@ globals[
   global:network-biological-nodes-number
   global:network-biological-gamma
   global:bio-ticks
+
+  global:setup-file-prefix
+  global:initial-nw-type
+
 
 ]
 
@@ -499,7 +506,9 @@ undirected-link-breed[ghost-transportation-links ghost-transportation-link]
 breed[ghost-transportation-nodes ghost-transportation-node]
 
 
-
+ghost-transportation-nodes-own [
+  ghost-transportation-node:id
+]
 
 
 
@@ -541,7 +550,7 @@ GRAPHICS-WINDOW
 466
 -1
 -1
-28.666666666666668
+17.2
 1
 10
 1
@@ -551,10 +560,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+24
+0
+24
 0
 0
 1
@@ -597,10 +606,10 @@ NIL
 1
 
 BUTTON
-32
-248
-218
-281
+20
+240
+206
+273
 NIL
 display:display-target-fit
 NIL
@@ -614,12 +623,12 @@ NIL
 1
 
 BUTTON
-264
-190
-351
-223
-test luti
+259
+28
+551
+61
 experiments-luti:test-experiment-luti
+clear-all\nexperiments-luti:test-experiment-luti
 NIL
 1
 T
@@ -631,12 +640,29 @@ NIL
 1
 
 BUTTON
-278
-239
-401
-272
+16
+293
+139
+326
 all scenarios
 experiments-luti:all-scenarios
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+259
+70
+502
+103
+experiments-luti:test-external
+clear-all\nexperiments-luti:test-external
 NIL
 1
 T

@@ -67,7 +67,7 @@ end
 to transportation:affectation [affect?]
     
   ; reinitialize
-  ifelse affect? [set global:patches-congestion list:rep 0 (count patches)][set global:patches-congestion list:rep 1 (count patches)]
+  ifelse affect? and count transportation-nodes > 0 [set global:patches-congestion list:rep 0 (count patches)][set global:patches-congestion list:rep 1 (count patches)]
   
   if affect? [
    

@@ -18,7 +18,7 @@ object Indicators {
     * compute state indicators
     * @param world
     */
-  def computeStateIndicators(world: World) = {
+  def printStateIndicators(world: World) = {
 
     println("--------------------------")
     println("Step "+world.time)
@@ -34,7 +34,7 @@ object Indicators {
     *
     * @param worlds
     */
-  def computeStatesIndicators(worlds: Seq[World]) = {
+  def printStatesIndicators(worlds: Seq[World]) = {
     println("  Actives diff = "+diffActives(worlds))
   }
 

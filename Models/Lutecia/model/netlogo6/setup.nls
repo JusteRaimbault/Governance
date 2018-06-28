@@ -114,22 +114,7 @@ to setup:setup-globals
   set global:gis-population-raster-file "setup/gis/guangdong/pop2010_wgs84_georef.asc"
   
   set global:link-distance-function "distance-projection"
-  
-  ; indicators tracked in time
-  set global:tracked-indicators (list "indicators:overall-mean-accessibility" "indicators:mean-travel-distance" 
-    "indicators:morphology:moran-actives" "indicators:morphology:entropy-actives" "indicators:morphology:slope-actives" "indicators:morphology:slope-rsquared-actives" "indicators:morphology:mean-distance-actives" ; morphology actives
-    "indicators:morphology:moran-employments" "indicators:morphology:entropy-employments" "indicators:morphology:slope-employments" "indicators:morphology:slope-rsquared-employments" "indicators:morphology:mean-distance-employments" ; morphology employments
-    "indicators:mean-distance-to-centre-actives" "indicators:mean-distance-to-centre-employments" "indicators:center-actives-prop" "indicators:center-employments-prop"
-    "indicators:max-accessibility" "indicators:min-accessibility" "indicators:stability" "indicators:mean-flow" "indicators:min-flow" "indicators:max-flow"
-    "global:rel-diff-actives" "global:rel-diff-employments" ; convergence
-    "indicators:mean-congestion" ; congestion
-    "indicators:mean-accessibility-balance"
-    "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments""indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false" ; timely correlations
-    "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
-    )
-  
-  
-  
+ 
 end
 
 
@@ -213,8 +198,10 @@ end
 ;  setup governance areas
 to setup:setup-governance-areas
  
-  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
-    ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
+  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" or global:setup-type = "external"[
+    if count (mayors with [self != global:regional-authority]) > 0 [
+      ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
+    ]
   ]
   
   if global:setup-type = "gis" [
@@ -272,15 +259,18 @@ to setup:setup-population-distribution
      ]
    ]
   
+  ;; text files
    if global:setup-type = "from-file" [
       let patchvals file:read-file (word global:setup-file-prefix "grid.csv")
       foreach but-first patchvals [
         r ->
-          let vals map read-from-string string:explode ";" r 
+      let vals map read-from-string string:explode "," r 
+          ;let vals map read-from-string string:explode ";" r 
       ask patch (floor item 1 vals) (floor item 2 vals) [set patch:number (item 0 vals) set patch:actives (item 3 vals) set patch:employments (item 4 vals)]
       ]
    ]
-   
+  
+  ;; real/synthetic gis setup 
    if global:setup-type = "gis" [
       let gis-population-raster gis:load-dataset global:gis-population-raster-file
       gis:apply-raster gis-population-raster patch:actives
@@ -289,6 +279,14 @@ to setup:setup-population-distribution
         if not (patch:actives < 0 or patch:actives > 0)[set patch:actives 0]
       ]
    ]
+  
+  ;; direct raster setting
+  if global:setup-type = "external" [
+    let i 0 let j 0 let k 0
+    foreach global:setup:actives [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:actives a set patch:number k]  set j j + 1 set k k + 1] set i i + 1]
+  ]
+  
+  
    
 end
 
@@ -322,6 +320,10 @@ to setup:setup-employment-distribution
          repeat 1000 [ask one-of eco-area-patches [set patch:employments patch:employments + current-employment / 1000]]
        ] 
     ]
+  ]
+  
+  if global:setup-type = "external" [
+    let i 0 let j 0 foreach global:setup:employments [arow -> set j 0 foreach arow [a -> ask patch i j [set patch:employments a]  set j j + 1] set i i + 1]  
   ]
   
 end
@@ -519,10 +521,7 @@ to setup:setup-cached-distances
   let p1 0 let p2 0
   repeat global:#-patches [
      let x1 (floor (p1 / world-width)) + min-pxcor let y1 (p1 - world-width * floor (p1 / world-width)) + min-pycor
-     
-     ; profite of this loop to set correspondance number <-> coordinates ? NO has to be done before !
-     ;ask (patch x1 y1) [set number p1] 
-     
+
      set p2 0
      repeat global:#-patches [
         let x2 (floor (p2 / world-width)) + min-pxcor let y2 (p2 - world-width * floor (p2 / world-width)) + min-pycor
@@ -546,7 +545,7 @@ end
 to setup:setup-nw-matrices
   tic output-print "...NW shortest distances"
   set global:#-patches count patches
-  ifelse count transportation-nodes = 0 [
+  if count transportation-nodes = 0 [
     ; initialize nw distance at -1 if no nw
     set global:network-distance-matrix matrix:make-constant global:#-patches global:#-patches -1
     ; for paths, put in table only if in nw
@@ -554,12 +553,7 @@ to setup:setup-nw-matrices
     
     ; nw intersections
     set global:closest-nw-inters table:make
-    set global:nw-inters []
-    
-    
-    
-  ][
-    
+    set global:nw-inters [] 
   ]
   
   let nw-patches-bool matrix:map [?1 -> bool-to-int (?1 > 0)] global:network-distance-matrix
@@ -621,12 +615,18 @@ to setup:setup-mayor-characteristics
   ]
   
   if global:setup-type = "from-file" [
+    ifelse file-exists? (word global:setup-file-prefix "mayors.csv")[
     let lines file:read-file (word global:setup-file-prefix "mayors.csv")
     foreach but-first lines [? -> let vals map read-from-string string:explode ";" ? set global:mayors-coordinates lput (list item 1 vals item 2 vals) global:mayors-coordinates]
     ;show global:mayors-coordinates
     set global:mayors-populations list:rep 0 length global:mayors-coordinates
     set global:mayors-employments list:rep 0 length global:mayors-coordinates
     set global:mayors-names list:rep "" length global:mayors-coordinates
+      
+    ][
+      set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories
+      
+    ]
   ]
   
   
@@ -657,11 +657,15 @@ to setup:setup-mayor-characteristics
     
   ]
   
-  if global:setup-type = "random" [set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories]
+  ifelse global:setup-type = "random" or global:setup-type = "external" [
+    set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories
+  ][
+    ; corresponding number pf territories
+    if global:setup-type != "random" and not (global:setup-type = "from-file" and not file-exists? (word global:setup-file-prefix "mayors.csv")) [set global:#-initial-territories length global:mayors-coordinates]
+  ]
   
   
-  ; corresponding number pf territories
-  if global:setup-type != "random" [set global:#-initial-territories length global:mayors-coordinates]
+  
   
 end
 
@@ -670,12 +674,17 @@ end
 ;  tracked indicators already assumed setup
 to setup:setup-indicators
   
+  set global:tracked-indicators indicators:get-tracked-indicators
+  
   set global:history-indicators table:make
   
   foreach global:tracked-indicators [
     ? -> 
     table:put global:history-indicators ? []
   ]
+  
+  ; update indicators to have the initial state in the history
+  indicators:update-indicators
   
 end
 

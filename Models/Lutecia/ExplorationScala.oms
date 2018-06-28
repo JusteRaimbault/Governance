@@ -1,0 +1,134 @@
+
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
+
+// Parameters
+val lambdaAcc = Val[Double]
+val networkSpeed = Val[Double]
+val gammaCDA=Val[Double]
+val gammaCDE=Val[Double]
+val betaDC=Val[Double]
+val relocationRate=Val[Double]
+val finalTime = Val[Double]
+
+val actives = Val[RasterLayer]
+val employments = Val[RasterLayer]
+
+
+val id = Val[Int]
+val replication = Val[Int]
+
+
+// Indicators
+val activesTrajectories = Val[Array[RasterLayer]]
+val employmentsTrajectories = Val[Array[RasterLayer]]
+
+
+val model = ScalaTask("""
+    |import lutecia._
+    |import lutecia.setup._
+    |import lutecia.network._
+    |import lutecia.indicators._
+    |
+    |val model = new Lutecia with SyntheticSetup 
+    |   //with ExponentialMixtureGrid
+    |   with ExternalGrid
+    |   with GridNetwork {
+    |  
+    |  override def worldSize = 20
+    |  override def finalTime: Int = input.finalTime.toInt
+    |  override def lambda: Double = input.lambdaAcc
+    |  override def beta: Double = input.betaDC
+    |  override def alpha: Double = input.relocationRate
+    |  override def gammaA: Double = input.gammaCDA
+    |  override def gammaE: Double = input.gammaCDE
+    |  override def euclidianPace: Double = input.networkSpeed
+    |  
+    |  override def actives = input.actives
+    |  override def employments= input.employments
+    |}
+    |
+    |val result = RunModel.run(model)
+    |val activesTrajectories = Result.getActivesTrajectories(result)
+    |val employmentsTrajectories = Result.getEmploymentsTrajectories(result)
+    |//val activesTrajectories = Result.getTrajectories(result,_.actives).toArray
+    |//val employmentsTrajectories = Result.getTrajectories(result,_.employments).toArray
+    |""".stripMargin
+) set (
+   plugins += pluginsOf(lutecia.Lutecia),
+   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,replication,id),
+   inputs += (actives,employments),
+   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,replication,id),
+   outputs += (activesTrajectories,employmentsTrajectories)
+)
+
+
+val purpose = "TEST"
+//val purpose = "DIRECT_SAMPLING"
+
+// output
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
+  arraysOnSingleRow := true
+)
+
+
+
+val env = LocalEnvironment(4)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+
+val replications =
+ Replication (
+   //evaluation = (model on env by 10 hook indics_hook),
+   evaluation = (model on env hook indics_hook),
+   seed = replication,
+   //replications = 200
+    replications = 4
+)
+
+//relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,scenario,replication,id
+val exploration =
+  DirectSampling(
+    evaluation = replications,
+    sampling =
+    /*(((lambdaAcc in (0.002 to 0.01 by 0.002)) x
+    (networkSpeed in (2.0 to 6.0 by 2.0)) x
+    (gammaCDA in (0.1 to 1.0 by 0.1))x
+    (gammaCDE in (0.1 to 1.0 by 0.1))x
+    (betaDC in (0.5 to 2.0 by 0.5))x
+    (relocationRate in (0.1 to 1.0 by 0.1))x
+    (scenario in (0 to 5 by 1))
+  ) withIndex id )*/
+   (
+     (LHS (
+      //500
+      1
+      //,lambdaAcc in Range(0.001,0.01)
+      //,networkSpeed in Range(2.5,10.0)
+      ,gammaCDA in Range(0.5,1.0)
+      ,gammaCDE in Range(0.5,1.0)
+      ,betaDC in Range(0.5,2.0)
+      ,relocationRate in Range(0.0,1.0)
+      ) withIndex id) x (lambdaAcc is 0.005) x (networkSpeed is 5.0) x (finalTime is 20.0) x 
+    ExponentialMixtureSpatialSampling(
+        gridSize = Left(20),
+        centersNumber = 3,
+        maxValue = Left(500.0),
+        kernelRadius = Right(Seq(1.0,0.8)),
+        samples = 10,
+        prototypes = Seq(actives,employments)
+    )
+    )
+  )
+
+
+exploration
+
+
+
+
+
+

@@ -1,0 +1,128 @@
+
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
+
+// Parameters
+val lambdaAcc = Val[Double]
+val networkSpeed = Val[Double]
+val gammaCDA=Val[Double]
+val gammaCDE=Val[Double]
+val betaDC=Val[Double]
+val relocationRate=Val[Double]
+
+val finalTime = Val[Double]
+val worldSize = Val[Double]
+val numberTerritories = Val[Double]
+
+val id = Val[Int]
+val replication = Val[Int]
+
+
+// spatial configurations
+val actives = Val[RasterLayer]
+val employments = Val[RasterLayer]
+
+val activesTrajectoriesNL5 = Val[Array[RasterLayer]]
+val activesTrajectoriesNL6 = Val[Array[RasterLayer]]
+val activesTrajectoriesScala = Val[Array[RasterLayer]]
+
+val employmentsTrajectoriesNL5 = Val[Array[RasterLayer]]
+val employmentsTrajectoriesNL6 = Val[Array[RasterLayer]]
+val employmentsTrajectoriesScala = Val[Array[RasterLayer]]
+
+
+// fixed parameters
+val tf = 2
+val ws = 15
+val territs = 5
+
+val cmds = List(
+  "experiments-luti:setup-experiment-luti ${relocationRate} ${gammaCDA} ${gammaCDE} ${betaDC} ${lambdaAcc} ${networkSpeed} -1 ${finalTime} ${worldSize} \"external\" ${replication}",
+  "experiments-luti:run-experiment-luti"
+)
+
+
+val model5task = NetLogo5Task(workDirectory / "netlogo5/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+  inputs += actives mapped "global:setup:actives",
+  inputs += employments mapped "global:setup:employments",
+  outputs += activesTrajectoriesNL5 mapped "indicators:actives-raster-alltimes",
+  outputs += employmentsTrajectoriesNL5 mapped "indicators:employments-raster-alltimes"
+)
+val model5 = Capsule(model5task,strain = true)
+
+val model6task = NetLogo6Task(workDirectory / "netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += actives mapped "global:setup:actives",
+  inputs += employments mapped "global:setup:employments",
+  outputs += activesTrajectoriesNL6 mapped "indicators:actives-raster-alltimes",
+  outputs += employmentsTrajectoriesNL6 mapped "indicators:employments-raster-alltimes"
+)
+val model6 = Capsule(model6task,strain = true)
+
+
+val nl5conf = Val[File]
+val nl6conf = Val[File]
+
+val export = ScalaTask("""
+    |import java.io.FileWriter
+    |val nl5conf = newFile()
+    |val nl6conf = newFile()
+    |val writer5: FileWriter = new FileWriter(nl5conf)
+    |val writer6: FileWriter = new FileWriter(nl6conf)
+    |var k = 0;println(activesTrajectoriesNL5(0)(0).length)
+    |for(i <- 0 until activesTrajectoriesNL5(0).length ; j <- 0 until activesTrajectoriesNL5(0)(0).length ) {
+    |   writer5.write(k+","+i+","+j+","+activesTrajectoriesNL5(0)(i)(j)+","+employmentsTrajectoriesNL5(0)(i)(j)+"\n")
+    |   k+=1
+    |}
+    |k = 0
+    |for(i <- 0 until activesTrajectoriesNL6(0).length ; j <- 0 until activesTrajectoriesNL6(0)(0).length ) {
+    |   writer6.write(k+","+i+","+j+","+activesTrajectoriesNL6(0)(i)(j)+","+employmentsTrajectoriesNL6(0)(i)(j)+"\n")
+    |   k+=1
+    |}
+    |writer5.close()
+    |writer6.close()
+    |
+""".stripMargin) set (
+    inputs += (activesTrajectoriesNL5,activesTrajectoriesNL6,employmentsTrajectoriesNL5,employmentsTrajectoriesNL6,id,replication),
+    outputs += (nl5conf,nl6conf,id,replication)
+)
+
+val copyHook5 = CopyFileHook(nl5conf,workDirectory / "conf" / "nl5conf_${id}_${replication}_grid.csv")
+val copyHook6 = CopyFileHook(nl5conf,workDirectory / "conf" / "nl6conf_${id}_${replication}_grid.csv")
+
+val task = MoleTask(model5 -- model6 -- export)
+
+val exploration =
+  DirectSampling(
+    //evaluation = (task on grid by 50 hook indics_hook) ,
+    evaluation = (task hook copyHook5 hook copyHook6) ,
+    sampling =
+   ((LHS (
+      1
+      ,lambdaAcc in Range(0.001,0.01)
+      ,networkSpeed in Range(2.5,10.0)
+      ,gammaCDA in Range(0.5,1.0)
+      ,gammaCDE in Range(0.5,1.0)
+      ,betaDC in Range(0.5,2.0)
+      ,relocationRate in Range(0.0,0.2)
+    ) withIndex id) x
+    (finalTime is tf) x 
+    (worldSize is ws) x
+    (numberTerritories is territs) x
+    (ExponentialMixtureSpatialSampling(
+        gridSize = Left(ws),
+        centersNumber = territs,
+        maxValue = Left(500.0),
+        kernelRadius = Right(Seq(1.0,0.8)),
+        samples = 1,
+        prototypes = Seq(actives,employments)
+    ) withIndex replication ) 
+   )
+  )
+
+
+exploration
+

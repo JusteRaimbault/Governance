@@ -391,6 +391,10 @@ globals[
 
   global:setup-from-world-file? ; only in experiments
 
+
+  global:setup:actives
+  global:setup:employments
+
 ]
 
 
@@ -571,8 +575,8 @@ GRAPHICS-WINDOW
 18
 1012
 479
-7
-7
+-1
+-1
 28.666666666666668
 1
 10
@@ -583,10 +587,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+14
+0
+14
 0
 0
 1
@@ -602,7 +606,7 @@ global:#-initial-territories
 global:#-initial-territories
 0
 10
-6
+0
 1
 1
 NIL
@@ -1086,14 +1090,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-206
-72
-332
-117
+207
+73
+327
+118
 global:setup-type
 global:setup-type
-"random" "from-file" "gis-synthetic" "gis"
-0
+"random" "from-file" "from-file-mayors" "gis-synthetic" "gis"
+1
 
 BUTTON
 454
@@ -1399,10 +1403,10 @@ CHOOSER
 73
 521
 118
-global:initial-nw-random-type
-global:initial-nw-random-type
-"tree-skeleton" "slime-mould" "full"
-1
+global:initial-nw-type
+global:initial-nw-type
+"tree-skeleton" "slime-mould" "full" "no-network"
+3
 
 MONITOR
 1516
@@ -1555,6 +1559,17 @@ NIL
 NIL
 NIL
 1
+
+INPUTBOX
+1506
+26
+1811
+186
+global:setup-file-prefix
+../netlogo6/setup/conf/nl5conf_0_0_
+1
+0
+String
 
 @#$#@#$#@
 ## Context

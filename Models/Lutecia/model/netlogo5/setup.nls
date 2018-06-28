@@ -125,6 +125,9 @@ to setup:setup-globals
     "indicators:mean-accessibility-balance"
     "indicators-stylized:cor-access-dev" "indicators-stylized:cor-access-employments""indicators-stylized:cor-access-time true" "indicators-stylized:cor-access-time false" ; timely correlations
     "indicators:patches-accessibilities" "indicators:patches-delta-actives" "indicators:patches-employments" "indicators:patches-unweighted-access-time" "indicators:patches-weighted-access-time" ; patch vars for overall correlations
+    "indicators:actives-raster" "indicators:employments-raster" "indicators:accessibilities-raster"
+    "indicators:distance-matrix true" "indicators:distance-matrix false"
+    "indicators:a-utilities-raster" "indicators:e-utilities-raster"
     )
   
   
@@ -139,7 +142,8 @@ to setup:setup-world
   if global:seed != 0 [random-seed global:seed]
   
   ; resize world if needed
-  resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
+  ;resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
+  resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
   set-patch-size 430 / global:world-size
   
 end
@@ -211,8 +215,10 @@ end
 ;  setup governance areas
 to setup:setup-governance-areas
  
-  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
-    ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
+  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" or global:setup-type = "external" [
+     if count (mayors with [self != global:regional-authority]) > 0 [
+       ask patches [set patch:governing-mayor one-of ((mayors with [self != global:regional-authority]) with-min [distance myself]) set pcolor [color] of patch:governing-mayor]
+     ]
   ]
   
   if global:setup-type = "gis" [
@@ -259,13 +265,25 @@ end
 ; population distribution
 to setup:setup-population-distribution
    
-   if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+   if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
      let centers [patch-here] of mayors with [self != global:regional-authority]
      foreach centers [
        let current-mayor one-of [mayors-here] of ? let current-pop 0
        ifelse [mayor:population] of current-mayor = 0 [set current-pop global:actives-max][set current-pop [mayor:population] of current-mayor]
        apply-monocentric-kernel "poisson" global:actives-spatial-dispersion current-pop "patch:actives" ?
      ]
+   ]
+   
+   
+   ;; text files
+   if global:setup-type = "from-file" [
+      let patchvals file:read-file (word global:setup-file-prefix "grid.csv")
+      foreach but-first patchvals [
+        let r ?
+          ;let vals map read-from-string string:explode ";" r 
+      let vals map read-from-string string:explode "," r 
+      ask patch (floor item 1 vals) (floor item 2 vals) [set patch:number (item 0 vals) set patch:actives (item 3 vals) set patch:employments (item 4 vals)]
+      ]
    ]
    
    if global:setup-type = "gis" [
@@ -277,13 +295,23 @@ to setup:setup-population-distribution
       ]
    ]
    
+   ;; direct raster setting
+  if global:setup-type = "external" [
+    let i 0 let j 0 let k 0
+    foreach global:setup:actives [let arow ? set j 0 foreach arow [let a ? ask patch i j [set patch:actives a set patch:number k]  set j j + 1 set k k + 1] set i i + 1]
+  ]
+   
+  
+   
+   
+   
 end
 
 ;;
 ; employments distribution
 to setup:setup-employment-distribution
   
-  if global:setup-type = "random" or global:setup-type = "from-file" or global:setup-type = "gis-synthetic" [
+  if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
     let centers [patch-here] of mayors with [self != global:regional-authority]
     foreach centers [
       let current-mayor one-of [mayors-here] of ? let current-emp 0
@@ -305,6 +333,10 @@ to setup:setup-employment-distribution
          repeat 1000 [ask one-of eco-area-patches [set patch:employments patch:employments + current-employment / 1000]]
        ] 
     ]
+  ]
+  
+  if global:setup-type = "external" [
+    let i 0 let j 0 foreach global:setup:employments [let arow ? set j 0 foreach arow [let a ? ask patch i j [set patch:employments a]  set j j + 1] set i i + 1]  
   ]
   
 end
@@ -371,7 +403,7 @@ end
 ;  Done AFTER nw distance caching ; updates
 to setup:setup-initial-network
   
-  if global:initial-nw? != false [
+  if global:initial-nw? != false and global:initial-nw-type != "no-network" [
   
     if global:setup-type = "random" [
       ;;
@@ -381,7 +413,7 @@ to setup:setup-initial-network
     
       ; strategy : setup a ghost network ; construct infras then
     
-      if global:initial-nw-random-type = "tree-skeleton" [
+      if global:initial-nw-type = "tree-skeleton" [
          ask mayors with [self != global:regional-authority] [
            hatch-ghost-transportation-nodes 1 ;[show self]
          ]
@@ -406,11 +438,11 @@ to setup:setup-initial-network
       ]
       
       
-      if global:initial-nw-random-type = "slime-mould" [
+      if global:initial-nw-type = "slime-mould" [
           network-biological:grow-network
       ]
       
-      if global:initial-nw-random-type = "full" [
+      if global:initial-nw-type = "full" [
          ask mayors with [self != global:regional-authority] [hatch-ghost-transportation-nodes 1]
          ask ghost-transportation-nodes [ask ((other ghost-transportation-nodes) with [not link-neighbor? myself]) [create-ghost-transportation-link-with myself]]
       ]
@@ -565,7 +597,7 @@ to setup:setup-mayor-characteristics
   set global:mayors-coordinates [] set global:mayors-populations [] set global:mayors-employments [] set global:mayors-names []
   set global:ext-position []
   
-  if global:setup-type = "from-file"[
+  if global:setup-type = "from-file-mayors"[
     let lines file:read-file global:positions-file
   
     foreach but-first but-first lines [
@@ -579,6 +611,23 @@ to setup:setup-mayor-characteristics
        set global:ext-position lput read-from-string ? global:ext-position
     ]
   ]
+  
+  
+  
+  if global:setup-type = "from-file" [
+     ifelse file-exists? (word global:setup-file-prefix "mayors.csv")[
+    let lines file:read-file (word global:setup-file-prefix "mayors.csv")
+    foreach but-first lines [let vals map read-from-string string:explode ";" ? set global:mayors-coordinates lput (list item 1 vals item 2 vals) global:mayors-coordinates]
+    ;show global:mayors-coordinates
+    set global:mayors-populations list:rep 0 length global:mayors-coordinates
+    set global:mayors-employments list:rep 0 length global:mayors-coordinates
+    set global:mayors-names list:rep "" length global:mayors-coordinates
+     ][
+      set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories
+    ]
+  ]
+  
+  
   
   
   if global:setup-type = "gis" or global:setup-type = "gis-synthetic" [
@@ -607,11 +656,12 @@ to setup:setup-mayor-characteristics
     
   ]
   
-  if global:setup-type = "random" [set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories]
-  
-  
+  ifelse global:setup-type = "random" or global:setup-type = "external" [
+    set global:mayors-populations list:rep 0 global:#-initial-territories set global:mayors-employments list:rep 0 global:#-initial-territories set global:mayors-names list:rep "" global:#-initial-territories
+  ][
   ; corresponding number pf territories
-  if global:setup-type != "random" [set global:#-initial-territories length global:mayors-coordinates]
+    set global:#-initial-territories length global:mayors-coordinates
+  ]
   
 end
 
@@ -625,6 +675,9 @@ to setup:setup-indicators
   foreach global:tracked-indicators [
     table:put global:history-indicators ? []
   ]
+  
+   ; update indicators to have the initial state in the history
+  indicators:update-indicators
   
 end
 

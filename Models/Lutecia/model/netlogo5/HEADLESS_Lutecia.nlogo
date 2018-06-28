@@ -158,6 +158,11 @@ globals[
   global:rel-diff-actives
   global:rel-diff-employments
 
+  global:setup:actives
+  global:setup:employments
+
+
+
   ; utility : cobb-douglas parameter
   ;gamma-cobb-douglas
 
@@ -377,6 +382,10 @@ globals[
   global:network-biological-gamma
   global:bio-ticks
 
+  global:initial-nw-type
+
+  global:setup-file-prefix
+
 ]
 
 
@@ -540,8 +549,8 @@ GRAPHICS-WINDOW
 27
 1273
 488
-7
-7
+-1
+-1
 28.666666666666668
 1
 10
@@ -552,10 +561,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--7
-7
--7
-7
+0
+14
+0
+14
 0
 0
 1
@@ -638,6 +647,23 @@ BUTTON
 272
 all scenarios
 experiments-luti:all-scenarios
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+266
+295
+509
+328
+experiments-luti:test-external
+clear-all\nexperiments-luti:test-external\n
 NIL
 1
 T

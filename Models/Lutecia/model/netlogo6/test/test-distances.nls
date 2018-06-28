@@ -1,7 +1,24 @@
 
+
+
+to test-distances:export-dist-map
+  let i 0 let j 0 let res [] repeat count patches [set j 0 repeat count patches [set res lput (list i j matrix:get global:effective-distance-matrix i j) res set j j + 1]set i i + 1]
+  show sublist res 0 5
+  file:lists-csv-export res ["i" "j" "d"] ";" "res/dmap_nl6.csv"
+end
+
+
+to-report test-distances:unique-effective-distances
+  let dmat list:concatenate indicators:distance-matrix false
+  report sort remove-duplicates dmat
+end
+
+
 ;;;;;;;;;;;;;;;;
 ;; Test dynamic programming shortest distance computation
 ;;;;;;;;;;;;;;;;
+
+
 
 
 ;; test effective distance
