@@ -27,7 +27,7 @@ val employments = Val[RasterLayer]
 
 
 // fixed parameters
-val tf = 3
+val tf = 2
 val ws = 15
 val territs = 5
 
@@ -88,6 +88,10 @@ val stepdiffautility6s = Val[Array[Double]]
 val stepdiffeutility6s = Val[Array[Double]]
 
 
+val timenl5 = Val[Long]
+val timenl6 = Val[Long]
+val timescala = Val[Long]
+
 // NetLogo models
 
 // experiments-luti:setup-experiment-luti [relocationRate gammaA gammaE betaDC lambdaacc nwspeed scenario finalTime worldSize rnd-seed]
@@ -101,6 +105,8 @@ val model5task = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.n
   inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   inputs += actives mapped "global:setup:actives",
   inputs += employments mapped "global:setup:employments",
+  outputs += (actives,employments),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   outputs += activesTrajectoriesNL5 mapped "indicators:actives-raster-alltimes",
   outputs += employmentsTrajectoriesNL5 mapped "indicators:employments-raster-alltimes",
   outputs += distMatNL5 mapped "indicators:distance-matrix-alltimes true",
@@ -108,11 +114,19 @@ val model5task = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.n
   outputs += aUtilitiesNL5 mapped "indicators:a-utilities-raster-alltimes",
   outputs += eUtilitiesNL5 mapped "indicators:e-utilities-raster-alltimes"
 )
-val model5 = Capsule(model5task,strain = true)
+//val model5 = Capsule(TimingTask(model5task,timenl5),strain = true)
+val model5 = TimingTask(model5task,timenl5)
 
 val model6task = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
   inputs += actives mapped "global:setup:actives",
   inputs += employments mapped "global:setup:employments",
+  inputs += timenl5,
+  inputs += (actives,employments),
+  outputs += (actives,employments),
+  outputs += timenl5,
+  inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+  outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+  outputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
   outputs += activesTrajectoriesNL6 mapped "indicators:actives-raster-alltimes",
   outputs += employmentsTrajectoriesNL6 mapped "indicators:employments-raster-alltimes",
   outputs += distMatNL6 mapped "indicators:distance-matrix-alltimes true",
@@ -120,7 +134,8 @@ val model6task = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.n
   outputs += aUtilitiesNL6 mapped "indicators:a-utilities-raster-alltimes",
   outputs += eUtilitiesNL6 mapped "indicators:e-utilities-raster-alltimes"
 )
-val model6 = Capsule(model6task,strain = true)
+//val model6 = Capsule(TimingTask(model6task,timenl6),strain = true)
+val model6 = TimingTask(model6task,timenl6)
 
 
 
@@ -162,15 +177,17 @@ val modelscalatask = ScalaTask("""
 ) set (
    plugins += pluginsOf(lutecia.Lutecia),
    inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-   //inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
-   //inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+   inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
+   inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+   inputs += (timenl5,timenl6),
    inputs += (actives,employments),
-   //outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
-   //outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
-   //outputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
+   outputs += (timenl5,timenl6),
+   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
+   outputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
+   outputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
    outputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala,accessibilitiesScala,aUtilitiesScala,eUtilitiesScala)
 )
-val modelscala = Capsule(modelscalatask, strain=true)
+val modelscala = TimingTask(modelscalatask,timescala)
 
 val comparisontask = ScalaTask("""
   |def stepdiff(a1: Array[Array[Array[Double]]],a2: Array[Array[Array[Double]]]) : Array[Double] = a1.zip(a2).map{
@@ -234,6 +251,8 @@ val comparisontask = ScalaTask("""
   inputs += (activesTrajectoriesNL6,employmentsTrajectoriesNL6,distMatNL6,accessibilitiesNL6,aUtilitiesNL6,eUtilitiesNL6),
   inputs += (activesTrajectoriesNL5,employmentsTrajectoriesNL5,distMatNL5,accessibilitiesNL5,aUtilitiesNL5,eUtilitiesNL5),
   inputs += (activesTrajectoriesScala,employmentsTrajectoriesScala,distMatScala,accessibilitiesScala,aUtilitiesScala,eUtilitiesScala),
+  inputs += (timenl5,timenl6,timescala),
+  outputs += (timenl5,timenl6,timescala),
   outputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   outputs += (avgstepdiffactives56,avgstepdiffemployments56,avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56),
   outputs += (stepdiffactives56,stepdiffemployments56,stepdiffaccess56,stepdiffautility56,stepdiffeutility56),
@@ -242,9 +261,9 @@ val comparisontask = ScalaTask("""
   outputs += (avgstepdiffdist56,stepdiffdist56,avgstepdiffdist6s,stepdiffdist6s)
 )
 // note : must add explicitely outputs, straining seems not compatible with the MoleTask ?
-val comparison = Capsule(comparisontask,strain=true)
+//val comparison = Capsule(comparisontask,strain=true)
 
-val task = MoleTask(model5 -- model6 -- modelscala -- comparison)
+val task = MoleTask(model5 -- model6 -- modelscala -- comparisontask)
 
 //val parameters = Seq(relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id)
 //val indicators = Seq(avgstepdiffactives56,avgstepdiffemployments56,avgstepdiffdist56,avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56)
@@ -261,10 +280,11 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
   stepdiffaccess56,stepdiffautility56,stepdiffeutility56,
   avgstepdiffactives6s,avgstepdiffemployments6s,avgstepdiffaccess6s,avgstepdiffautility6s,avgstepdiffeutilty6s,
   stepdiffactives6s,stepdiffemployments6s,stepdiffaccess6s,stepdiffautility6s,stepdiffeutility6s,
-  avgstepdiffdist56,stepdiffdist56,avgstepdiffdist6s,stepdiffdist6s
+  avgstepdiffdist56,stepdiffdist56,avgstepdiffdist6s,stepdiffdist6s,
+  timenl5,timenl6,timescala
 ) set (arraysOnSingleRow := true)
 
-val env = LocalEnvironment(4)
+val local = LocalEnvironment(10)
 //val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
@@ -273,7 +293,7 @@ val env = LocalEnvironment(4)
 val exploration =
   DirectSampling(
     //evaluation = (task on grid by 50 hook indics_hook) ,
-    evaluation = (task hook indics_hook) ,
+    evaluation = (task on local hook indics_hook) ,
     sampling =
    ((LHS (
       1
@@ -292,7 +312,7 @@ val exploration =
         centersNumber = territs,
         maxValue = Left(500.0),
         kernelRadius = Right(Seq(1.0,0.8)),
-        samples = 1,
+        samples = 10,
         prototypes = Seq(actives,employments)
     ) withIndex replication ) 
    )
