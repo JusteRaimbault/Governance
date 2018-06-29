@@ -16,8 +16,7 @@ trait Lutecia {
     */
   val rng = new Random
 
-  val lutecia: Lutecia = this
-
+  //val lutecia: Lutecia = new Lutecia(this) with Transportation
   /**
     * Meta-parameters
     */
@@ -92,8 +91,17 @@ trait Lutecia {
     * @param world
     * @return
     */
-  def nextState(world: World): World = {
-    timeStep(Governance.evolveNetwork(Luti.evolveLandUse(Transportation.assignTransportation(world),lutecia)))
+  def nextState(lutecia: Lutecia, world: World): World = {
+    val trworld = lutecia match {
+      case l: Lutecia with Transportation => Transportation.assignTransportation(l,world)
+      case _ => world
+    }
+    val luworld = Luti.evolveLandUse(lutecia,trworld)
+    val govworld = lutecia match {
+      case l: Lutecia with Governance =>  Governance.evolveNetwork(luworld)
+      case _ => luworld
+    }
+    timeStep(govworld)
   }
 
   /**
@@ -141,7 +149,7 @@ object RunModel {
     Indicators.printStateIndicators(states(0))
     for(t <- 0 to model.finalTime - 1){
       //println(t)
-      states.append(model.nextState(states.last))
+      states.append(model.nextState(model,states.last))
       Indicators.printStatesIndicators(states)
     }
 

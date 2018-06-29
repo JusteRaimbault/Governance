@@ -3,6 +3,7 @@ import lutecia.{Lutecia, RunModel, utils}
 import lutecia.indicators.Result
 import lutecia.network.{Network, SlimeMould}
 import lutecia.setup._
+import lutecia.transportation.{EmptyTransportation, ShortestPathTransportation}
 
 
 
@@ -14,7 +15,9 @@ object RunTest extends App {
   val model = new Lutecia with SyntheticSetup
     with ExponentialMixtureGrid
     //with ExternalGrid
-    with GridNetwork {
+    with GridNetwork
+    with ShortestPathTransportation
+  {
         override def worldSize = 15
         override def finalTime: Int = 10
         override def numberTerritories: Int = 3
@@ -35,9 +38,9 @@ object RunTest extends App {
 
   //Test.testNetwork()
   //Test.testGridNetwork(model)
-  Test.testNetworkExport(model)
+  //Test.testNetworkExport(model)
   //Test.testSlimeMould()
-  //Test.testRun(model)
+  Test.testRun(model)
   //Test.testNetworkDistances()
 
   println("Ellapsed Time : "+(System.currentTimeMillis()-t)/1000.0)

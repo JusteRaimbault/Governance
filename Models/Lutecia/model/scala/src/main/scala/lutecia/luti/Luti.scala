@@ -14,7 +14,7 @@ object Luti {
     * @param world
     * @return
     */
-  def evolveLandUse(world: World,lutecia: Lutecia): World = {
+  def evolveLandUse(lutecia: Lutecia,world: World): World = {
     /**
       * - compute accessibilities
       * - compute form factors

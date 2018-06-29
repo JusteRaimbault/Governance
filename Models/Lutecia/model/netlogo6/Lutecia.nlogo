@@ -610,7 +610,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-0.0
+2.0
 1
 1
 NIL
@@ -987,7 +987,7 @@ global:total-time-steps
 global:total-time-steps
 0
 1000
-0.0
+14.0
 1
 1
 NIL
@@ -1101,7 +1101,7 @@ CHOOSER
 global:setup-type
 global:setup-type
 "random" "gis-synthetic" "gis" "from-file-mayors" "from-file" "external"
-4
+0
 
 BUTTON
 454

@@ -40,7 +40,21 @@ object Grid {
 
 
   /**
-    *
+    * Get vector of cell values, given a projection, ordered by cell number
+    * @param grid
+    * @param getvar
+    * @return
+    */
+    def getValues(grid: Grid,getvar: Cell=>Double = _.actives): Array[Double] = {
+      val res = Array.fill[Double](grid.cells.map{_.size}.sum)(0.0)
+      grid.cells.foreach(_.foreach{case c => res(c.number) = getvar(c)})
+      res
+    }
+
+
+
+  /**
+    * Absolute difference between two grids on a given projection
     * @param grid1
     * @param grid2
     * @param getvar
