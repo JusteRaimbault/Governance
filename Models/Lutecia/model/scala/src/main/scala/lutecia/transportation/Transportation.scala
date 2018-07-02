@@ -26,7 +26,7 @@ object Transportation {
     * @param world
     * @return
     */
-  def gravityFlows(world: World,iterationsFlows: Int = 20, lambdaFlows: Double = 0.05): Map[(Int,Int),Double] = {
+  def gravityFlows(world: World,iterationsFlows: Int = 100, lambdaFlows: Double = 0.05): Map[(Int,Int),Double] = {
     val n = world.grid.cells.flatten.size
 
     val actives = MatrixUtils.createRealVector(Grid.getValues(world.grid,_.actives))
@@ -34,25 +34,37 @@ object Transportation {
     var p = MatrixUtils.createRealVector(Array.fill(actives.getDimension())(1/actives.getDimension().toDouble))
     var q = MatrixUtils.createRealVector(Array.fill(employments.getDimension())(1/employments.getDimension().toDouble))
     val dmat: RealMatrix = MatrixUtils.createRealMatrix(world.network.distances.map{_.map{case d => math.exp(- d * lambdaFlows)}})
+    val ptilde = dmat.operate(employments) map{1 / _}
 
-    //println(employments)
-    //println(actives)
-    //println(dmat)
-    //println(q)
+    /*
+    println("Amax = "+employments.toArray().max)
+    println("Emax = "+actives.toArray().max)
+    println("dmax = "+dmat.getData().map{_.max}.max)
+    println("q0 = "+q.getEntry(0))
+    println("p0 = "+p.getEntry(0))
+    */
     //println(employments.ebeMultiply(q))
+
+    p = ptilde
 
     for(k <- 0 until iterationsFlows){
       val prevp = p.copy();val prevq = q.copy()
 
-      p = dmat.operate(employments.ebeMultiply(q)) map {1 / _}
-      q = dmat.operate(actives.ebeMultiply(p)) map {1 / _}
+      q = dmat.operate(actives.ebeMultiply(p)) map{1 / _}
+      p = dmat.operate(employments.ebeMultiply(q)) map{1 / _}
 
-      println("it. "+k)
-      println(p subtract prevp map math.abs toArray() sum)
-      println(q subtract prevq map math.abs toArray() sum)
+      val ptot = p.toArray().sum;val qtot = q.toArray().sum
+      p = p.mapDivide(ptot)
+      q = q.mapDivide(qtot)
 
-      // FIXME DOES NOT CONVERGE with lambda = 0.05
+      //println("it. "+k)
+      //println(p.copy() subtract prevp map math.abs toArray() sum)
+      //println(q.copy() subtract prevq map math.abs toArray() sum)
+      //  DOES NOT CONVERGE with lambda = 0.05 ? -> OK with renormalization of flows
     }
+
+    //println("p in "+p.toArray().min+" ; "+p.toArray().max)
+    //println("q in "+q.toArray().min+" ; "+q.toArray().max)
 
     val piai = Array.fill(n){p.ebeMultiply(actives).toArray()}
     val qjej = Array.fill(n){p.ebeMultiply(actives).toArray()}.transpose
@@ -83,9 +95,9 @@ trait Transportation {
   def assignTransportation(world: World): World
 
 
-  def iterationsFlows: Int = 50
+  def iterationsFlows: Int = 20
 
-  def lambdaFlows: Double = 1.0
+  def lambdaFlows: Double = 0.05//1.0
 
 
 
@@ -105,8 +117,9 @@ object ShortestPathTransportation {
   def shortestPathFlows(world: World, tr: ShortestPathTransportation): World = {
     // compute gravity flows
     val gravityFlows = Transportation.gravityFlows(world,tr.iterationsFlows,tr.lambdaFlows)
-    println("Max flow = "+gravityFlows.values.max)
-    println("Min flow = "+gravityFlows.values.min)
+    //println("Max flow = "+gravityFlows.values.max)
+    //println("Min flow = "+gravityFlows.values.min)
+    //println(gravityFlows.values)
 
     world
   }

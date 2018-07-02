@@ -610,7 +610,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -672,7 +672,7 @@ global:actives-spatial-dispersion
 global:actives-spatial-dispersion
 0
 10
-4.2
+1.0
 0.1
 1
 NIL
@@ -687,7 +687,7 @@ global:employments-spatial-dispersion
 global:employments-spatial-dispersion
 0
 10
-4.4
+0.8
 0.1
 1
 NIL
@@ -790,10 +790,10 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
-1045
-756
-1502
-1050
+1324
+346
+1808
+569
 10
 
 TEXTBOX
@@ -987,7 +987,7 @@ global:total-time-steps
 global:total-time-steps
 0
 1000
-14.0
+589.0
 1
 1
 NIL
@@ -1413,10 +1413,10 @@ global:initial-nw-type
 3
 
 MONITOR
-1516
-772
-1583
-817
+1455
+24
+1522
+69
 bio ticks
 global:bio-ticks
 17

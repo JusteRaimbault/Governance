@@ -33,18 +33,38 @@ to transportation:compute-flows
   verbose "... flows"
   
   ; initial weights
-  let p list:rep (1 / global:#-patches) global:#-patches let q list:rep (1 / global:#-patches) global:#-patches
+  ;let p list:rep (1 / global:#-patches) global:#-patches
+  let q list:rep (1 / global:#-patches) global:#-patches
+ 
+  
   ; reinitialize matrix
   set global:flow-matrix matrix:make-constant global:#-patches global:#-patches 0
   
+  let dmat (matrix:map [? -> exp (- ? * global:lambda-flows)] global:effective-distance-matrix)
+  
+  let p map [? -> 1 / ?] first matrix:to-column-list (matrix:times dmat (matrix:from-column-list (list global:patches-employments-list)))
+  
+  output-print (word "Amax = " max global:patches-actives-list)
+  output-print (word "Emax = " max global:patches-employments-list)
+  output-print (word "dmax = " max map max matrix:to-row-list dmat)
+  output-print (word "p0 = " item 0 p)
+  output-print (word "q0 = " item 0 q)
+  
   ; compute (equilibrium ?) weights
   ; how many iterations needed ?
-  let n-iter-furness 10
+  ;let n-iter-furness 10
+  let n-iter-furness 20
   repeat n-iter-furness [    
     let ptemp p let qtemp q
-    set p map [? -> 1 / ?] first matrix:to-column-list (matrix:times (matrix:map [? -> exp (- ? * global:lambda-flows)] global:effective-distance-matrix) (matrix:from-column-list (list list:times-element-wise qtemp global:patches-employments-list)))
-    set q map [? -> 1 / ?] first matrix:to-column-list (matrix:times (matrix:map [? -> exp (- ? * global:lambda-flows)] global:effective-distance-matrix) (matrix:from-column-list (list list:times-element-wise ptemp global:patches-actives-list)))
+    set q map [? -> 1 / ?] first matrix:to-column-list (matrix:times dmat (matrix:from-column-list (list list:times-element-wise p global:patches-actives-list)))
+    set p map [? -> 1 / ?] first matrix:to-column-list (matrix:times dmat (matrix:from-column-list (list list:times-element-wise q global:patches-employments-list)))
+    
+    let ptot sum p set p map [? -> ? / ptot] p let qtot sum q set q map [? -> ? / qtot] q
+    
   ]
+  
+  output-print (word "q in " min q " ; " max q)
+  output-print (word "p in " min p " ; " max p)
   
   ; then set flows as \phi_ij = p_i*q_j*A_i*E_j*exp( - \lambda * effective_distance(i,j) )
   ;   -> Q : here effective dist takes into account network
@@ -52,7 +72,7 @@ to transportation:compute-flows
   ; WARNING : BORD EFFECTS : proportion of population that should go 'outside the world' is indeed redistributed to nearest patches,
   ;   causing sometimes highest flows to result of bord effects. -- for that, choose centers not to close from brod of the world ?
   
-  set global:flow-matrix matrix:times-element-wise (matrix:times-element-wise (matrix:from-column-list (list:rep (list:times-element-wise p global:patches-actives-list) global:#-patches)) (matrix:from-row-list (list:rep (list:times-element-wise q global:patches-employments-list) global:#-patches))) (matrix:map [? -> exp (- ? * global:lambda-flows)] global:effective-distance-matrix)
+  set global:flow-matrix matrix:times-element-wise (matrix:times-element-wise (matrix:from-column-list (list:rep (list:times-element-wise p global:patches-actives-list) global:#-patches)) (matrix:from-row-list (list:rep (list:times-element-wise q global:patches-employments-list) global:#-patches))) dmat
    
   verbose (word "min flow = " min map min matrix:to-row-list global:flow-matrix)
   verbose (word "max flow = " max map max matrix:to-row-list global:flow-matrix)
