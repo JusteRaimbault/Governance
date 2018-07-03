@@ -3,12 +3,19 @@ package lutecia.transportation
 
 import lutecia.Lutecia
 import lutecia.core._
+import lutecia.network._
 import org.apache.commons.math3.linear._
+
+import scala.collection.mutable
+//import scala.collection.mutable._
 
 object Transportation {
 
-
+  /**
+    * Static call to the assignTransportation method
+   */
   def assignTransportation(lutecia: Lutecia with Transportation,world: World): World = lutecia.assignTransportation(world)
+
 
 
   def emptyTransportation(world: World): World = {
@@ -76,32 +83,77 @@ object Transportation {
 
 
 
-  /**
-    * Computes effective speeds and corresponding distances, from flows within links
-    * @param world
-    * @return
-    */
-  def flowsToEffectiveDistances(world: World): World = {
-
-    world
-  }
-
 
 }
 
 
 trait Transportation {
 
-  def assignTransportation(world: World): World
+  /**
+    * Transportation assignement
+    *
+    * @param world
+    * @param lutecia
+    * @return
+    */
+  def assignTransportation(world: World,lutecia: Lutecia): World
 
-
+  /**
+    * iteration for flows algorithms
+    * @return
+    */
   def iterationsFlows: Int = 20
 
+  /**
+    * characteristic distance for flows
+    * @return
+    */
   def lambdaFlows: Double = 0.05//1.0
 
 
 
+
+  /**
+    * Computes effective speeds and corresponding distances, from flows within links.
+    *
+    * use for example a BPR function
+    * Defauts ot nothing
+    * @param link
+    * @return
+    */
+  def flowToEffectiveDistance(link: Link,flow: Double): Link = link
+
+
 }
+
+
+trait BPRFlowFunction extends Transportation {
+
+  def bprEpsilon: Double = 0.15
+  def bprAlpha: Double = 4
+
+  def bprTime(t0: Double, volume: Double, capacity: Double, epsilon: Double, alpha: Double): Double = {
+    t0*(1 + epsilon*math.pow(volume/capacity,alpha))
+  }
+
+  /**
+    * BPR flow function
+    *
+    * @param link
+    * @param flow
+    * @return
+    */
+  override def flowToEffectiveDistance(link: Link, flow: Double): Link = {
+    Link(link.e1,link.e2, link.length, link.speed,
+      bprTime(link.length/link.speed,flow,link.capacity,bprEpsilon,bprAlpha),
+      link.capacity,
+      flow
+    )
+  }
+
+}
+
+
 
 
 trait EmptyTransportation extends Transportation {
@@ -112,31 +164,6 @@ trait EmptyTransportation extends Transportation {
 
 
 
-object ShortestPathTransportation {
-
-  def shortestPathFlows(world: World, tr: ShortestPathTransportation): World = {
-    // compute gravity flows
-    val gravityFlows = Transportation.gravityFlows(world,tr.iterationsFlows,tr.lambdaFlows)
-    //println("Max flow = "+gravityFlows.values.max)
-    //println("Min flow = "+gravityFlows.values.min)
-    //println(gravityFlows.values)
-
-    world
-  }
-
-  def shortestPathAssignement(world: World, tr: ShortestPathTransportation): World = {
-    shortestPathFlows(world,tr)
-  }
-
-
-}
-
-
-trait ShortestPathTransportation extends Transportation {
-
-  override def assignTransportation(world: World): World = ShortestPathTransportation.shortestPathAssignement(world,this)
-
-}
 
 
 
