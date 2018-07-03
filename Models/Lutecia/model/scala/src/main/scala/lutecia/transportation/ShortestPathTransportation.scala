@@ -18,7 +18,7 @@ object ShortestPathTransportation {
     * @param tr
     * @return
     */
-  def shortestPathAssignement(world: World, tr: ShortestPathTransportation): Network = {
+  def shortestPathAssignement(world: World, tr: Transportation): Network = {
     // compute gravity flows
     val gravityFlows: Map[(Int,Int),Double] = Transportation.gravityFlows(world,tr.iterationsFlows,tr.lambdaFlows)
     //println("Max flow = "+gravityFlows.values.max)
@@ -36,7 +36,7 @@ object ShortestPathTransportation {
     //  -> should have both for comparison ? not possible as relocation depend on accessibility !
 
     // get links with effective speeds
-    val effectivelinks = linkflows.map{case (l,phi) => Transportation.flowToEffectiveDistance(l,phi)}.toSeq
+    val effectivelinks = linkflows.map{case (l,phi) => tr.flowToEffectiveDistance(l,phi)}.toSeq
 
     // reconstruct the network with new distances computation
     val networkEffectiveDistances = Network(world.network.nodes,effectivelinks)

@@ -14,7 +14,7 @@ object Transportation {
   /**
     * Static call to the assignTransportation method
    */
-  def assignTransportation(lutecia: Lutecia with Transportation,world: World): World = lutecia.assignTransportation(world)
+  def assignTransportation(lutecia: Lutecia with Transportation,world: World): World = lutecia.assignTransportation(world,lutecia)
 
 
 
@@ -158,7 +158,7 @@ trait BPRFlowFunction extends Transportation {
 
 trait EmptyTransportation extends Transportation {
 
-  override def assignTransportation(world: World): World = Transportation.emptyTransportation(world)
+  override def assignTransportation(world: World,lutecia: Lutecia): World = Transportation.emptyTransportation(world)
 
 }
 
