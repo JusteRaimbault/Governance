@@ -124,6 +124,9 @@ trait Transportation {
   def flowToEffectiveDistance(link: Link,flow: Double): Link = link
 
 
+  def timeFlowDerivative(link: Link,flow: Double): Double = 0.0
+
+
 }
 
 
