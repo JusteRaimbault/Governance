@@ -139,6 +139,10 @@ trait BPRFlowFunction extends Transportation {
     t0*(1 + epsilon*math.pow(volume/capacity,alpha))
   }
 
+  def bprDerivative(t0: Double, volume: Double, capacity: Double, epsilon: Double, alpha: Double): Double = {
+    t0*alpha*epsilon/capacity*math.pow(volume/capacity,alpha-1)
+  }
+
   /**
     * BPR flow function
     *
@@ -153,6 +157,8 @@ trait BPRFlowFunction extends Transportation {
       flow
     )
   }
+
+  override def timeFlowDerivative(link: Link, flow: Double): Double = bprDerivative(link.length/link.speed,flow,link.capacity,bprEpsilon,bprAlpha)
 
 }
 

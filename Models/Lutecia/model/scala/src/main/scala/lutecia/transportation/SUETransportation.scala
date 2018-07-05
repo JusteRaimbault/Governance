@@ -33,16 +33,22 @@ object SUETransportation {
       * @param p
       * @return
       */
-    def computeLinkFlows(p: Map[(Int,Int),Seq[(Path,Double)]]): Map[(Int,Int),Link] = {
-      val linkflows: mutable.Map[Link,Double] = new mutable.HashMap[Link,Double]
-      world.network.links.foreach{case l => linkflows(l) = 0.0}
-      p.foreach {
-        case (_, s) =>
-          s.foreach { case (p, d) => p.pathLinks.foreach { case l => linkflows(l) = linkflows(l) + d }
+    def computeLinkFlows(p: Map[(Int,Int),Seq[(Path,Double)]],links: Map[(Int,Int),Link]): Map[(Int,Int),Link] = {
+      val linkflows: mutable.Map[(Int,Int),Double] = new mutable.HashMap[(Int,Int),Double]
+      links.values.foreach{case l => linkflows((l.e1.id,l.e2.id)) = 0.0}
+      p.values.foreach {
+        _.foreach { case (p, d) => p.pathLinks.foreach { case l => linkflows((l.e1.id,l.e2.id)) = linkflows((l.e1.id,l.e2.id)) + d }
           }
       }
 
-      linkflows.map{case (l,phi) => tr.flowToEffectiveDistance(l,phi)}.map{case l => ((l.e1.id,l.e2.id),l)}.toMap
+      //println(linkflows.size)
+
+      val totalpathflows = p.values.map{_.map{case (path,flow) => flow * path.pathLinks.size}.sum}.sum
+      println("path flows = "+totalpathflows)
+      println("link flows = "+linkflows.map{_._2}.sum)
+      assert(math.abs(linkflows.map{_._2}.sum - totalpathflows)<1e-8,"Non conservation of flows in link flows computation")
+
+      linkflows.map{case (k,phi) => tr.flowToEffectiveDistance(links(k),phi)}.map{case l => ((l.e1.id,l.e2.id),l)}.toMap
     }
 
     /**
@@ -64,10 +70,14 @@ object SUETransportation {
       */
     def reassignPathFlows(prevpaths: Map[(Int,Int),Seq[(Path,Double)]], shortestPaths: Map[(Int,Int),Path], linkFlows: Map[(Int,Int),Link], flows: Map[(Int,Int),Double]): Map[(Int,Int),Seq[(Path,Double)]] = {
 
+      //println(prevpaths.values.map{case s => s.map{case (p,d)=>d}.sum}.sum)
+
       // update path costs
       val updatedPaths = prevpaths.map{
-        case (k,seq) => (k,seq.map{case (p,d) => (p.updateCost(linkFlows),d)})
+        case (k,seq) => (k,seq.map{case (p,d) => {val updatedpath =p.updateCost(linkFlows); (updatedpath,updatedpath.cost)}})
       }
+
+      //println(updatedPaths.values.map{case s => s.map{case (p,d)=>d}.sum}.sum)
 
       val res: mutable.Map[(Int,Int),Seq[(Path,Double)]] = new mutable.HashMap[(Int,Int),Seq[(Path,Double)]]
 
@@ -75,7 +85,8 @@ object SUETransportation {
           case (k,shortest) => {
             val existing = updatedPaths(k)
             var newPaths = existing
-            if (!existing.map{case (p,d) => p.cost}.contains(shortest.cost)) {
+            //if (!existing.map{case (p,d) => p.cost}.contains(shortest.cost)) {
+            if (shortest.cost < existing.map{_._1.cost}.min) {
               val tailNewPaths = existing.map{
                 case (p,d) => {
                   // here change the flow of this new path
@@ -84,10 +95,18 @@ object SUETransportation {
                   val p2set = shortest.pathLinks.map{case l => (l.e1.id,l.e2.id)}.toSet
                   val noncommonlinks: Seq[(Int,Int)]= ((p1set &~ p2set) union (p2set &~ p1set)).toSeq
                   val cumderiv = noncommonlinks.map{case (i1,i2) => tr.timeFlowDerivative(linkFlows((i1,i2)),linkFlows((i1,i2)).flow)}.sum
-                  (p,d - (p.cost - shortest.cost) / cumderiv)
+                  if (cumderiv == 0.0) {
+                    //println("cost diff = " + (p.cost - shortest.cost))
+                    //println(p.pathLinks)
+                    //println(shortest.pathLinks)
+                    //println((p.pathLinks.size,d));
+                    //println("noncommonlinks : "+noncommonlinks.size)}
+                  }
+                  (p, if (cumderiv != 0.0) math.max(0.0,d - (p.cost - shortest.cost) / cumderiv) else d)
                 }
               }
               val totalFlows = tailNewPaths.map{_._2}.sum
+              //println("Total redirected = "+totalFlows)
               newPaths = Seq((shortest, flows(k) - totalFlows)) ++ tailNewPaths
             }
 
@@ -107,29 +126,49 @@ object SUETransportation {
     val initialshortest: Map[(Int,Int),Path] = world.network.paths.map{case ((n1,n2),p) => ((n1.id,n2.id),p)}
 
     // all paths - to simplify, shortest is always the first one in the Seq
-    var paths = new mutable.HashMap[(Int,Int),(Path,Set[(Path,Double)])]
+    val pathsmut = new mutable.HashMap[(Int,Int),Seq[(Path,Double)]]
     // initialisation
-    gravityFlows.foreach{case (k,d) => paths(k) = Seq((initialshortest(k),d))}
+    gravityFlows.foreach{case (k,d) => pathsmut(k) = Seq((initialshortest(k),d))}
 
-    var effectivelinks = computeLinkFlows(paths)
-    var shortestpaths = computeShortestPaths(effectivelinks.values.toSeq)._1
+    // loaded paths
+    var paths = pathsmut.keys.zip(pathsmut.values).toMap
+
+    // loaded links
+    var links = world.network.links.map{case l => ((l.e1.id,l.e2.id),l)}.toMap
+    //println("|Links| = "+links.size)
+    // load flows to link
+    //var effectivelinks = computeLinkFlows(paths,links)
+    var effectivelinks: Map[(Int,Int),Link] = Map.empty
+    //println("eff links"+effectivelinks.size)
+    // loaded shortest paths
+    //var (shortestpaths,network) = computeShortestPaths(effectivelinks.values.toSeq)
+    var shortestpaths: Map[(Int,Int),Path] = Map.empty
+    var network: Network = Network.empty
+    // initial shortest paths did not take into account loaded network ?
 
     for (it <- 0 until tr.sueIterations) {
       println("SUE Iteration "+it)
 
-      // reassign flows
-      paths = reassignPathFlows(paths, shortestpaths, effectivelinks, gravityFlows)
-
       // compute link flows
-      effectivelinks = computeLinkFlows(paths)
+      effectivelinks = computeLinkFlows(paths,links)
+      println("Effective links : "+effectivelinks.size)
 
       // compute new shortest paths
-      shortestpaths = computeShortestPaths(effectivelinks.values.toSeq)._1
+      val res = computeShortestPaths(effectivelinks.values.toSeq)
+      shortestpaths = res._1
+      network = res._2
+
+      links = network.links.map{case l => ((l.e1.id,l.e2.id),l)}.toMap
+
+      // reassign flows
+      paths = reassignPathFlows(paths, shortestpaths, effectivelinks, gravityFlows)
+      println("Total flow = "+paths.values.map{case s => s.map{case (p,d) => d}.sum}.sum)
+
 
       // FIXME add an endogenous convergence criteria ?
     }
 
-    shortestpaths._2
+    network
   }
 
 
