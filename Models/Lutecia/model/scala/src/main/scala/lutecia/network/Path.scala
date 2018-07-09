@@ -8,7 +8,20 @@ case class Path(
                pathNodes: Seq[Node],
                pathLinks: Seq[Link],
                cost: Double
-               )
+               ){
+
+  def updateCost(linkFlows: Map[(Int,Int),Link]): Path = {
+    val newLinks = pathLinks.map{case l => Link(l.e1,l.e2,l.length,l.speed,linkFlows((l.e1.id,l.e2.id)).cost,l.capacity,linkFlows((l.e1.id,l.e2.id)).flow)}
+    Path(
+      o,
+      d,
+      pathNodes,
+      newLinks,
+      newLinks.map{_.cost}.sum
+    )
+  }
+
+}
 
 
 object Path {

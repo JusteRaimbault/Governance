@@ -92,18 +92,19 @@ object GraphAlgorithm {
     val paths = mutable.Map[(Node,Node),Path]()
     for (i <- 0 until n) {
       //val ps = mutable.Map[Int, Seq[Int]]()
-      for (j <- 0 until n)
-        if (ds(i)(j) != inf) {
+      for (j <- 0 until n) {
+        //if (ds(i)(j) != inf) {
           //val p = new ArrayBuffer[Int]()
           val currentPath = new ArrayBuffer[Node]()
           val currentPathLinks = new ArrayBuffer[Link]()
           currentPath.append(revnodes(i))
           if (i != j) {
-            extractPath(currentPath,currentPathLinks, i, j)
+            extractPath(currentPath, currentPathLinks, i, j)
             currentPath.append(revnodes(j))
           }
-          paths((revnodes(i),revnodes(j))) = Path(revnodes(i),revnodes(j),currentPath.toList,currentPathLinks.toList)
-        }
+          paths((revnodes(i), revnodes(j))) = Path(revnodes(i), revnodes(j), currentPath.toList, currentPathLinks.toList)
+       // }
+      }
     }
 
     // Return extracted paths.

@@ -39,10 +39,12 @@ object Network {
     if(computeDist) {
       // compute shortest paths
       val network = Network(n, l, Map.empty, Map.empty, Array.empty)
-      val paths = GraphAlgorithm.allPairsShortestPath(network)
+      val paths: Map[(Node,Node),Path] = GraphAlgorithm.allPairsShortestPath(network)
       //println(paths.keySet.size)
       //println(n.size*n.size)
+      println(paths.values.map{case p => if (p.pathLinks.size > 0) 1 else 0}.sum)
       val distMap = paths.mapValues { case p => p.cost }
+      //println(distMap.size)
       //val distMat = Array.tabulate(n.size, n.size) { case (i, j) => distMap((n(i), n(j))) } // note : no issue here as the network is necessarily connected
       val distMat = Array.fill[Double](n.size,n.size){0.0}
       for(i <- 0 until n.size - 1;j <- 0 until n.size - 1){distMat(n(i).id)(n(j).id) = distMap((n(i),n(j)))}

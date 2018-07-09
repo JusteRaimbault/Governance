@@ -15,3 +15,12 @@ object Governance {
 }
 
 
+
+
+trait Governance {
+
+}
+
+
+
+
