@@ -27,7 +27,7 @@ val employments = Val[RasterLayer]
 
 
 // fixed parameters
-val tf = 2
+val tf = 20
 val ws = 15
 val territs = 5
 
@@ -118,6 +118,7 @@ val model5task = NetLogo5Task(workDirectory / "model/netlogo5/HEADLESS_Lutecia.n
 val model5 = TimingTask(model5task,timenl5)
 
 val model6task = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id),
   inputs += actives mapped "global:setup:actives",
   inputs += employments mapped "global:setup:employments",
   inputs += timenl5,
@@ -268,11 +269,11 @@ val task = MoleTask(model5 -- model6 -- modelscala -- comparisontask)
 //val parameters = Seq(relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id)
 //val indicators = Seq(avgstepdiffactives56,avgstepdiffemployments56,avgstepdiffdist56,avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56)
 
-val purpose = "IMPLEMENTATION_TEST"
-//val purpose = "IMPLEMENTATION"
+//val purpose = "IMPLEMENTATION_TEST"
+val purpose = "IMPLEMENTATION_LOCAL"
 
 // note : CSVHook does not accept seq of vals ?
-val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv",
+val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+"_ws"+ws.toInt+"_nt"+territs.toInt+".csv",
   relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id,
   avgstepdiffactives56,avgstepdiffemployments56,
   avgstepdiffaccess56,avgstepdiffautility56,avgstepdiffeutilty56,
@@ -284,7 +285,7 @@ val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new Simp
   timenl5,timenl6,timescala
 ) set (arraysOnSingleRow := true)
 
-val local = LocalEnvironment(10)
+val local = LocalEnvironment(50)
 //val grid = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
@@ -292,11 +293,11 @@ val local = LocalEnvironment(10)
 //relocationRate,gammaCDA,gammaCDE,betaDC,lambdaAcc,networkSpeed,finalTime,worldSize,numberTerritories,replication,id
 val exploration =
   DirectSampling(
-    //evaluation = (task on grid by 50 hook indics_hook) ,
+    //evaluation = (task on grid by 30 hook indics_hook) ,
     evaluation = (task on local hook indics_hook) ,
     sampling =
    ((LHS (
-      1
+      2000
       ,lambdaAcc in Range(0.001,0.01)
       ,networkSpeed in Range(2.5,10.0)
       ,gammaCDA in Range(0.5,1.0)
@@ -312,7 +313,7 @@ val exploration =
         centersNumber = territs,
         maxValue = Left(500.0),
         kernelRadius = Right(Seq(1.0,0.8)),
-        samples = 10,
+        samples = 50,
         prototypes = Seq(actives,employments)
     ) withIndex replication ) 
    )
