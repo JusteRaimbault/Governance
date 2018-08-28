@@ -732,7 +732,7 @@ global:gamma-cobb-douglas-a
 global:gamma-cobb-douglas-a
 0
 1
-0.78
+0.8
 0.01
 1
 NIL
@@ -747,7 +747,7 @@ global:beta-discrete-choices
 global:beta-discrete-choices
 0
 5
-3.05
+1.2
 0.05
 1
 NIL
@@ -825,7 +825,7 @@ global:regional-decision-proba
 global:regional-decision-proba
 0
 1
-0.05
+0.0
 0.05
 1
 NIL
@@ -925,7 +925,7 @@ global:road-length
 global:road-length
 1.0
 20
-1.0
+2.0
 1.0
 1
 NIL
@@ -940,7 +940,7 @@ global:#-explorations
 global:#-explorations
 0
 200
-0.0
+50.0
 1
 1
 NIL
@@ -955,7 +955,7 @@ global:lambda-accessibility
 global:lambda-accessibility
 0
 0.01
-0.0052
+0.001
 0.0001
 1
 NIL
@@ -1087,7 +1087,7 @@ global:collaboration-cost
 global:collaboration-cost
 0
 0.005
-0.0
+5.0E-6
 1e-6
 1
 NIL
@@ -1146,7 +1146,7 @@ global:gamma-cobb-douglas-e
 global:gamma-cobb-douglas-e
 0
 1
-0.8
+0.9
 0.05
 1
 NIL
@@ -1228,7 +1228,7 @@ SWITCH
 616
 global:evolve-network?
 global:evolve-network?
-1
+0
 1
 -1000
 
@@ -1301,7 +1301,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.14
+0.5
 0.01
 1
 NIL
@@ -1326,7 +1326,7 @@ global:total-infrastructure-stock
 global:total-infrastructure-stock
 0
 100
-0.0
+10.0
 1
 1
 NIL
