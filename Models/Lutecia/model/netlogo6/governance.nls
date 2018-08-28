@@ -174,7 +174,7 @@ to-report governance:compare-infrastructures [old-nw-config choices decidor patc
       if (new-acc - old-acc) > delta-acc [
         set best-choice ?
         set delta-acc (new-acc - old-acc)
-        set deltas [] let i 0 foreach news [set deltas lput (? - item i olds) deltas set i i + 1]
+        set deltas [] let i 0 foreach news [?? -> set deltas lput (?? - item i olds) deltas set i i + 1]
       ]
     
       ; kill the potential infra, will be reconstructed if indeed the best
@@ -236,13 +236,11 @@ to-report governance:game-result [decidors old-config]
       let patchset2 (patches with [patch:governing-mayor = dec2])
       let patchset patches
      
-      ;let best1 compare-infrastructures old-config (potential-infrastructures (list dec1) road-length patchset1) (list dec1) patchset1
-      ;let best2 compare-infrastructures old-config (potential-infrastructures (list dec2) road-length patchset2) (list dec2) patchset2
       let best1 governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec1) global:road-length patchset) (list dec1) patchset1
       let best2 governance:compare-infrastructures old-config (governance:potential-infrastructures (list dec2) global:road-length patchset) (list dec2) patchset2
       
       let best12 governance:compare-infrastructures old-config (governance:potential-infrastructures global:regional-authority (2 * global:road-length) patchset) global:regional-authority patchset
-    let sortdec sort-by [[?1 ?2] -> [who] of ?1 < [who] of ?2] (list dec1 dec2)
+      let sortdec sort-by [[?1 ?2] -> [who] of ?1 < [who] of ?2] (list dec1 dec2)
       let D11 item ((position dec1 sortdec) + 1) (item 1 best1) let D22 item ((position dec2 sortdec) + 1) (item 1 best2)
       let Dc1 item ((position dec1 sortdec) + 1) (item 1 best12) let Dc2 item ((position dec2 sortdec) + 1) (item 1 best12)
       
@@ -269,6 +267,7 @@ to-report governance:game-result [decidors old-config]
         ; discrete-choices
         ;set p1 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc1 - D11) (Dc2 - D22) beta-dc-game]) 0 1 0.01)
         ;set p2 (numanal:brent-root (task [governance:to-rootize-dc-game ? collaboration-cost (Dc2 - D22) (Dc1 - D11) beta-dc-game]) 0 1 0.01)
+        ;show (Dc1 - D11) show (Dc2 - D22)
         set p1 (numanal:get-brent-root (word "dc-fun " (Dc1 - D11) " " (Dc2 - D22)) 0 1 0.01)
         set p2 (numanal:get-brent-root (word "dc-fun " (Dc2 - D22) " " (Dc1 - D11)) 0 1 0.01)
       ]
