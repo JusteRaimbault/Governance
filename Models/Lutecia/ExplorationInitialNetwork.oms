@@ -27,7 +27,7 @@ val meanCongestion = Val[Double]
 // network shape
 val nwRelativeLength = Val[Double]
 val nwRelativeSpeed = Val[Double]
-
+val nwRobustness = Val[Double]
 
 // urban form
 val moranActives=Val[Double]
@@ -48,43 +48,43 @@ val cmds = List(
 )
 
 val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
-  inputs += (nwType,centerNumber,gammaSlimeMould,replication,id),
-  outputs += (nwType,centerNumber,gammaSlimeMould,replication,id),
-  netLogoOutputs += ("indicators:overall-mean-accessibility",meanAccessibility),
-  netLogoOutputs += ("indicators:mean-congestion",meanCongestion),
-  netLogoOutputs += ("network-indicators:relative-nw-length",nwRelativeLength),
-  netLogoOutputs += ("network-indicators:mean-relative-speed",nwRelativeSpeed),
-  netLogoOutputs += ("indicators:morphology:moran-actives",moranActives),
-  netLogoOutputs += ("indicators:morphology:mean-distance-actives",meanDistanceActives),
-  netLogoOutputs += ("indicators:morphology:slope-actives",slopeActives),
-  netLogoOutputs += ("indicators:morphology:entropy-actives",entropyActives),
-  netLogoOutputs += ("indicators:morphology:moran-employments",moranEmployments),
-  netLogoOutputs += ("indicators:morphology:mean-distance-employments",meanDistanceEmployments),
-  netLogoOutputs += ("indicators:morphology:slope-employments",slopeEmployments),
-  netLogoOutputs += ("indicators:morphology:entropy-employments",entropyEmployments),
-  netLogoOutputs += ("global:initial-nw-random-type",nwTypeName)
+  (inputs,outputs) += (nwType,centerNumber,gammaSlimeMould,replication,id),
+  outputs += meanAccessibility mapped "indicators:overall-mean-accessibility",
+  outputs += meanCongestion mapped "indicators:mean-congestion",
+  outputs += nwRelativeLength mapped "network-indicators:relative-nw-length",
+  outputs += nwRelativeSpeed mapped "network-indicators:mean-relative-speed",
+  outputs += nwRobustness mapped "network-indicators:geometrical-NRI",
+  outputs += moranActives mapped "indicators:morphology:moran-actives",
+  outputs += meanDistanceActives mapped "indicators:morphology:mean-distance-actives",
+  outputs += slopeActives mapped "indicators:morphology:slope-actives",
+  outputs += entropyActives mapped "indicators:morphology:entropy-actives",
+  outputs += moranEmployments mapped "indicators:morphology:moran-employments",
+  outputs += meanDistanceEmployments mapped "indicators:morphology:mean-distance-employments",
+  outputs += slopeEmployments mapped "indicators:morphology:slope-employments",
+  outputs += entropyEmployments mapped "indicators:morphology:entropy-employments",
+  outputs += nwTypeName mapped "global:initial-nw-random-type"
 )
 
 
 
-//val purpose = "TEST"
-val purpose = "INITIAL_NETWORK"
+val purpose = "TEST"
+//val purpose = "INITIAL_NETWORK"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
-//val env = LocalEnvironment(60)
-val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+val env = LocalEnvironment(15)
+//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   evaluation = (model on env by 10 hook indics_hook),
-   //evaluation = (model on env hook indics_hook),
+   //evaluation = (model on env by 20 hook indics_hook),
+   evaluation = (model on env hook indics_hook),
    seed = replication,
-   replications = 100
+   replications = 1//100
 )
 
 //nwType,centerNumber,gammaSlimeMould,replication,id
@@ -93,10 +93,9 @@ val exploration =
     evaluation = replications,
     sampling =
    ((LHS (
-      500
-      ,centerNumber in Range(2.0,6.999)
+      1//500
       ,gammaSlimeMould in Range(0.5,2.5)
-    ) withIndex id) x (nwType in (0 to 2 by 1)) )
+    ) withIndex id) x (centerNumber in 2.0 to 6.0 by 1.0) x (nwType in (0 to 2 by 1)) )
   )
 
 

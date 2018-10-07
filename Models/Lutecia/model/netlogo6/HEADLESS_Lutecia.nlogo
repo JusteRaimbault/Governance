@@ -492,6 +492,8 @@ transportation-links-own [
 
   transportation-link:bw-centrality
 
+  transportation-link:NRI
+
 ]
 
 ;; nodes of the transportation network
@@ -550,7 +552,7 @@ GRAPHICS-WINDOW
 466
 -1
 -1
-17.2
+28.666666666666668
 1
 10
 1
@@ -561,9 +563,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-24
+14
 0
-24
+14
 0
 0
 1
@@ -663,6 +665,23 @@ BUTTON
 103
 experiments-luti:test-external
 clear-all\nexperiments-luti:test-external
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+262
+126
+520
+159
+NIL
+experiments-luti:test-initial-network
 NIL
 1
 T

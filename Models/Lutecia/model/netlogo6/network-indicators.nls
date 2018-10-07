@@ -8,6 +8,69 @@
 ;;
 ; Network robustness with NTR ?
 ;  -> difficult, needs to deconstruct some links.
+;  computation of a NRI through geometrical repartition of flow (not Wardrop)
+;  travel-time is directly proportionnal to distance, let say the factor is 1 (anyway the NRI is normalised)
+;  first associates flows to each real links in the total network
+;  travels are doubled but again not a problem thanks to the normalisation
+;
+;  RQ : this indicator has an implicit parameter which is the multiplicative factor of a disruption (set to 10 by default) -> so always works as does not disconnect network.
+;   may change qualitatively results ? not for small world with this value
+to-report network-indicators:geometrical-NRI
+
+  ;ask real-links[set real-link-geometrical-flux 0 ]
+  
+  nw:set-context transportation-nodes transportation-links
+  
+  ;ask poles[
+  ;   let start self
+  ;   ask other poles[
+  ;      let chemin nw:weighted-path-to start "d"
+  ;      foreach chemin[
+  ;        ask ? [set real-link-geometrical-flux (real-link-geometrical-flux + 1) ]
+  ;      ]
+  ;   ]
+  ;]
+  ; -> done in network caching, use transportation-link:bw-centrality
+  
+  ;;c is Sum(t*x)
+  let cc sum [ transportation-link:length * transportation-link:bw-centrality] of transportation-links
+  
+  ;;do the same, suppressing each link
+  ask transportation-links [    
+     let dist transportation-link:length
+     
+     ;;supress the link by putting very huge distance?
+     set transportation-link:length transportation-link:length * 10
+     
+     ; recompute betweenness 
+     ask transportation-links [set transportation-link:bw-centrality 0 ]
+     
+     nw:set-context transportation-nodes transportation-links
+   
+     ask transportation-nodes[
+     let start self
+     ask other transportation-nodes[
+        let chemin nw:weighted-path-to start "transportation-link:length"
+        foreach chemin[
+          ? ->
+             ask ? [set transportation-link:bw-centrality (transportation-link:bw-centrality + 1) ]
+          ]
+       ]
+     ]
+    
+     set transportation-link:NRI ((sum [ transportation-link:length * transportation-link:bw-centrality] of transportation-links) - cc)
+     
+     set transportation-link:length dist
+     
+  ]
+  
+  let nn count transportation-nodes
+  report (sum [transportation-link:NRI] of transportation-links)/(nn * (nn - 1))
+  
+  
+end
+
+
 
 
 

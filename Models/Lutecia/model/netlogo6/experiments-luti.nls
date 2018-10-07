@@ -89,18 +89,26 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
   set global:network-biological-gamma bioGamma
   
   ; parameters not needed (do not run)
-  ;set global:relocation-rate relocationRate
-  ;set global:gamma-cobb-douglas-a gammaA
-  ;set global:gamma-cobb-douglas-e gammaE
-  ;set global:beta-discrete-choices betaDC
-  ;set global:lambda-accessibility lambdaacc
-  ;set global:network-speed nwspeed
-  ;set global:total-time-steps finalTime
+  ; default needed for some setups however
+  set global:relocation-rate 0.1
+  set global:gamma-cobb-douglas-a 0.8
+  set global:gamma-cobb-douglas-e 0.8
+  set global:beta-discrete-choices 2.0
+  set global:lambda-accessibility 0.05
+  set global:network-speed 5
+  set global:total-time-steps 1
   set global:seed rnd-seed
   
   set global:world-size 15
   setup:setup
   
+end
+
+to experiments-luti:test-initial-network
+  experiments-luti:setup-experiment-initial-network 2 4 2 0
+  ;indicators:compute-network-indicators
+  network:cache-nw-measures
+  show network-indicators:geometrical-NRI
 end
 
 
