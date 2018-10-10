@@ -62,7 +62,7 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
   outputs += meanDistanceEmployments mapped "indicators:morphology:mean-distance-employments",
   outputs += slopeEmployments mapped "indicators:morphology:slope-employments",
   outputs += entropyEmployments mapped "indicators:morphology:entropy-employments",
-  outputs += nwTypeName mapped "global:initial-nw-random-type"
+  outputs += nwTypeName mapped "global:initial-nw-type"
 )
 
 
