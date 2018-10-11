@@ -62,29 +62,29 @@ val model = NetLogo6Task(workDirectory / "model/netlogo6/HEADLESS_Lutecia.nlogo"
   outputs += meanDistanceEmployments mapped "indicators:morphology:mean-distance-employments",
   outputs += slopeEmployments mapped "indicators:morphology:slope-employments",
   outputs += entropyEmployments mapped "indicators:morphology:entropy-employments",
-  outputs += nwTypeName mapped "global:initial-nw-random-type"
+  outputs += nwTypeName mapped "global:initial-nw-type"
 )
 
 
 
-val purpose = "TEST"
-//val purpose = "INITIAL_NETWORK"
+//val purpose = "TEST"
+val purpose = "INITIAL_NETWORK"
 
 // output
 val indics_hook = AppendToCSVFileHook(workDirectory / "exploration" / ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv") set (
   arraysOnSingleRow := true
 )
 
-val env = LocalEnvironment(15)
-//val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+//val env = LocalEnvironment(15)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
 
 
 val replications =
  Replication (
-   //evaluation = (model on env by 20 hook indics_hook),
-   evaluation = (model on env hook indics_hook),
+   evaluation = (model on env by 20 hook indics_hook),
+   //evaluation = (model on env hook indics_hook),
    seed = replication,
-   replications = 1//100
+   replications = 100
 )
 
 //nwType,centerNumber,gammaSlimeMould,replication,id
@@ -93,9 +93,9 @@ val exploration =
     evaluation = replications,
     sampling =
    ((LHS (
-      1//500
+      1000
       ,gammaSlimeMould in Range(0.5,2.5)
-    ) withIndex id) x (centerNumber in 2.0 to 6.0 by 1.0) x (nwType in (0 to 2 by 1)) )
+    ) withIndex id) x (centerNumber in (2.0 to 6.0 by 1.0)) x (nwType in (0 to 2 by 1)) )
   )
 
 
