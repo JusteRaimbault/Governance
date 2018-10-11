@@ -78,7 +78,7 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
   set global:headless? true
   set global:failed 0
  
-  set global:setup-type "random" 
+  set global:setup-type "random"
   set global:evolve-network? false
   set global:evolve-landuse? true
   set global:stopping-type "time"
@@ -105,7 +105,7 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
 end
 
 to experiments-luti:test-initial-network
-  experiments-luti:setup-experiment-initial-network 2 4 2 0
+  experiments-luti:setup-experiment-initial-network 1 4 2 0
   ;indicators:compute-network-indicators
   network:cache-nw-measures
   show network-indicators:geometrical-NRI
