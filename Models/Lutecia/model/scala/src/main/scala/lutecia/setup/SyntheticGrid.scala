@@ -6,6 +6,8 @@ import lutecia.governance.Mayor
 
 import scala.util.Random
 
+import org.openmole.spatialdata.utils.math.Statistics
+
 trait SyntheticGrid extends SyntheticSetup {
 
 }

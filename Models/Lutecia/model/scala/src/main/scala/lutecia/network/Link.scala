@@ -3,10 +3,11 @@ package lutecia.network
 
 import lutecia.core.Cell
 
+import org.openmole.spatialdata.network
+import org.openmole.spatialdata.network._
+
 case class Link(
-               e1: Node, /** origin node */
-               e2: Node, /** destination node */
-               length: Double, /** real length */
+               link: network.Link, /** extended generic link*/
                speed: Double, /** max speed : used to compute effective distance*/
                cost: Double, /** generalized cost used to compute shortest paths*/
                capacity: Double, /** capacity (compared with flows to have effective speed) */

@@ -25,6 +25,7 @@ to setup:setup
   ; setup patches
   setup:setup-patches
   
+  
   ; setup initial governance
   setup:setup-territories
   
@@ -36,6 +37,9 @@ to setup:setup
   
   ; cached distances
   setup:setup-cached-distances
+  
+  set global:patches-display "patch:actives"
+  display:color-patches
   
   ; setup initial network
   setup:setup-initial-network
@@ -70,7 +74,7 @@ to setup:setup-globals
   
   set global:network-biological-steps 1000
   ;set network-biological-threshold 0.95
-  set global:network-biological-threshold 0.05
+  set global:network-biological-threshold 0.04;0.05
   set global:network-biological-initial-diameter 1
   set global:network-biological-input-flow 1
   ;set network-biological-gamma 10
@@ -126,8 +130,10 @@ to setup:setup-world
   
   ; resize world if needed
   ;resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
-  resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
-  set-patch-size 430 / global:world-size
+  ;resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
+  resize-world 0 (global:world-width - 1) 0 (global:world-height - 1)
+  
+  ;set-patch-size 430 / global:world-size
   
 end
 
@@ -160,7 +166,8 @@ to setup:setup-patches
   ; setup patches number
   let p 0
   repeat count patches [
-    let x (floor (p / world-width)) + min-pxcor let y (p - world-width * floor (p / world-width)) + min-pycor
+    ;let x (floor (p / world-width)) + min-pxcor let y (p - world-width * floor (p / world-width)) + min-pycor
+    let x (floor (p / world-width)) + min-pxcor let y (p - world-height * floor (p / world-height)) + min-pycor
     ask (patch x y) [set patch:number p] set p p + 1
   ]
 end
@@ -695,10 +702,11 @@ end
 to setup:setup-headless-vars
   
   ; general 
-  set global:#-initial-territories 3
+  ;set global:#-initial-territories 3
   set global:log-level "DEFAULT"
   ;set log-level "VERBOSE"
   ;set total-time-steps 4
+  
   
   ; world size setup as function of setup type
   ;set world-size 30

@@ -1,12 +1,18 @@
 ;;;;;;;;;;;;;;;;;;;;;
+;; MetropolSim v3.0
 ;;
-;; LUTECIA Model
+;; Major changes since v2
+;;   - matrix dynamic shortest path (euclidian and nw) computation
+;;   - simplified population structure (one csp)
+;;   - game-theoretical governance management
 ;;
-;; --  Endogenous transportation governance in a model of co-evolution of transport and land-use --
+;; TODO - possible extensions :
+;;    * add different transportation modes ?
+;;    * add csp ? not prioritary.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;
 
-extensions[matrix table nw shell palette gis morphology context] ;
+extensions[matrix table context nw palette gis morphology]
 
 __includes [
 
@@ -15,8 +21,6 @@ __includes [
 
   ; setup
   "setup.nls"
-
-
 
   ;;;;;;;;;
   ;; main modules
@@ -51,7 +55,7 @@ __includes [
   ; ghost network
   "network-ghost.nls"
 
-  ; biological network generation
+  ; biological network
   "network-biological.nls"
 
   ;;;;;;;;;
@@ -75,35 +79,23 @@ __includes [
   ; indicators
   ;;;;;;;;;;
 
-  ; main indics
   "indicators.nls"
 
-  ; morphology
   "morphology.nls"
-
-  ; network
   "network-indicators.nls"
 
-  ; stylized facts
   "indicators-stylized.nls"
 
 
   ;;;;;;;;;;
-  ;; visual exploration
+  ; Experiments
   ;;;;;;;;;;
 
-  "exploration.nls"
-
-  ;;;;;;;;
-  ;; experiments
-  ;;;;;;;;
-
-  ;; full experiments
   "experiments.nls"
 
-  ;; specific luti experiments
+  ;;
+  ; specific experiments for Luti
   "experiments-luti.nls"
-
 
 
   ;;;;;;;;;;
@@ -113,13 +105,9 @@ __includes [
   ; Q : package utils subpackages or all utils to have a simpler use ?
 
   "utils/math/SpatialKernels.nls"
-  "utils/math/Statistics.nls"
-  "utils/math/EuclidianDistanceUtilities.nls"
-  "utils/math/Numanal.nls"
   "utils/misc/List.nls"
   "utils/misc/Types.nls"
   "utils/misc/Matrix.nls"
-  "utils/misc/Table.nls"
   "utils/gui/Display.nls"
   "utils/agent/Link.nls"
   "utils/agent/AgentSet.nls"
@@ -129,16 +117,17 @@ __includes [
   "utils/io/Logger.nls"
   "utils/io/File.nls"
   "utils/misc/String.nls"
+  "utils/math/Statistics.nls"
+  "utils/misc/Table.nls"
+  "utils/math/EuclidianDistanceUtilities.nls"
+  "utils/math/Numanal.nls"
 
   ;;;;;;;;;;;
   ;; Tests
   ;;;;;;;;;;;
 
-  "test/test.nls"
   "test/test-distances.nls"
-  "test/test-transportation.nls"
   "test/test-experiments.nls"
-
 
 ]
 
@@ -152,11 +141,11 @@ globals[
   ;;;;;;;;;;;;;
 
   ; initial number of territories
-  ;global:#-initial-territories
+  ;#-initial-territories
 
   ; spatial distribution params
-  ;global:actives-spatial-dispersion
-  ;global:employments-spatial-distribution
+  ;actives-spatial-dispersion
+  ;employments-spatial-distribution
 
   ;; global employments and actives list
   global:patches-employments-list
@@ -168,8 +157,6 @@ globals[
   global:rel-diff-actives
   global:rel-diff-employments
 
-  global:initial-max-acc
-
   ; utility : cobb-douglas parameter
   ;gamma-cobb-douglas
 
@@ -179,102 +166,39 @@ globals[
   ; governor of the region : particular mayor
   global:regional-authority
 
-  ;
-  global:infra-snapping-tolerance ; \in [0,10] - default 1
 
 
-  ; initial network
-  ;initial-nw-random-type
-  global:initial-nw?
-
-  ;;
-  ; slime mould initial network
-  global:network-biological-steps
-  global:network-biological-threshold
-  global:network-biological-new-links-number
-  global:network-biological-initial-diameter
-  global:network-biological-diameter-max
-  global:network-biological-total-diameter-variation
-  global:network-biological-o
-  global:network-biological-d
-  global:network-biological-nodes-number
-  global:network-biological-input-flow
-  ;global:network-biological-gamma
-  global:bio-ticks
-
-
-
-  global:setup:actives
-  global:setup:employments
-
-
-
-  ;;
-  ; externality
-
-  global:with-externalities?
-  ;; list of patches for the external facility
-  global:external-facility
-  ; endogenous growth of employments within the externality
-  global:ext-growth-factor
-  ; initial size of externality in employments
-  global:ext-employments-proportion-of-max
-
-  ;; coordinates of mayors, taken from setup file
-  global:mayors-coordinates
-  global:mayors-populations
-  global:mayors-employments
-  global:mayors-names
-
-  ;; position of ext patch
-  global:ext-position
-
-  ;; path to the setup files
   global:positions-file
   global:ext-file
 
 
-  ;; GIS setup
-  global:gis-network-file
-  global:gis-extent-file
-  global:gis-centers-file
-  global:gis-population-raster-file
-  global:gis-sea-file
-  global:gis-economic-areas-file
-  global:gis-governed-patches-file
+  global:external-facility
 
-  ;conf-file
+  global:mayors-coordinates
+  global:ext-position
+
+
+  global:with-externalities?
+
+  global:ext-growth-factor
 
   ;;;;;;;;;;;;;
   ;; Transportation
   ;;;;;;;;;;;;;
 
-  ;;
-  ;  Take congestion into account .
   global:with-congestion?
 
-  ;;
-  ;  Price of congestion (see distance:network-pace function)
-  global:congestion-price
-
-  ;;
-  ;  Spatial range to compute transportation flows (effective commuting range)
-  global:lambda-flows
-
-  ;;
-  ; transportation flows \phi_ij between patches
+  ;; transportation flows \phi_ij between patches
   global:flow-matrix
 
-  ;;
-  ; congestion in patches
+  ;; congestion in patches
   ; list ordered by patch number
   global:patches-congestion
 
-  ;;
-  ; maximal pace (inverse of speed) in the transportation network
-  ; network-max-pace
-  global:euclidian-min-pace
-  global:network-min-pace
+  ;; maximal pace (inverse of speed) in the transportation network
+  ;network-max-pace
+
+  global:lambda-flows
 
 
 
@@ -286,13 +210,6 @@ globals[
   global:collaborations-realized
   global:collaborations-expected
 
-  ;;
-  ; discrete choices parameter for the corresponding game
-  global:beta-dc-game
-
-  ;;
-  ; should the network evolve ?
-  ;global:evolve-network?
 
 
   ;;;;;;;;;;;;;
@@ -312,10 +229,6 @@ globals[
   ;  - with congestion in network -
   global:effective-distance-matrix
 
-  ;;
-  ; Cached access patches to network, i.e. closest patch belonging to nw
-  ;  @type table
-  ;   number -> number of access
   global:nw-access-table
 
   ;; cached shortest paths -> updated same time as distance
@@ -325,8 +238,6 @@ globals[
   global:network-shortest-paths
 
   ;; list of nw patches
-  ;  @type list
-  ;  List of network patches number
   global:nw-patches
 
   ;; number of patches
@@ -336,15 +247,7 @@ globals[
   global:closest-nw-inters
 
   ;; network intersections
-  ;  @type list
-  ;  List of intersection patches numbers
   global:nw-inters
-
-  ;; network clusters
-  global:network-clusters
-
-  ;; connexion between clusters
-  global:network-clusters-connectors
 
   ; overall
   ; stored as table (num_patch_1,num_patch_2) -> [[i,i1],[i1,i2],...,[in,j]] where couples are either (void-nw) or (nw-nw)
@@ -355,14 +258,8 @@ globals[
   ; maximal distance in the world
   global:dmax
 
-
-  ;target-network-file
-
-  ;;;
-  ; network measures
-  global:shortest-paths
-  global:nw-relative-speeds
-  global:nw-distances
+  global:network-clusters
+  global:network-clusters-connectors
 
 
 
@@ -380,38 +277,129 @@ globals[
 
   global:gridor
 
-  ;; infra constructed by hand
-  global:to-construct
 
+
+  ;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;
   ;; HEADLESS
-  global:headless?
 
+  ;;
+  ; setup
+  global:setup-type
+
+  global:setup:actives
+  global:setup:employments
+
+  global:actives-max
+  global:employments-max
+  ;global:#-initial-territories
+  global:actives-spatial-dispersion
+  global:employments-spatial-dispersion
+  global:gamma-cobb-douglas
+  global:beta-discrete-choices
+  global:lambda-accessibility
+  global:regional-decision-proba
+  global:road-length
+  global:#-explorations
+  global:log-level
+  global:patches-display ; no init in headless
+  global:network-min-pace
+  global:euclidian-min-pace
+  global:network-speed
+  global:congestion-price
+  global:game-type
+  global:collaboration-cost
+  global:ext-employments-proportion-of-max
+  global:gamma-cobb-douglas-a
+  global:gamma-cobb-douglas-e
+  global:infra-snapping-tolerance
+  global:construction-cost
+  global:beta-dc-game
+  global:relocation-rate
+
+  global:initial-max-acc
+
+  global:total-time-steps
+  global:headless?
   global:failed
 
+  global:to-construct
+
+
+  global:gis-network-file
+  global:gis-extent-file
+  global:gis-centers-file
+  global:gis-sea-file
+  global:gis-economic-areas-file
+  global:gis-governed-patches-file
+  global:gis-population-raster-file
+
+  global:world-size
+  global:world-height
+  global:world-width
+
+  global:seed
+
+  global:initial-nw?
+  global:initial-nw-random-type
+
+  global:mayors-populations
+  global:mayors-employments
+  global:mayors-names
+
+  global:target-network-file
+
+  global:setup-from-world-file?
 
   global:link-distance-function
 
+  global:conf-file
   global:tracked-indicators
   global:history-indicators
+  global:evolve-network?
+  global:evolve-landuse?
 
-  global:setup-from-world-file? ; only in experiments
+  global:shortest-paths
+  global:nw-relative-speeds
+  global:nw-distances
+
+  global:stopping-type
+  global:total-infrastructure-stock
+
+  ;;
+  ; biological network
+  global:network-biological-steps
+  global:network-biological-threshold
+  global:network-biological-initial-diameter
+  global:network-biological-input-flow
+  global:network-biological-new-links-number
+  global:network-biological-diameter-max
+  global:network-biological-total-diameter-variation
+  global:network-biological-o
+  global:network-biological-d
+  global:network-biological-nodes-number
+  ;global:network-biological-gamma
+  global:bio-ticks
+
+  global:setup-file-prefix
+  ;global:initial-nw-type
+
 
 ]
 
 
-
 patches-own [
 
-  ; number of actives on the patch
+   ; number of actives on the patch
   patch:actives
 
   ; number of jobs on the patch
   patch:employments
 
-  ; variation of actives
+  ;
   patch:delta-actives
 
-  ; variation of employments
+  ;
   patch:delta-employments
 
 
@@ -429,8 +417,6 @@ patches-own [
 
 
 
-
-
   ;;;;;
   ;; utilities and accessibilities
   ;;;;;
@@ -441,7 +427,6 @@ patches-own [
   ; accessibility of actives to employments
   patch:e-to-a-accessibility
 
-  ; previous and current cumulated accessibilities
   patch:prev-accessibility
   patch:current-accessibility
 
@@ -492,33 +477,22 @@ undirected-link-breed[transportation-links transportation-link]
 
 transportation-links-own [
 
-  ;;
-  ; link length
   transportation-link:length
 
-  ;;
-  ; betweenness centrality
-  transportation-link:bw-centrality
-
-  ;;
   ; capacity of the link ; expressed as max trip per length unit
   transportation-link:capacity
 
-  ;;
   ; congestion : travels in the link
   transportation-link:congestion
 
-  ;;
   ; speed in the link, deduced from capacity and congestion
   transportation-link:speed
 
-  ;;
-  ; tick on which the infra has been constructed
   transportation-link:age
 
-  ;;
-  ; status of the link
   transportation-link:status
+
+  transportation-link:bw-centrality
 
   transportation-link:NRI
 
@@ -528,20 +502,18 @@ transportation-links-own [
 breed[transportation-nodes transportation-node]
 
 transportation-nodes-own[
-
-  ;;
-  ; node closeness centrality
   transportation-node:closeness-centrality
 ]
 
-
+; needs ghost breeds to not perturbate shortest paths update
 undirected-link-breed[ghost-transportation-links ghost-transportation-link]
-
 breed[ghost-transportation-nodes ghost-transportation-node]
+
 
 ghost-transportation-nodes-own [
   ghost-transportation-node:id
 ]
+
 
 
 ;;
@@ -566,7 +538,6 @@ biological-network-nodes-own [
 ]
 
 
-
 biological-network-links-own [
   ;; diameter
   biological-network-link:diameter
@@ -577,13 +548,13 @@ biological-network-links-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-572
-18
-1010
-457
+301
+16
+883
+599
 -1
 -1
-28.666666666666668
+30.0
 1
 10
 1
@@ -594,1009 +565,108 @@ GRAPHICS-WINDOW
 0
 1
 0
-14
+19
 0
-14
+19
 0
 0
 1
 ticks
 30.0
 
-SLIDER
-3
-73
-186
-106
-global:#-initial-territories
-global:#-initial-territories
-1
-5
-3.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
-385
-579
-451
-612
-setup
-setup:setup\n;luti luti display:color-patches
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-CHOOSER
-13
-660
-165
-705
-global:patches-display
-global:patches-display
-"governance" "patch:actives" "patch:employments" "a-utility" "e-utility" "accessibility" "a-to-e-accessibility" "e-to-a-accessibility" "congestion" "mean-effective-distance" "lbc-effective-distance" "center-effective-distance" "lbc-network-distance" "network"
-1
-
-TEXTBOX
 11
-15
-161
-33
-Setup parameters
-11
-0.0
-1
-
-TEXTBOX
-15
-248
-165
-266
-Runtime parameters
-11
-0.0
-1
-
-SLIDER
-3
-120
-284
-153
-global:actives-spatial-dispersion
-global:actives-spatial-dispersion
-0
-10
-1.0
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-2
-155
-282
-188
-global:employments-spatial-dispersion
-global:employments-spatial-dispersion
-0
-10
-0.8
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-285
-155
-483
-188
-global:actives-max
-global:actives-max
-0
-1000
-500.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-286
-120
-486
-153
-global:employments-max
-global:employments-max
-0
-1000
-500.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-7
-290
-250
-323
-global:gamma-cobb-douglas-a
-global:gamma-cobb-douglas-a
-0
-1
-0.9
-0.01
-1
-NIL
-HORIZONTAL
-
-SLIDER
-7
-358
-251
-391
-global:beta-discrete-choices
-global:beta-discrete-choices
-0
-5
-1.8
-0.05
-1
-NIL
-HORIZONTAL
-
-BUTTON
-512
-579
-567
-612
-go
-main:go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-0
-
-PLOT
-1019
-184
-1242
-339
-convergence
-NIL
-NIL
-0.0
-2.0
-0.0
-1.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -5298144 true "" "plot global:rel-diff-employments / count patches"
-"pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
-
-OUTPUT
-1324
-346
-1808
-569
-10
-
-TEXTBOX
-12
-273
-162
-291
-LUTI
-11
-0.0
-1
-
-TEXTBOX
-336
-261
-486
-279
-Governance
-11
-0.0
-1
-
-SLIDER
-285
-278
-530
-311
-global:regional-decision-proba
-global:regional-decision-proba
-0
-1
-0.0
-0.05
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-263
-272
-278
-303
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-293
-278
-324
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-315
-278
-333
-|
-25
-0.0
-1
-
-TEXTBOX
-13
-447
-216
-474
-_________________
-20
-0.0
-1
-
-TEXTBOX
-14
-473
-164
-491
-Transportation
-11
-0.0
-1
-
-TEXTBOX
-263
-326
-278
-357
-|
-25
-0.0
-1
-
-CHOOSER
-332
-713
-470
-758
-global:log-level
-global:log-level
-"DEBUG" "VERBOSE" "DEFAULT"
-2
-
-SLIDER
-14
-494
-181
-527
-global:network-speed
-global:network-speed
-1
-50
-5.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-285
-312
-530
-345
-global:road-length
-global:road-length
-1.0
-20
-0.0
-1.0
-1
-NIL
-HORIZONTAL
-
-SLIDER
-285
-344
-530
-377
-global:#-explorations
-global:#-explorations
-0
-200
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-7
-392
-251
-425
-global:lambda-accessibility
-global:lambda-accessibility
-0
-0.01
-0.005
-0.0001
-1
-NIL
-HORIZONTAL
-
-BUTTON
-14
-776
-175
-809
-compute indicators
-indicators:compute-indicators
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-433
-616
-667
-649
-global:total-time-steps
-global:total-time-steps
-0
-1000
-20.0
-1
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-16
-520
-182
-556
-__________________
-20
-0.0
-1
-
-CHOOSER
-283
-414
-435
-459
-global:game-type
-global:game-type
-"random" "simple-nash" "discrete-choices"
-2
-
-TEXTBOX
-263
-348
-278
-380
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-370
-281
-400
-|
-25
-0.0
-1
-
-PLOT
-1019
-17
-1242
-183
-accessibility
-NIL
-NIL
-0.0
-2.0
-0.99
-1.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -12186836 true "" "plot indicators:overall-mean-accessibility"
-
-TEXTBOX
-347
-674
-556
-702
-__________________
-20
-0.0
-1
-
-BUTTON
-170
-670
-245
-703
-update
-accessibilities:compute-patches-variables\ndisplay:color-patches
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-284
-377
-530
-410
-global:collaboration-cost
-global:collaboration-cost
-0
-0.005
-0.0
-1e-6
-1
-NIL
-HORIZONTAL
-
-CHOOSER
-206
-72
-369
-117
-global:setup-type
-global:setup-type
-"random" "gis-synthetic" "gis" "from-file-mayors" "from-file" "external"
-0
-
-BUTTON
-454
-579
-509
-612
-go
-main:go
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-15
-742
-175
-775
-construct infrastructure
-governance:manual-infrastructure-construction
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-7
-324
-250
-357
-global:gamma-cobb-douglas-e
-global:gamma-cobb-douglas-e
-0
-1
-0.8
-0.05
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-11
-639
-58
-657
-Display
-11
-0.0
-1
-
-SLIDER
-0
-33
-101
-66
-global:seed
-global:seed
--100000
-100000
-0.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-100
-34
-203
-67
-global:world-size
-global:world-size
-0
-50
-15.0
-1
-1
-NIL
-HORIZONTAL
-
-INPUTBOX
-205
-10
-522
-70
-global:conf-file
-NIL
-1
-0
-String
-
-PLOT
-1244
-17
-1452
-184
-morphology
-moran
-slope
-0.0
-0.1
-0.0
-0.1
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plotxy indicators:morphology:moran-actives indicators:morphology:slope-actives"
-
-SWITCH
-14
-583
+176
+156
 209
-616
-global:evolve-network?
-global:evolve-network?
+generate
+experiments-luti:test-initial-network
+NIL
 1
-1
--1000
-
-SWITCH
-14
-550
-210
-583
-global:evolve-landuse?
-global:evolve-landuse?
-0
-1
--1000
-
-PLOT
-1244
-186
-1451
-340
-mean-travel-distance
+T
+OBSERVER
 NIL
 NIL
-0.0
-10.0
-75.0
-85.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot indicators:mean-effective-distance"
-
-INPUTBOX
-481
-705
-605
-765
-global:target-network-file
-0
-1
-0
-String
-
-TEXTBOX
-393
-556
-422
-574
-Run
-11
-0.0
-1
-
-TEXTBOX
-11
-718
-161
-736
-Interactive
-11
-0.0
-1
-
-SLIDER
-7
-425
-251
-458
-global:relocation-rate
-global:relocation-rate
-0
-1
-0.1
-0.01
-1
 NIL
-HORIZONTAL
-
-CHOOSER
-291
-628
-427
-673
-global:stopping-type
-global:stopping-type
-"time" "infrastructure-stock"
-0
-
-SLIDER
-432
-651
-668
-684
-global:total-infrastructure-stock
-global:total-infrastructure-stock
-0
-100
-0.0
-1
-1
 NIL
-HORIZONTAL
-
-TEXTBOX
-700
-583
-715
-613
-|
-25
-0.0
-1
-
-TEXTBOX
-700
-607
-715
-637
-|
-25
-0.0
-1
-
-TEXTBOX
-700
-625
-734
-653
-|
-25
-0.0
-1
-
-TEXTBOX
-700
-647
-715
-677
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-390
-278
-420
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-413
-278
-443
-|
-25
-0.0
-1
-
-TEXTBOX
-263
-435
-278
-465
-|
-25
-0.0
 1
 
 CHOOSER
-372
-72
-560
-117
+23
+20
+180
+65
 global:initial-nw-type
 global:initial-nw-type
-"tree-skeleton" "slime-mould" "full" "no-network" "from-file"
-1
-
-MONITOR
-1455
-24
-1522
-69
-bio ticks
-global:bio-ticks
-17
-1
-11
+"slime-mould" "tree-skeleton" "full"
+0
 
 SLIDER
-3
-190
-256
-223
+16
+114
+238
+147
 global:network-biological-gamma
 global:network-biological-gamma
-0
-10
+0.8
+1.9
 1.2
 0.1
 1
 NIL
 HORIZONTAL
 
-PLOT
-1501
-582
-1723
-732
-cor-access-dev
-NIL
-NIL
-0.0
-1.0
--0.1
-0.1
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-dev"
-"pen-1" 1.0 0 -2674135 true "" "plot 0"
-"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-dev-mw"
-
-PLOT
-1276
-582
-1499
-732
-corr-access-employments
-NIL
-NIL
-0.0
-1.0
--0.1
-0.1
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-employments"
-"pen-1" 1.0 0 -2674135 true "" "plot 0"
-"pen-2" 1.0 0 -13791810 true "" "plot indicators:causal-moving-average \"indicators-stylized:cor-access-employments\" 15"
-
-PLOT
-871
-582
-1071
-732
-cor-access-wtime
-NIL
-NIL
-0.0
-10.0
--0.05
-0.05
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-time true"
-"pen-1" 1.0 0 -2674135 true "" "plot 0"
-"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw true"
-
-PLOT
-1074
-582
-1274
-732
-cor-access-utime
-NIL
-NIL
-0.0
-10.0
--0.05
-0.05
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot indicators-stylized:cor-access-time false"
-"pen-1" 1.0 0 -2674135 true "" "plot 0"
-"pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw false"
-
-TEXTBOX
-875
-543
-957
-561
-Correlations
-12
-0.0
+SLIDER
+15
+75
+240
+108
+global:#-initial-territories
+global:#-initial-territories
+2
+8
+6.0
 1
-
-PLOT
-1026
-380
-1318
-556
-Relative sustainibility indics
-NIL
-NIL
-0.0
-10.0
-0.95
-1.05
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -13403783 true "" "if ticks > 0 [plot indicators:relative-accessibility]"
-"pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
-
-INPUTBOX
-1524
-24
-1738
-84
-global:setup-file-prefix
-0
 1
-0
-String
+NIL
+HORIZONTAL
 
 @#$#@#$#@
-## Context
+## WHAT IS IT?
 
-The LUTECIA model is a co-evolution model for land-use and transportation networks.
+MetropolSim 3.0
 
-It is an extended LUTI model which currently implements the following sub-models :
- - Land-use evolution
- - Transportation flows (no traffic model yet)
- - Evaluation of Cooperation and Infrastructure provision
- - (not implemented : Agglomeration economies)
+## HOW IT WORKS
 
-## Model description
+(what rules the agents use to create the overall behavior of the model)
 
+## HOW TO USE IT
 
+(how to use the model, including a description of each of the items in the Interface tab)
 
+## THINGS TO NOTICE
 
-## References
+(suggested things for the user to notice while running the model)
 
-Raimbault, J. (2018). Characterizing and modeling the co-evolution of transportation networks and territories. PhD Thesis, Université Paris 7.
+## THINGS TO TRY
 
-Le Néchet, F., & Raimbault, J. (2015, September). Modeling the emergence of metropolitan transport autorithy in a polycentric urban region. In European Colloqueum on Theoretical and Quantitative Geography.
+(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
 
-Le Néchet, F. (2011, September). Urban dynamics modelling with endogeneous transport infrastructures, in a polycentric region. In 17th European Colloquium on Quantitative and Theoretical Geography.
+## EXTENDING THE MODEL
 
+(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
 
-## Versions
+## NETLOGO FEATURES
 
+(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
 
-(MetropolSim v3.0)
-Major changes since v2
-   - matrix dynamic shortest path (euclidian and nw) computation
-   - simplified population structure (one csp)
-   - game-theoretical governance management
+## RELATED MODELS
 
-Possible extensions (v4) :
-    * add different transportation modes ?
-    * add csp ? not prioritary.
+(models in the NetLogo Models Library and elsewhere which are of related interest)
+
+## CREDITS AND REFERENCES
+
+(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true

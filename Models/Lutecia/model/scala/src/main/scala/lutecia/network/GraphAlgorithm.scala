@@ -3,6 +3,7 @@ package lutecia.network
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
+import org.openmole.spatialdata.utils.math.Graph
 
 object GraphAlgorithm {
 

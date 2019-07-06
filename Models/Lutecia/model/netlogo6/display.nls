@@ -26,6 +26,7 @@ end
 
 to display:color-patches
   ; basic
+  show global:patches-display
   if global:patches-display = "governance"[
      ask patches [set pcolor [color] of patch:governing-mayor]
   ]
