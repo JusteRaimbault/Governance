@@ -1,0 +1,3 @@
+evolution$generation,relocationRate,gammaCDA,gammaCDE,betaDC,finalTime,scenario,oppositeRelativeAccessibility,relativeCongestion,evolution$samples
+4,0.0,0.9999999999999999,0.7,1.3,80,6,-4.440892098500626E-16,0.23655385273519416,1
+4,0.0,0.0,0.7999999999999999,4.6,45,3,1.1102230246251565E-16,0.33106965932988297,2
