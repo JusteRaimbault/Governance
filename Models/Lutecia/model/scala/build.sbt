@@ -2,7 +2,7 @@ name := "lutecia"
 
 version := "0.1"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.13.1"
 
 enablePlugins(SbtOsgi)
 
@@ -21,7 +21,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies += "org.apache.commons" % "commons-math3" % "3.6.1"
-libraryDependencies += "org.openmole" %% "spatialdata" % "0.1-SNAPSHOT" //exclude("org.scala-graph","graph-core")
-libraryDependencies += "org.scala-graph" %% "graph-core" % "1.12.5"
+libraryDependencies += "org.openmole.library" %% "spatialdata" % "0.4-SNAPSHOT"
+libraryDependencies += "org.scala-graph" %% "graph-core" % "1.13.2"
 
 mainClass in (Compile,run) := Some("RunTest")
