@@ -1,0 +1,127 @@
+\input{header_slides.tex}
+
+\begin{document}
+
+\title
+[A co-evolution ABM for systems of cities]{A co-evolution agent-based model for systems of cities and transportation networks integrating top-down governance through game theory}
+\author[Raimbault]{J.~Raimbault$^{1,2,3}$\\\medskip
+$^{\ast}$\texttt{juste.raimbault@polytechnique.edu}
+}
+
+\institute[UCL]{$^{1}$Center for Advanced Spatial Analysis, University College London\\
+$^{2}$UPS CNRS 3611 Complex Systems Institute Paris\\
+$^{3}$UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
+}
+
+
+
+
+\date[08/12/2020]{CCS 2020\\
+\\
+December 8th, 2020
+}
+
+\frame{\maketitle}
+
+
+% The evolutionary theory for systems of cities at the macroscopic scale proposed by [1] suggests the existence of co-evolutionary dynamics in the trajectories of cities and their environment. In particular, transportation infrastructure connecting cities can in some cases co-evolve with them [2]. Understanding such processes is crucial for sustainable planning at large scales. The issue of the interplay between bottom-up emergence of urban dynamics and top-down planning of infrastructures is in that context relevant to study. We propose in this contribution a model of co-evolution for cities and transportation networks, with a focus on how transportation networks evolve. More particularly, we extend the model of [3] by introducing top-down governance agents which decide on investments in transportation links. The model simulates population trajectories of cities and network link speed trajectories, with two main modules: (i) spatial interaction modeling to determine growth rates of cities, and (ii) governance modeling for network evolution. Using a game-theoretic approach, macroscopic agents (such as governments or planning authorities) arbitrate stochastically between national and international investments, following a payoff-matrix considering optimal accessibility gains and collaboration costs, with probabilities obtained under the assumption of mixed strategies in a Nash equilibrium. Network investments are used to increase effective link speed by fixed increments. The model is applied to synthetic systems of cities, in a stylized configuration of two neighbor countries of comparable size. We systematically study model behavior with the OpenMOLE platform for model exploration and validation [4]. First exploration results suggest a strong qualitative influence of propensity to collaborate on trajectories of the full system, and that intermediate levels of international investments may be more optimal in terms of accessibility gains at fixed costs. In comparison to null model behavior obtained running the base model from [3], the introduction of top-down governance decisions also changes considerably model behavior. We also show that initial spatial conditions such as urban hierarchy significantly influence model outcomes [5]. This work illustrates how co-evolution models at this scale can be refined, opening research possibilities towards more complex or multi-scale models.
+% [1] Pumain, D. (2018). An evolutionary theory of urban systems. In International and transnational perspectives on urban systems (pp. 3-18). Springer, Singapore.
+%[2] Raimbault, J. (2020). Modeling the co-evolution of cities and networks. In Handbook of Cities and Networks. Rozenblat C., Niel Z., eds. In press
+%[3] Raimbault, J. (2020). Hierarchy and co-evolution processes in urban systems. arXiv preprint arXiv:2001.11989.
+%[4] Reuillon, R., Leclaire, M., & Rey-Coyrehourcq, S. (2013). OpenMOLE, a workflow engine specifically tailored for the distributed exploration of simulation models. Future Generation Computer Systems, 29(8), 1981-1990.
+%[5] Raimbault, J., Cottineau, C., Le Texier, M., Le Nechet, F., & Reuillon, R. (2019). Space Matters: Extending Sensitivity Analysis to Initial Spatial Conditions in Geosimulation Models. Journal of Artificial Societies and Social Simulation, 22(4).
+
+
+
+\section{Introduction}
+
+
+
+\section{Discussion}
+
+\sframe{Discussion}{
+
+\justify
+
+\textbf{Developments}
+
+\medskip
+
+$\rightarrow$ 
+
+\medskip
+
+$\rightarrow$ 
+
+\bigskip
+\bigskip
+
+
+\textbf{Applications}
+
+\medskip
+
+$\rightarrow$ 
+
+
+}
+
+
+
+
+
+
+
+
+\sframe{Conclusion}{
+
+
+$\rightarrow$
+
+\bigskip
+
+$\rightarrow$
+
+
+\bigskip
+\bigskip
+
+\textbf{Open repositories}
+
+\url{https://github.com/JusteRaimbault/CoevolGov}
+
+\url{https://github.com/JusteRaimbault/Governance}
+
+
+\bigskip
+
+\textbf{Data at} \texttt{}
+
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+\frametitle{References}
+\bibliographystyle{apalike}
+\bibliography{biblio}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%\sframe{Reserve slides}{
+%
+%\Huge
+%
+%\centering
+%
+%Reserve slides
+%
+%}
+
+
+
+\end{document}
+
