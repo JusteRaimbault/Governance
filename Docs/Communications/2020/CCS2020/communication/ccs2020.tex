@@ -36,10 +36,183 @@ December 8th, 2020
 \section{Introduction}
 
 
+\sframe{Urban evolutionary theory}{
+
+\cite{pumain2018evolutionary}
+
+}
+
+
+\sframe{Co-evolution and governance processes}{
+
+\cite{Xie2011}
+\cite{xie2011governance}
+
+}
+
+\sframe{Multinational transport investments}{
+
+
+\cite{melo2013productivity} meta-analysis: positive effects of transport investments
+
+\cite{tsamboulas1984multinational} difficulty of multinational investments
+
+\cite{tsamboulas2007tool} framework for prioritization, using multi attribute theory
+
+\cite{yii2018transportation} one belt one road - positive effect of transport investments
+
+\cite{proost2014selected} many trans European projects fail in cost-benefit analysis
+
+
+}
+
+\sframe{Game theory and transportation}{
+
+\cite{adler2010high} competition HSR/airplane
+
+\cite{medda2007game} public private partnerships
+
+\cite{roumboutsos2008game} public transport integration
+
+}
+
+
+\sframe{Proposed approach}{
+
+
+\cite{raimbault2020modeling}
+
+}
+
+
+
+\section{Model}
+
+
+\sframe{Model rationale}{
+
+extend the model of \cite{raimbault2020hierarchy}
+
+}
+
+
+\sframe{Cities populations}{
+
+%The model operates at the macroscopic scale: basic units are cities, distributed in space and described by their population $P_i$. A spatial interaction model is used to estimate flows between pairs of cities as
+
+\[
+\varphi_{ij} = \left( P_i P_j \right)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
+\]
+
+% From these flows is computed a growth rate for cities, assuming that it is for one city proportional to the sum of flows to all other cities, such that
+
+\[
+\frac{P_i (t+ \Delta t) - P_i(t)}{\Delta t} \propto P_i(t)^{\gamma} \cdot \sum_j P_j(t)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
+\]
+
+% WITH FIXED EFFECT COUNTRY MULTIPLIER
+
+% Flows between cities are then distributed into the network. We assume no congestion and that the shortest path is taken.
+
+
+}
+
+\sframe{Network}{
+
+%The set of deciders - which are the level of respective countries - evaluate the relevance of different infrastructure development options. More precisely, they have in a simplified setting the choice between an international collaboration and a strictly national infrastructure development. Let $Z^{\ast}_i$ be the optimal infrastructure in terms of accessibility gains for the country $i$ only, and $Z^{\ast}_C$ the optimal international infrastructure.
+%Making the assumption that deciders aim at optimizing the accessibility gain, 
+
+% - distinguish between national and international flows
+% - link increase function: flow quantile, improve only if above (no decrease)
+
+
+
+}
+
+
+\sframe{Payoff matrix}{
+
+\begin{tabular}{ |c|c|c| } 
+ \hline
+ 0 $|$ 1  & C & NC \\ \hline
+ C & $U_i = \Delta X_i(Z^{\ast}_C) - I - \frac{J}{2}$
+   & $\begin{cases}U_0 = \Delta X_0(Z^{\ast}_0)-I \\U_1 = \Delta X_1(Z^{\ast}_1)-I - \frac{J}{2}\end{cases}$ \\ \hline
+ NC & $\begin{cases}U_0 =  \Delta X_0(Z^{\ast}_0)-I - \frac{J}{2}\\U_1 =\Delta X_1(Z^{\ast}_1)-I\end{cases}$
+   & $U_i = \Delta X_i(Z^{\ast}_i) - I$ \\
+ \hline
+\end{tabular}
+
+}
+
+
+\sframe{Mixed Nash equilibrium probabilities}{
+
+\[
+p_{1-i} = - \frac{U_i(C,NC) - U_i(NC,NC)}{\left(U_i(C,C) - U_i(NC,C)\right) - \left(U_i(C,NC) - U_i(NC,NC)\right)}
+\]
+
+\begin{equation}
+p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 - i}}}
+\end{equation}
+
+% from lutecia paper
+% It also forces feasibility conditions on $J$ and accessibility gains to keep a probability. These are
+%\begin{itemize}
+%	\item $ J \leq \Delta X_{1 - i}(Z^{\star}_{C}) - \Delta X_{1 - i}(Z^{\star}_{1 - i})$, what can be interpreted as a cost-benefits condition for cooperation, e.g. that the gain induced by the common infrastructure must be larger than the collaboration cost;
+%	\item $\Delta X_{1 - i}(Z^{\star}_{C}) \leq \Delta X_{1 - i}(Z^{\star}_{1 - i})$, e.g. that the gain induced by the common infrastructure must be positive.
+%\end{itemize}
+
+}
+
+
+
+\section{Results}
+
+\sframe{Implementation and experiments}{
+
+\footnotesize
+
+\textbf{Implementation}
+
+\begin{itemize}
+	%\item Model implemented in NetLogo (good compromise interactivity / ergonomy), with fast data structures (matrix/table extensions)
+	%\item Integrated seamlessly into OpenMOLE \cite{reuillon2013openmole} for model exploration \url{https://openmole.org/}
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.1\linewidth]{figures/iconOM.png}
+\includegraphics[width=0.4\linewidth]{figures/openmole.png}
+\end{center}
+
+\medskip
+
+%\textbf{Experiments}
+%
+%\begin{itemize}
+%	\item 
+%\end{itemize}
+
+}
+
+
+
+
+\sframe{Role of urban hierarchy}{
+
+\cite{raimbault2019space}
+
+}
+
 
 \section{Discussion}
 
 \sframe{Discussion}{
+
+% Discuss alternative flow assignment procedures. You can in particular have a look at the transportation literature
+
+% Discuss the structure of this model, of canonical LUTI, and of a sample of more advanced LUTI models could a much more detailed representation of underlying capture intrinsic crucial process which would be missed by our approach? In other words, what is the purpose of LUTI models? More generally, discuss the relation between the degree of validation of a model and its potential operationalization.
+
+
 
 \justify
 
