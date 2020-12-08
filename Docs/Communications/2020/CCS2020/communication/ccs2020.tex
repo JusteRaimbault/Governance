@@ -5,7 +5,7 @@
 \title
 [A co-evolution ABM for systems of cities]{A co-evolution agent-based model for systems of cities and transportation networks integrating top-down governance through game theory}
 \author[Raimbault]{J.~Raimbault$^{1,2,3}$\\\medskip
-$^{\ast}$\texttt{juste.raimbault@polytechnique.edu}
+$^{\ast}$\texttt{j.raimbault@ucl.ac.uk}
 }
 
 \institute[UCL]{$^{1}$Center for Advanced Spatial Analysis, University College London\\
@@ -17,8 +17,8 @@ $^{3}$UMR CNRS 8504 G{\'e}ographie-cit{\'e}s
 
 
 \date[08/12/2020]{CCS 2020\\
-\\
-December 8th, 2020
+Session Transportation\\
+December 8th, 2020\\
 }
 
 \frame{\maketitle}
@@ -36,51 +36,237 @@ December 8th, 2020
 \section{Introduction}
 
 
+
+
+\sframe{Interactions between networks and territories}{
+
+\justify
+
+\begin{center}
+\includegraphics[width=0.45\linewidth]{../../../../../../CityNetwork/Results/CaseStudies/PRD/accessp_withbridge_prd_EN.png}
+\hspace{0.1cm}
+\includegraphics[width=0.52\linewidth]{../../../../../../NetworksTerritories/ChinaAccessibility/Results/TCAccess/avgaccess_facet.png}
+
+\end{center}
+
+\medskip
+
+%\vspace{-0.5cm}
+
+%\begin{justify}
+\textit{Accessibility as part of complex processes of co-evolution between transportation networks and territories.}
+
+%\end{justify}
+
+\nocite{raimbault2018evolving}
+
+\medskip
+
+\tiny
+
+Raimbault, J. (2019). Evolving accessibility landscapes: mutations of transportation networks in China. In Aveline-Dubach, N., ed. \textit{Pathways of sustainable urban development across China - the cases of Hangzhou, Datong and Zhuhai}, pp 89-108. Imago. ISBN:978-88-94384-71-0
+
+}
+
+
 \sframe{Urban evolutionary theory}{
 
-\cite{pumain2018evolutionary}
+
+% The evolutionary theory for systems of cities at the macroscopic scale proposed by [1] suggests the existence of co-evolutionary dynamics in the trajectories of cities and their environment.
+
+\begin{columns}
+\begin{column}{0.3\textwidth}
+	\centering
+	\includegraphics[width=0.9\textwidth]{../../../../../../SimulationModels/Docs/Communications/2019/TongjiWorkshop/figures/urban-dynamics-simulation-models-geodivercity.png}
+\end{column}
+\begin{column}{0.6\textwidth}
+	Development of an evolutionary urban theory
+	
+	 \nocite{pumain2018evolutionary}
+	
+	\medskip
+
+	$\rightarrow$ Recurrent stylized facts on main systems of cities
+	
+	$\rightarrow$ Construction of simulation models (with an explicative purpose)
+	
+	$\rightarrow$ Tools and methods to explore simulation models
+	
+	\smallskip
+	
+	\includegraphics[width=0.25\textwidth]{figures/iconOM.png}
+	\includegraphics[width=0.7\textwidth]{figures/openmole.png}
+		
+	
+\end{column}
+\end{columns}
+
+\bigskip
+\tiny
+
+\nocite{pumain2018evolutionary}
+
+Pumain, D. (2018). An evolutionary theory of urban systems. In International and Transnational Perspectives on Urban Systems (pp. 3-18). Springer, Singapore.
+
+\nocite{reuillon2013openmole}
+
+Reuillon, R., Leclaire, M., and Rey-Coyrehourcq, S. (2013). OpenMOLE, a workflow engine specifically tailored for the distributed exploration of simulation models. Future Generation Computer Systems, 29(8), 1981-1990.
+
 
 }
 
 
-\sframe{Co-evolution and governance processes}{
 
-\cite{Xie2011}
-\cite{xie2011governance}
+\sframe{Co-evolution of cities and transportation networks}{
+
+% In particular, transportation infrastructure connecting cities can in some cases co-evolve with them [2].
+
+
+\textit{System of cities interaction model including network evolution; exhibits multiple co-evolution regimes; calibrated for France 1830-2000.}
+
+\medskip
+
+\includegraphics[width=0.6\textwidth]{../../../../../../SimulationModels/Docs/Communications/2019/TongjiWorkshop/figures/macrocoevol_en.png}
+\includegraphics[width=0.39\linewidth]{../../../../../../SimulationModels/Docs/Communications/2019/TongjiWorkshop/figures/6-2-2-fig-macrocoevol-correlations.jpg}
+
+
+\nocite{raimbault2018indirect}
+\nocite{raimbault2020modeling}
+
+
+\bigskip
+
+\tiny
+
+Raimbault, J. (2020). Indirect evidence of network effects in a system of cities. Environment and Planning B: Urban Analytics and City Science, 47(1), 138-155.
+
+\smallskip
+
+Raimbault, J. (2020). Modeling the co-evolution of cities and networks. In Niel, Z., Rozenblat, C., eds. \textit{Handbook of Cities and Networks}, Edwar Elgar Publishing, \textit{in press}.
+
 
 }
+
+
+
+
+\sframe{International transport infrastructure projects}{
+
+\footnotesize
+
+\begin{columns}
+\begin{column}{0.5\linewidth}
+
+\vspace{-0.5cm}
+\begin{center}
+\includegraphics[width=0.7\linewidth,height=0.35\textheight]{figures/oresund.png}
+\end{center}
+
+\vspace{-0.5cm}
+\cite{khan2014constructive}
+
+\hrule
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{figures/channeltunnel.png}
+\end{center}
+
+\vspace{-0.5cm}
+\cite{gibb1992channel}
+
+\end{column}
+\begin{column}{0.5\linewidth}
+
+\vspace{-0.8cm}
+\begin{center}
+\includegraphics[width=0.7\linewidth,height=0.35\textheight]{figures/HZMB.png}
+\end{center}
+
+\vspace{-0.5cm}
+\cite{yang2006geopolitics}
+
+\hrule
+
+\begin{center}
+\includegraphics[width=0.7\linewidth]{figures/LyonTurin.png}
+\end{center}
+
+\vspace{-0.5cm}
+\cite{marincioni2009lyon}
+
+\end{column}
+\end{columns}
+
+}
+
+
+
 
 \sframe{Multinational transport investments}{
 
+\textit{At the macroscopic scale: governance of multinational transport investments}
 
-\cite{melo2013productivity} meta-analysis: positive effects of transport investments
+\bigskip
 
-\cite{tsamboulas1984multinational} difficulty of multinational investments
-
-\cite{tsamboulas2007tool} framework for prioritization, using multi attribute theory
-
-\cite{yii2018transportation} one belt one road - positive effect of transport investments
-
-\cite{proost2014selected} many trans European projects fail in cost-benefit analysis
-
+\begin{itemize}
+	\item Positive effects of transport investments: \cite{melo2013productivity} meta-analysis, \cite{yii2018transportation} One-Belt-One-Road economic impact
+	\item Difficult implementation of multinational investments \cite{tsamboulas1984multinational}; many trans-European projects fail in cost-benefit analysis \cite{proost2014selected} 
+	\item Example of framework for prioritization based on multi-attribute theory \cite{tsamboulas2007tool}
+\end{itemize}
 
 }
 
-\sframe{Game theory and transportation}{
+\sframe{Co-evolution and governance processes}{
 
-\cite{adler2010high} competition HSR/airplane
+\textbf{Modeling co-evolution with governance processes}
 
-\cite{medda2007game} public private partnerships
+\medskip
 
-\cite{roumboutsos2008game} public transport integration
+\begin{itemize}
+	\item Model of governance choice \cite{Xie2011}
+	\item Spatialized simulation model \cite{xie2011governance} 
+	\item LUTI model with evolving network and game theory \cite{le2015modeling}
+\end{itemize}
+
+\bigskip
+
+\textbf{Game theory and transportation models}
+
+\medskip
+
+\begin{itemize}
+	\item Competition HSR/airplane \cite{adler2010high} 
+	\item Public-private partnerships \cite{medda2007game} 
+	\item Public transport integration \cite{roumboutsos2008game}
+\end{itemize}
+
 
 }
 
 
 \sframe{Proposed approach}{
 
+% Understanding such processes is crucial for sustainable planning at large scales. The issue of the interplay between bottom-up emergence of urban dynamics and top-down planning of infrastructures is in that context relevant to study. We propose in this contribution a model of co-evolution for cities and transportation networks, with a focus on how transportation networks evolve. More particularly, we extend the model of [3] by introducing top-down governance agents which decide on investments in transportation links.
 
-\cite{raimbault2020modeling}
+% rq: have a look again at Mimeur's model
+
+\justify
+
+$\rightarrow$ \textit{Interaction of bottom-up and top-down planning processes in network and territories co-evolution}
+
+\medskip
+
+
+$\rightarrow$ \textit{Stylized yet applicable simple models accounting for governance processes may be useful tools towards sustainable small scale territorial planning}
+% rq: discussed - see review mesobench
+
+
+\bigskip
+
+\textbf{Research objective}
+
+Explore a co-evolution model for cities and transportation networks at the macroscopic scale, focusing on network evolution rules including governance choices.
+
 
 }
 
@@ -91,7 +277,25 @@ December 8th, 2020
 
 \sframe{Model rationale}{
 
-extend the model of \cite{raimbault2020hierarchy}
+\justify
+
+% The model simulates population trajectories of cities and network link speed trajectories, with two main modules: (i) spatial interaction modeling to determine growth rates of cities, and (ii) governance modeling for network evolution.
+
+$\rightarrow$ \textit{Extend the model of \cite{raimbault2020hierarchy} and \cite{raimbault2020modeling} with two governance levels (national and international) and the game theoretic cooperation module introduced by \cite{le2015modeling}}
+
+\bigskip
+
+\begin{itemize}
+	\item \justify Cities described by their population $P_i\left(t\right)$, linked with a physical transportation network with links described by effective distance $d_l\left(t\right)$
+\end{itemize}
+\begin{itemize}
+	\item \justify Iterative macro-scale LUTI simulation model: at each time step
+		\begin{enumerate}
+			\item Update spatial interaction flows
+			\item Evolve cities populations depending on flows
+			\item Evolve network speeds depending on link flows assigned in the network
+		\end{enumerate}
+\end{itemize}
 
 }
 
@@ -100,15 +304,26 @@ extend the model of \cite{raimbault2020hierarchy}
 
 %The model operates at the macroscopic scale: basic units are cities, distributed in space and described by their population $P_i$. A spatial interaction model is used to estimate flows between pairs of cities as
 
+Spatial interaction flows
+
 \[
-\varphi_{ij} = \left( P_i P_j \right)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
+\varphi_{ij} \textrm{=} \left( P_i P_j \right)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
 \]
 
 % From these flows is computed a growth rate for cities, assuming that it is for one city proportional to the sum of flows to all other cities, such that
 
+\bigskip
+\bigskip
+
+Assume growth rate of cities are proportional to cumulated interaction flows as
+
+
 \[
-\frac{P_i (t+ \Delta t) - P_i(t)}{\Delta t} \propto P_i(t)^{\gamma} \cdot \sum_j P_j(t)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
+\frac{P_i \left(t \textrm{+} \Delta t\right) - P_i\left(t\right)}{\Delta t} \propto c_{ij} \cdot P_i\left(t\right)^{\gamma} \cdot \sum_j P_j\left(t\right)^{\gamma} \cdot \exp\left(- \frac{d_{ij}}{d_0}\right)
 \]
+
+
+with $c_{ij}$ a multiplier parameter equal to $1$ if cities are in the same country and $c_0 \leq 1$ otherwise
 
 % WITH FIXED EFFECT COUNTRY MULTIPLIER
 
@@ -119,6 +334,9 @@ extend the model of \cite{raimbault2020hierarchy}
 
 \sframe{Network}{
 
+
+% Using a game-theoretic approach, macroscopic agents (such as governments or planning authorities) arbitrate stochastically between national and international investments, following a payoff-matrix considering optimal accessibility gains and collaboration costs, with probabilities obtained under the assumption of mixed strategies in a Nash equilibrium. Network investments are used to increase effective link speed by fixed increments.
+
 %The set of deciders - which are the level of respective countries - evaluate the relevance of different infrastructure development options. More precisely, they have in a simplified setting the choice between an international collaboration and a strictly national infrastructure development. Let $Z^{\ast}_i$ be the optimal infrastructure in terms of accessibility gains for the country $i$ only, and $Z^{\ast}_C$ the optimal international infrastructure.
 %Making the assumption that deciders aim at optimizing the accessibility gain, 
 
@@ -126,34 +344,58 @@ extend the model of \cite{raimbault2020hierarchy}
 % - link increase function: flow quantile, improve only if above (no decrease)
 
 
+\begin{enumerate}
+	\item Baseline model: self-reinforcment of link speed according to
+	\[
+	d_l\left(t \textrm{+} \Delta t\right) \textrm{=} d_l\left(t\right) \cdot \left[ 1 \textrm{+} \Delta t \cdot g_M \left( \frac{1 - \left(\frac{\varphi_l}{\varphi_0}\right)^{\gamma_N}}{1 \textrm{+} \left(\frac{\varphi_l}{\varphi_0}\right)^{\gamma_N}} \right) \right]	
+	\]
+	for links with $\varphi_l > \varphi_0$, where $\varphi_0$ corresponds to the $\varphi_0^{(q)}$ quantile of link flows
+	\item Estimate for each country $k$ accessibility gains $\Delta Z_k^{(N)}$ and $\Delta Z_k^{(I)}$ obtained respectively with national $(N)$ and international $(I)$ flows, and corresponding construction costs $C_k^{(N)}$, $C_k^{(I)}$
+\end{enumerate}
 
 }
 
 
 \sframe{Payoff matrix}{
 
+Utility matrix for the two actor game is
+
+\medskip
+
+\begin{center}
 \begin{tabular}{ |c|c|c| } 
  \hline
  0 $|$ 1  & C & NC \\ \hline
- C & $U_i = \Delta X_i(Z^{\ast}_C) - I - \frac{J}{2}$
-   & $\begin{cases}U_0 = \Delta X_0(Z^{\ast}_0)-I \\U_1 = \Delta X_1(Z^{\ast}_1)-I - \frac{J}{2}\end{cases}$ \\ \hline
- NC & $\begin{cases}U_0 =  \Delta X_0(Z^{\ast}_0)-I - \frac{J}{2}\\U_1 =\Delta X_1(Z^{\ast}_1)-I\end{cases}$
-   & $U_i = \Delta X_i(Z^{\ast}_i) - I$ \\
+ C & $U_i \textrm{=} \Delta Z_k^{(I)} - \kappa \cdot C_k^{(I)} - \frac{J}{2}$
+   & $\begin{cases}U_0 \textrm{=} \Delta Z_0^{(N)} - \kappa \cdot C_0^{(N)} \\U_1 \textrm{=} \Delta Z_1^{(N)} - \kappa \cdot C_1^{(N)} - \frac{J}{2}\end{cases}$ \\ \hline
+ NC & $\begin{cases}U_0 \textrm{=}  \Delta Z_0^{(N)} - \kappa \cdot C_0^{(N)} - \frac{J}{2}\\U_1 = \Delta Z_1^{(N)} - \kappa \cdot C_1^{(N)}\end{cases}$
+   & $U_i =  \Delta Z_i^{(N)} - \kappa \cdot C_i^{(N)}$ \\
  \hline
 \end{tabular}
+\end{center}
 
 }
 
 
 \sframe{Mixed Nash equilibrium probabilities}{
 
+The general mixed Nash equilibrium probabilities are
+
+\medskip
+
 \[
-p_{1-i} = - \frac{U_i(C,NC) - U_i(NC,NC)}{\left(U_i(C,C) - U_i(NC,C)\right) - \left(U_i(C,NC) - U_i(NC,NC)\right)}
+p_{1-i} \textrm{=} - \frac{U_i\left(C,NC\right) - U_i\left(NC,NC\right)}{\left(U_i\left(C,C\right) - U_i\left(NC,C\right)\right) - \left(U_i\left(C,NC\right) - U_i\left(NC,NC\right)\right)}
 \]
 
-\begin{equation}
-p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 - i}}}
-\end{equation}
+\medskip
+
+what gives with the payoff matrix
+
+\medskip
+
+\[
+p_i \textrm{=} \frac{J}{\left(Z_{1-i}^{(I)} - Z_{1-i}^{(N)}\right) - \kappa \cdot \left(C_{1-i}^{(I)} - C_{1-i}^{(N)}\right)}
+\]
 
 % from lutecia paper
 % It also forces feasibility conditions on $J$ and accessibility gains to keep a probability. These are
@@ -161,6 +403,13 @@ p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 -
 %	\item $ J \leq \Delta X_{1 - i}(Z^{\star}_{C}) - \Delta X_{1 - i}(Z^{\star}_{1 - i})$, what can be interpreted as a cost-benefits condition for cooperation, e.g. that the gain induced by the common infrastructure must be larger than the collaboration cost;
 %	\item $\Delta X_{1 - i}(Z^{\star}_{C}) \leq \Delta X_{1 - i}(Z^{\star}_{1 - i})$, e.g. that the gain induced by the common infrastructure must be positive.
 %\end{itemize}
+
+
+% ! non collab game? justify? // other approach such as DC?
+
+\footnotesize
+
+Parameters $\kappa, J$ are in practiced rescaled such that: (i) given a baseline model run, average cost absolute difference times $\kappa$ is a fixed proportion $k_0$ of average absolute accessibility difference; and (ii) collaboration cost $J$ yields a fixed probability $p_0$ computed on absolute average of the baseline run.
 
 }
 
@@ -170,13 +419,17 @@ p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 -
 
 \sframe{Implementation and experiments}{
 
+% The model is applied to synthetic systems of cities, in a stylized configuration of two neighbor countries of comparable size. We systematically study model behavior with the OpenMOLE platform for model exploration and validation [4].
+
+
 \footnotesize
 
 \textbf{Implementation}
 
 \begin{itemize}
-	%\item Model implemented in NetLogo (good compromise interactivity / ergonomy), with fast data structures (matrix/table extensions)
-	%\item Integrated seamlessly into OpenMOLE \cite{reuillon2013openmole} for model exploration \url{https://openmole.org/}
+	\item Model implemented in NetLogo (good compromise interactivity / ergonomy), with fast data structures (matrix/table extensions)
+	\item Applied on synthetic systems of cities \cite{raimbault2019second}
+	\item Integrated seamlessly into OpenMOLE \cite{reuillon2013openmole} for model exploration \url{https://openmole.org/}
 \end{itemize}
 
 \begin{center}
@@ -186,33 +439,160 @@ p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 -
 
 \medskip
 
-%\textbf{Experiments}
-%
-%\begin{itemize}
-%	\item 
-%\end{itemize}
+\textbf{Experiments}
+
+\begin{itemize}
+	\item Saltelli Global Sensitivity Analysis \cite{saltelli2008global}
+	\item Role of stochasticity
+	\item Grid experiment with role of spatial configuration
+\end{itemize}
+
+}
+
+\sframe{Example of simulated systems}{
+ 
+\begin{center}
+	\includegraphics[width=0.65\linewidth]{figures/ex_baseline.png}\\\hrule
+	\includegraphics[width=0.65\linewidth]{figures/ex_baseline_full.png}
+\end{center}
+
+ 
+ 
+}
+
+\sframe{Global sensitivity analysis}{
+
+% First exploration results suggest a strong qualitative influence of propensity to collaborate on trajectories of the full system
+
+% first order
+% deltaPop,
+%deltaAccessibility,
+%deltaHierarchiesPop,
+% rankCorrPop,
+% governanceLevel,
+%networkCost,
+
+% total order
+
+% ,,,,,,,,,
+%deltaAccessibility,
+% deltaHierarchiesPop,
+% rankCorrPop,
+% governanceLevel,
+% networkCost,
+
+% synthRankSize,gravityGamma,gravityDecay,gravityInterRatio,nwGmax,nwExponent,nwReinQuantile,govCostToAccess,govEffectiveProba,seed
+
+
+\footnotesize
+
+\textbf{Indicators: } $\Delta P$ average population growth; $\Delta Z$ average accessibility growth; $\Delta \alpha_P$ population hierarchy change; $r_P$ population rank correlation; $g$ average governance level; $C$ total cost
+
+
+\begin{center}
+\resizebox{\linewidth}{!}{
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{2}{|c|}{$\alpha_0$} & \multicolumn{2}{|c|}{$\gamma_G$} & \multicolumn{2}{|c|}{$d_G$} & \multicolumn{2}{|c|}{$c_0$} & \multicolumn{2}{|c|}{$g_{max}$} & \multicolumn{2}{|c|}{$\gamma_N$}  & \multicolumn{2}{|c|}{$\varphi_0^{(q)}$}  & \multicolumn{2}{|c|}{$k_0$} & \multicolumn{2}{|c|}{$p_0$} & \multicolumn{2}{|c|}{$S$} \\
+ & F & T & F & T & F & T & F & T & F & T & F & T & F & T & F & T & F & T & F & T \\
+ \hline
+$\Delta P$ & 0.094 & 0.22 & 0.17 & 0.37 & 0.07 & 0.15 & 0.3 & 0.59 & $7\cdot 10^{-5}$ & 0.003 & -0.002 & $6.9\cdot 10^{-4}$ & -0.002 & 0.002 & -0.001 & 0.0003 & 0.002 & 0.003 & 0.02 & 0.06 \\
+$\Delta Z$ & 0.05 & 0.1 & 0.02 & 0.16 & 0.52 & 0.8 & 0.02 & 0.03 & -0.006 & 0.18 & -0.006 & 0.008 & -0.008 & 0.03 & 0.0005 & 0.003 & -0.006 & 0.01 & -0.005 & 0.1 \\
+$\Delta \alpha_P$ & 0.2 & 0.3 & 0.3 & 0.5 & 0.06 & 0.12 & 0.17 & 0.26 & -0.002 & 0.002 & 0.0001 & 0.0003 & -0.004 & 0.001 &-0.0007 & 0.0003 & - 0.0008 & 0.0008 & 0.01 & 0.04 \\
+$r_P$ & -0.7& 0.1 & -0.1& 0.2 &-0.4 & 0.3& 0.26& 0.002 & -0.09 & 0.01 & 0.5 & 0.01 & 1.0 & 0.09 & 0.1 & 0.0002 & 0.3 & 0.001 & 0.1 & 0.07 \\
+$g$ & -0.01 & 0.26 & -0.004 & 0.3 & -0.01 & 0.44 &0.03 & 0.6 & -0.03& 0.25 &-0.02 &0.2 & -0.05 & 0.3 & -0.01 & 0.2 & 0.07 & 0.7 & -0.01 & 0.5 \\
+$C$ & -0.002 & 0.002 &-0.007 & 0.01 & -0.001& 0.002 & 0.002 & 0.002 & 0.06 &0.09 & 0.002 & 0.01 &0.8 & 0.9 & -0.0008 & 0.0005 &0.003 & 0.003 & 0.04& 0.04 \\\hline
+\end{tabular}
+}
+\end{center}
+
+\medskip
+
+$\rightarrow$ \textit{effect of spatial configuration (seed and hierarchy) \cite{raimbault2019space}; 
+crossed effects between network, cities and governance}
+
+% + stat analysis? later
+
+}
+
+\sframe{Role of stochasticity}{
+
+On 100 parameters sampled (LHS) with 100 replications:
+
+\begin{itemize}
+	\item All indicators have a high Sharpe ratio (1st quartile with a minimum of 7.7 expect governance level $g$ with a median at 1.02)
+	\item Distance between average relative to standard deviations are also high (1st quartile higher than 2.3, except for $g$ with a median at 1.2 and $r_P$ with a median of 1.26)
+\end{itemize}
+
+%\medskip
+
+\begin{center}
+	\includegraphics[width=0.4\textwidth]{figures/networkCost_samples10-seed42.png}
+	\includegraphics[width=0.4\textwidth]{figures/deltaHierarchiesPop_samples10-seed666.png}
+\end{center}
+
+
 
 }
 
 
+\sframe{Grid exploration}{
+
+% , and that intermediate levels of international investments may be more optimal in terms of accessibility gains at fixed costs. In comparison to null model behavior obtained running the base model from [3], the introduction of top-down governance decisions also changes considerably model behavior.
+
+% pareto fronts?
+% grid plot for some indicators.
 
 
-\sframe{Role of urban hierarchy}{
 
-\cite{raimbault2019space}
+
+\begin{center}
+	\includegraphics[width=0.5\textwidth]{figures/deltaAccessibility_gravityInterRatio0_75_govCostToAccess0_75_nwExponent2_nwGmax0_05_nwReinQuantile0_1.png}
+	\includegraphics[width=0.5\textwidth]{figures/governanceCollab_gravityInterRatio0_75_govCostToAccess0_25_nwExponent2_nwGmax0_05_nwReinQuantile0_1.png}
+\end{center}
+
+{\footnotesize Rows: hierarchy; columns: $\gamma_G$}
+
+\smallskip
+
+$\rightarrow$ \textit{Larger span in spatial interaction decrease relative accessibility gain, as do less hierarchical flows; effect of interaction decay on governance level qualitatively changed by $p_0$}
 
 }
+
+
+\sframe{Optimizing accessibility and cost}{
+
+\begin{center}
+	\includegraphics[height=0.65\textheight,width=0.65\textwidth]{figures/pareto-access-cost_cut2.png}	
+\end{center}
+
+{\footnotesize Rows: hierarchy; columns: $c_0$}
+
+\smallskip
+
+$\rightarrow$ \textit{Intermediate values of governance levels on the optimal Pareto front when international exchanges are intense (right column)}
+
+}
+
+
+%\sframe{Role of urban hierarchy}{
+% We also show that initial spatial conditions such as urban hierarchy significantly influence model outcomes [5].
+% -> GSA
+%}
 
 
 \section{Discussion}
 
 \sframe{Discussion}{
 
+% This work illustrates how co-evolution models at this scale can be refined, opening research possibilities towards more complex or multi-scale models.
+
 % Discuss alternative flow assignment procedures. You can in particular have a look at the transportation literature
 
 % Discuss the structure of this model, of canonical LUTI, and of a sample of more advanced LUTI models could a much more detailed representation of underlying capture intrinsic crucial process which would be missed by our approach? In other words, what is the purpose of LUTI models? More generally, discuss the relation between the degree of validation of a model and its potential operationalization.
 
 
+% game type - Nash eq?
 
 \justify
 
@@ -220,11 +600,15 @@ p_i = \frac{J}{\Delta X_{1 - i}{Z^{\star}_{C}} - \Delta X_{1 - i}{Z^{\star}_{1 -
 
 \medskip
 
-$\rightarrow$ 
+$\rightarrow$ Towards a macroscopic Land-use Transport model (including other network assignment procedures and congestion)
 
 \medskip
 
-$\rightarrow$ 
+$\rightarrow$ More elaborated representation of decision-making and governance processes
+
+\medskip
+
+$\rightarrow$ Integration into a multi-scale model \cite{raimbault:halshs-02351722}
 
 \bigskip
 \bigskip
@@ -234,7 +618,11 @@ $\rightarrow$
 
 \medskip
 
-$\rightarrow$ 
+$\rightarrow$ Evaluate transportation scenarios/projects in a multinational stakeholders context
+
+\medskip
+
+$\rightarrow$ Planning for sustainable territories on long time scales
 
 
 }
@@ -249,11 +637,11 @@ $\rightarrow$
 \sframe{Conclusion}{
 
 
-$\rightarrow$
+$\rightarrow$ A co-evolution model at the macroscopic scale complexified by including transportation governance
 
 \bigskip
 
-$\rightarrow$
+$\rightarrow$ Well understood stylized models as a first step towards policy applications
 
 
 \bigskip
@@ -261,14 +649,14 @@ $\rightarrow$
 
 \textbf{Open repositories}
 
-\url{https://github.com/JusteRaimbault/CoevolGov}
+\url{https://github.com/JusteRaimbault/CoevolGov} for the model
 
-\url{https://github.com/JusteRaimbault/Governance}
+\url{https://github.com/JusteRaimbault/Governance} for results
 
 
 \bigskip
 
-\textbf{Data at} \texttt{}
+\textbf{Simulation data at} \url{https://doi.org/10.7910/DVN/WP4V7S}
 
 }
 
@@ -283,7 +671,7 @@ $\rightarrow$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
+%
 %\sframe{Reserve slides}{
 %
 %\Huge
@@ -292,7 +680,27 @@ $\rightarrow$
 %
 %Reserve slides
 %
+%% possible questions?
+%% application to real systems?
+%% policy applications?
+%% def/carac coevol
+%% multiscale? ~
+%
 %}
+%
+%
+%\sframe{Defining co-evolution}{
+%
+%}
+%
+%\sframe{Characterizing co-evolution}{
+%
+%}
+%
+%\sframe{A LUTI model with governance processes}{
+%
+%}
+
 
 
 
