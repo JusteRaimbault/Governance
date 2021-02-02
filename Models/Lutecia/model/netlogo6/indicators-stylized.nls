@@ -61,10 +61,14 @@ to-report indicators-stylized:cor-access-time [weighted?]
     set avgdist list:order-by-last-element ([(list ((patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot))) patch:number)] of patches)
     if sum avgdist = 0 [set avgdist list:rep 1 count patches]
   ]
-  let avgtime map [? -> global:network-speed / ?] avgdist
+  let avgtime map [? -> indicators-stylized:avgtime ?] avgdist
   ;let sortaccess map [first ?] (sort-by [last ?1 < last ?2] ([(list patch:current-accessibility patch:number)] of patches))
   let sortaccess list:order-by-last-element ([(list patch:current-accessibility patch:number)] of patches)
   report list:pearson-correlation avgtime sortaccess
+end
+
+to-report indicators-stylized:avgtime [dist]
+  ifelse dist = 0 [report 0][report global:network-speed / dist]
 end
 
 

@@ -612,7 +612,7 @@ global:#-initial-territories
 global:#-initial-territories
 1
 5
-3.0
+5.0
 1
 1
 NIL
@@ -927,7 +927,7 @@ global:road-length
 global:road-length
 1.0
 20
-0.0
+3.0
 1.0
 1
 NIL
@@ -1230,7 +1230,7 @@ SWITCH
 616
 global:evolve-network?
 global:evolve-network?
-1
+0
 1
 -1000
 
@@ -1269,7 +1269,7 @@ INPUTBOX
 605
 765
 global:target-network-file
-0
+setup/target/network0.shp
 1
 0
 String

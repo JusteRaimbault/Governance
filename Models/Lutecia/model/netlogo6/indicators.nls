@@ -393,7 +393,7 @@ end
 to-report indicators:patches-weighted-access-time
   let atot sum [patch:actives] of patches let etot sum [patch:employments] of patches
   let avgdist list:order-by-last-element ([(list ((patch:a-to-e-distance + patch:e-to-a-distance) / (2 * (atot) * (etot))) patch:number)] of patches)
-  report map [? -> global:network-speed / ?] avgdist
+  report map [? -> indicators-stylized:avgtime ?] avgdist
 end
 
 to-report indicators:patches-alltimes-weighted-access-time

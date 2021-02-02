@@ -112,6 +112,7 @@ to setup:setup-globals
     set global:gis-sea-file table:get conf "gis-sea-file"
     set global:gis-economic-areas-file table:get conf "gis-economic-areas-file"
     set global:gis-governed-patches-file table:get conf "gis-governed-patches-file"
+    set global:target-network-file table:get conf "gis-target-network-file"
   ]
   
   ; population raster
@@ -258,6 +259,8 @@ end
 ; population distribution
 to setup:setup-population-distribution
    
+  output-print "    -> population"
+  
    if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
      let centers [patch-here] of mayors with [self != global:regional-authority]
      foreach centers [
@@ -302,6 +305,8 @@ end
 ;;
 ; employments distribution
 to setup:setup-employment-distribution
+  
+  output-print "    -> employment"
   
   if global:setup-type = "random" or global:setup-type = "from-file-mayors" or global:setup-type = "gis-synthetic" [
     let centers [patch-here] of mayors with [self != global:regional-authority]
@@ -399,6 +404,8 @@ end
 ;  Done AFTER nw distance caching ; updates
 to setup:setup-initial-network
   
+  output-print "... Network"
+  
   if global:initial-nw? != false and global:initial-nw-type != "no-network" [
   
     if global:setup-type = "random" or global:setup-type = "from-file" [
@@ -479,11 +486,11 @@ to setup:setup-initial-network
       let network-dataset gis:load-dataset global:gis-network-file
     
       foreach gis:feature-list-of network-dataset [   
-        ? ->
-        foreach gis:vertex-lists-of ? [
-          let i 0 let l ?
-          foreach but-first ? [
-            let p1 gis:location-of item i l let p2 gis:location-of ?
+        feature ->
+        foreach gis:vertex-lists-of feature [ vertices ->
+          let i 0 let l vertices
+          foreach but-first vertices [ vertex ->
+            let p1 gis:location-of item i l let p2 gis:location-of vertex
             ;output-print p1 output-print p2
             if p1 != [] and p2 != [] [
               set p1 ([list pxcor pycor] of patch first p1 last p1) set p2 ([list pxcor pycor] of patch first p2 last p2)
@@ -506,7 +513,10 @@ to setup:setup-initial-network
   ask transportation-links [set transportation-link:status "initial"]
   
   ; ghost nw at setup
-  if global:setup-type = "gis" [network-ghost:ghost-network-from-gis global:target-network-file]
+  if global:setup-type = "gis" [
+    output-print "... Ghost network"
+    network-ghost:ghost-network-from-gis global:target-network-file
+  ]
   
   
 end
@@ -552,7 +562,7 @@ end
 ;;
 ; setup initial network matrices
 to setup:setup-nw-matrices
-  tic output-print "...NW shortest distances"
+  tic output-print "... NW shortest distances matrices"
   set global:#-patches count patches
   if count transportation-nodes = 0 [
     ; initialize nw distance at -1 if no nw
@@ -602,6 +612,8 @@ end
 ;
 ;  -> sets the globals mayors-coordinates
 to setup:setup-mayor-characteristics
+  
+  output-print "... Mayor characteristics"
   
   set global:mayors-coordinates [] set global:mayors-populations [] set global:mayors-employments [] set global:mayors-names []
   set global:ext-position []
@@ -682,6 +694,8 @@ end
 ;;
 ;  tracked indicators already assumed setup
 to setup:setup-indicators
+  
+  output-print "... Indicators"
   
   set global:tracked-indicators indicators:get-tracked-indicators
   
