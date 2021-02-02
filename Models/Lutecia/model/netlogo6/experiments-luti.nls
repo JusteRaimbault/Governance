@@ -102,7 +102,7 @@ to experiments-luti:setup-experiment-initial-network [networkType centers bioGam
   set global:seed rnd-seed
   
   set global:world-size 20
-  set global:world-height 20 set global:world-width 20
+  ;set global:world-height 20 set global:world-width 20
   set-patch-size 30
   set global:patches-display "patch:actives"
   display:update-display

@@ -1103,7 +1103,7 @@ CHOOSER
 global:setup-type
 global:setup-type
 "random" "gis-synthetic" "gis" "from-file-mayors" "from-file" "external"
-0
+2
 
 BUTTON
 454
@@ -1200,7 +1200,7 @@ INPUTBOX
 522
 70
 global:conf-file
-NIL
+setup/conf/real_nonw.conf
 1
 0
 String
@@ -1336,9 +1336,9 @@ HORIZONTAL
 
 TEXTBOX
 700
-583
+585
 715
-613
+615
 |
 25
 0.0
@@ -1412,7 +1412,7 @@ CHOOSER
 global:initial-nw-type
 global:initial-nw-type
 "tree-skeleton" "slime-mould" "full" "no-network" "from-file"
-1
+4
 
 MONITOR
 1455
@@ -1535,7 +1535,7 @@ PLOT
 380
 1318
 556
-Relative sustainibility indics
+Relative sustainability indics
 NIL
 NIL
 0.0
@@ -1935,7 +1935,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.2
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

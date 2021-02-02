@@ -130,8 +130,8 @@ to setup:setup-world
   
   ; resize world if needed
   ;resize-world (- global:world-size / 2) (global:world-size / 2) (- global:world-size / 2) (global:world-size / 2)
-  ;resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
-  resize-world 0 (global:world-width - 1) 0 (global:world-height - 1)
+  resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
+  ;resize-world 0 (global:world-width - 1) 0 (global:world-height - 1)
   
   ;set-patch-size 430 / global:world-size
   
@@ -156,7 +156,8 @@ to setup:setup-patches
     gis:set-world-envelope gis:envelope-of gis:load-dataset global:gis-extent-file
     
     ; sea patches
-    foreach gis:feature-list-of gis:load-dataset global:gis-sea-file [
+    let gissea gis:feature-list-of gis:load-dataset global:gis-sea-file
+    foreach gissea [
       ? -> ask patches with [gis:contains? ? self] [set patch:sea? true]
     ]
     
@@ -212,7 +213,8 @@ to setup:setup-governance-areas
   ]
   
   if global:setup-type = "gis" [
-    foreach gis:feature-list-of gis:load-dataset global:gis-governed-patches-file [
+    let govgis gis:feature-list-of gis:load-dataset global:gis-governed-patches-file
+    foreach govgis [
       ? ->
       let area-name gis:property-value ? "NAME"
       ask patches with [gis:contains? ? self or gis:intersects? ? self] [
@@ -316,7 +318,7 @@ to setup:setup-employment-distribution
   if global:setup-type = "gis" [
     let economic-dataset gis:load-dataset global:gis-economic-areas-file
     let properties gis:property-names economic-dataset
-  
+    
     foreach gis:feature-list-of economic-dataset [
       ? ->
        let current-employment-cat0 0 if member? "PRMRY_S" properties [set current-employment-cat0 gis:property-value ? "PRMRY_S"]
@@ -648,10 +650,10 @@ to setup:setup-mayor-characteristics
        let current-pop 0 if member? "POPULATION" properties [set current-pop gis:property-value ? "POPULATION"]
        let current-employment 0 if member? "EMPLOYMENT" properties [set current-employment gis:property-value ? "EMPLOYMENT"]
        let current-name "" if member? "NAME" properties [set current-name gis:property-value ? "NAME"]
-       foreach gis:vertex-lists-of ? [
-          foreach ? [
+       foreach gis:vertex-lists-of ? [ vertexlist ->
+          foreach vertexlist [ vertex ->
            ; center coordinates
-           set global:mayors-coordinates lput (gis:location-of ?) global:mayors-coordinates
+           set global:mayors-coordinates lput (gis:location-of vertex) global:mayors-coordinates
            ;show global:mayors-coordinates
            ;show current-pop show current-employment
            set global:mayors-populations lput current-pop global:mayors-populations
