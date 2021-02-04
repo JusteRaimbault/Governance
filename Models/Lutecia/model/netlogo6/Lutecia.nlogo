@@ -577,13 +577,13 @@ biological-network-links-own [
 ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-572
-18
-1010
-457
+429
+13
+977
+562
 -1
 -1
-28.666666666666668
+18.0
 1
 10
 1
@@ -594,9 +594,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-14
+29
 0
-14
+29
 0
 0
 1
@@ -606,7 +606,7 @@ ticks
 SLIDER
 3
 73
-186
+168
 106
 global:#-initial-territories
 global:#-initial-territories
@@ -648,7 +648,7 @@ global:patches-display
 TEXTBOX
 11
 15
-161
+111
 33
 Setup parameters
 11
@@ -668,7 +668,7 @@ Runtime parameters
 SLIDER
 3
 120
-284
+219
 153
 global:actives-spatial-dispersion
 global:actives-spatial-dispersion
@@ -681,10 +681,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-2
-155
-282
-188
+3
+154
+219
+187
 global:employments-spatial-dispersion
 global:employments-spatial-dispersion
 0
@@ -696,10 +696,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-285
-155
-483
-188
+220
+154
+398
+187
 global:actives-max
 global:actives-max
 0
@@ -711,9 +711,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-286
+220
 120
-486
+398
 153
 global:employments-max
 global:employments-max
@@ -728,7 +728,7 @@ HORIZONTAL
 SLIDER
 7
 290
-250
+224
 323
 global:gamma-cobb-douglas-a
 global:gamma-cobb-douglas-a
@@ -743,7 +743,7 @@ HORIZONTAL
 SLIDER
 7
 358
-251
+224
 391
 global:beta-discrete-choices
 global:beta-discrete-choices
@@ -773,10 +773,10 @@ NIL
 0
 
 PLOT
-1019
-184
-1242
-339
+986
+178
+1209
+333
 convergence
 NIL
 NIL
@@ -792,10 +792,10 @@ PENS
 "pen-1" 1.0 0 -12087248 true "" "plot global:rel-diff-actives / count patches"
 
 OUTPUT
-1324
-346
-1808
-569
+1234
+343
+1718
+566
 10
 
 TEXTBOX
@@ -809,20 +809,20 @@ LUTI
 1
 
 TEXTBOX
-336
-261
-486
-279
+240
+271
+322
+289
 Governance
 11
 0.0
 1
 
 SLIDER
-285
-278
-530
-311
+237
+291
+421
+324
 global:regional-decision-proba
 global:regional-decision-proba
 0
@@ -834,9 +834,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-263
+226
 272
-278
+241
 303
 |
 25
@@ -844,9 +844,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 293
-278
+241
 324
 |
 25
@@ -854,9 +854,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 315
-278
+241
 333
 |
 25
@@ -884,9 +884,9 @@ Transportation
 1
 
 TEXTBOX
-263
+226
 326
-278
+241
 357
 |
 25
@@ -919,10 +919,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-285
-312
-530
-345
+237
+325
+422
+358
 global:road-length
 global:road-length
 1.0
@@ -934,10 +934,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-285
-344
-530
-377
+237
+357
+422
+390
 global:#-explorations
 global:#-explorations
 0
@@ -951,7 +951,7 @@ HORIZONTAL
 SLIDER
 7
 392
-251
+224
 425
 global:lambda-accessibility
 global:lambda-accessibility
@@ -989,7 +989,7 @@ global:total-time-steps
 global:total-time-steps
 0
 1000
-20.0
+19.0
 1
 1
 NIL
@@ -1006,19 +1006,19 @@ __________________
 1
 
 CHOOSER
-283
-414
-435
-459
+235
+427
+387
+472
 global:game-type
 global:game-type
 "random" "simple-nash" "discrete-choices"
 2
 
 TEXTBOX
-263
+226
 348
-278
+241
 380
 |
 25
@@ -1026,9 +1026,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 370
-281
+244
 400
 |
 25
@@ -1036,10 +1036,10 @@ TEXTBOX
 1
 
 PLOT
-1019
-17
-1242
-183
+987
+10
+1210
+176
 accessibility
 NIL
 NIL
@@ -1081,10 +1081,10 @@ NIL
 1
 
 SLIDER
-284
-377
-530
-410
+237
+389
+421
+422
 global:collaboration-cost
 global:collaboration-cost
 0
@@ -1096,10 +1096,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-206
-72
-369
-117
+169
+73
+276
+118
 global:setup-type
 global:setup-type
 "random" "gis-synthetic" "gis" "from-file-mayors" "from-file" "external"
@@ -1142,7 +1142,7 @@ NIL
 SLIDER
 7
 324
-250
+224
 357
 global:gamma-cobb-douglas-e
 global:gamma-cobb-douglas-e
@@ -1181,14 +1181,14 @@ HORIZONTAL
 
 SLIDER
 100
-34
+33
 203
-67
+66
 global:world-size
 global:world-size
 0
 50
-15.0
+30.0
 1
 1
 NIL
@@ -1197,7 +1197,7 @@ HORIZONTAL
 INPUTBOX
 205
 10
-522
+387
 70
 global:conf-file
 setup/conf/real_nonw.conf
@@ -1206,10 +1206,10 @@ setup/conf/real_nonw.conf
 String
 
 PLOT
-1244
-17
-1452
-184
+1211
+10
+1419
+177
 morphology
 moran
 slope
@@ -1246,10 +1246,10 @@ global:evolve-landuse?
 -1000
 
 PLOT
-1244
-186
-1451
-340
+1211
+179
+1418
+333
 mean-travel-distance
 NIL
 NIL
@@ -1269,7 +1269,7 @@ INPUTBOX
 605
 765
 global:target-network-file
-setup/target/network0.shp
+setup/target/network1.shp
 1
 0
 String
@@ -1297,7 +1297,7 @@ Interactive
 SLIDER
 7
 425
-251
+224
 458
 global:relocation-rate
 global:relocation-rate
@@ -1375,9 +1375,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 390
-278
+241
 420
 |
 25
@@ -1385,9 +1385,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 413
-278
+241
 443
 |
 25
@@ -1395,9 +1395,9 @@ TEXTBOX
 1
 
 TEXTBOX
-263
+226
 435
-278
+241
 465
 |
 25
@@ -1405,20 +1405,20 @@ TEXTBOX
 1
 
 CHOOSER
-372
-72
-560
-117
+276
+73
+404
+118
 global:initial-nw-type
 global:initial-nw-type
 "tree-skeleton" "slime-mould" "full" "no-network" "from-file"
 4
 
 MONITOR
-1455
-24
-1522
-69
+1428
+10
+1495
+55
 bio ticks
 global:bio-ticks
 17
@@ -1441,10 +1441,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1501
-582
-1723
-732
+964
+751
+1186
+901
 cor-access-dev
 NIL
 NIL
@@ -1461,10 +1461,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-dev-mw"
 
 PLOT
-1276
-582
-1499
-732
+739
+751
+962
+901
 corr-access-employments
 NIL
 NIL
@@ -1481,10 +1481,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators:causal-moving-average \"indicators-stylized:cor-access-employments\" 15"
 
 PLOT
-871
-582
-1071
-732
+739
+595
+962
+751
 cor-access-wtime
 NIL
 NIL
@@ -1501,10 +1501,10 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw true"
 
 PLOT
-1074
-582
-1274
-732
+964
+594
+1187
+750
 cor-access-utime
 NIL
 NIL
@@ -1521,20 +1521,20 @@ PENS
 "pen-2" 1.0 0 -13791810 true "" "plot indicators-stylized:cor-access-time-mw false"
 
 TEXTBOX
-875
-543
-957
-561
+760
+578
+842
+596
 Correlations
 12
 0.0
 1
 
 PLOT
-1026
-380
-1318
-556
+981
+342
+1224
+492
 Relative sustainability indics
 NIL
 NIL
@@ -1550,10 +1550,10 @@ PENS
 "pen-1" 1.0 0 -5825686 true "" "if ticks > 0 [plot indicators:relative-congestion]"
 
 INPUTBOX
-1524
-24
-1738
-84
+1426
+61
+1640
+121
 global:setup-file-prefix
 0
 1

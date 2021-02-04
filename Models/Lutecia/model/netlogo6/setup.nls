@@ -134,7 +134,7 @@ to setup:setup-world
   resize-world 0 (global:world-size - 1) 0 (global:world-size - 1)
   ;resize-world 0 (global:world-width - 1) 0 (global:world-height - 1)
   
-  ;set-patch-size 430 / global:world-size
+  set-patch-size 540 / global:world-size
   
 end
 
