@@ -1,3 +1,6 @@
 [submodule "Models/CoevolGov"]
 	path = Models/CoevolGov
 	url = git@github.com:JusteRaimbault/CoevolGov.git
+[submodule "Docs/Papers/Lutecia-paper"]
+	path = Docs/Papers/Lutecia-paper
+	url = git@github.com:JusteRaimbault/Lutecia-paper.git
