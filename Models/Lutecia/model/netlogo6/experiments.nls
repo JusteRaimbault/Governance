@@ -61,11 +61,11 @@ to experiments:setup-experiment [regionalproba lambdaacc nwspeed game coll-cost 
   set global:target-network-file (word "setup/target/network" target-network ".shp")
   
   ; setup type
-  if setuptype = 0 [set global:setup-type "random"]
-  if setuptype = 1 [set global:setup-type "gis-synthetic"]
-  if setuptype = 2 [set global:setup-type "gis"]
-  if setuptype = 3 [set global:setup-type "external"]
+  ; "random" "gis-synthetic" "gis" "external"
+  set global:setup-type setuptype
   
+  ; stop type 
+  ; "time" "infrastructure-stock"
   set global:stopping-type stoptype
 
   if global:stopping-type = "time" [set global:total-time-steps finalValue]

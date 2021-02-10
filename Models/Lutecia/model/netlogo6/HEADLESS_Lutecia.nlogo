@@ -1,15 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;
-;; MetropolSim v3.0
-;;
-;; Major changes since v2
-;;   - matrix dynamic shortest path (euclidian and nw) computation
-;;   - simplified population structure (one csp)
-;;   - game-theoretical governance management
-;;
-;; TODO - possible extensions :
-;;    * add different transportation modes ?
-;;    * add csp ? not prioritary.
-;;
+;; Lutecia HEADLESS model
 ;;;;;;;;;;;;;;;;;;;;;
 
 extensions[matrix table context nw palette gis morphology]

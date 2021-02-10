@@ -583,7 +583,7 @@ GRAPHICS-WINDOW
 562
 -1
 -1
-18.0
+36.0
 1
 10
 1
@@ -594,9 +594,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-29
+14
 0
-29
+14
 0
 0
 1
@@ -988,8 +988,8 @@ SLIDER
 global:total-time-steps
 global:total-time-steps
 0
-1000
-19.0
+50
+8.0
 1
 1
 NIL
@@ -1188,7 +1188,7 @@ global:world-size
 global:world-size
 0
 50
-30.0
+15.0
 1
 1
 NIL
@@ -1303,7 +1303,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-0.1
+1.0
 0.01
 1
 NIL

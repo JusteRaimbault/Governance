@@ -1,0 +1,114 @@
+import java.util.Date
+import java.text.SimpleDateFormat
+
+logger.level("FINE")
+
+
+// Parameters
+val regionalProba = Val[Double]
+val lambdaAcc = Val[Double]
+val networkSpeed = Val[Double]
+val game = Val[Double]
+val collCost = Val[Double]
+val roadLength = Val[Double]
+val gammaCDA=Val[Double]
+val gammaCDE=Val[Double]
+val betaDC=Val[Double]
+val relocationRate=Val[Double]
+
+val evolveNetwork = Val[Int]
+val evolveLanduse = Val[Int]
+val targetNetwork = Val[Int]
+val finalTime = Val[Int]
+
+val setupType = Val[String]
+val synthConfFile = Val[String]
+
+val id = Val[Int]
+val replication = Val[Int]
+
+
+// indicators
+val nwLength = Val[Double]
+val nwRelativeSpeed = Val[Double]
+val nwCloseness = Val[Double]
+val nwBetweenness = Val[Double]
+val nwPathLength = Val[Double]
+val nwDiameter = Val[Double]
+val gametype=Val[String]
+val expcollab=Val[Double]
+val wantedcollab=Val[Double]
+val realcollab=Val[Double]
+val failed=Val[Double]
+val targetDistance = Val[Double]
+
+
+// experiments:setup-experiment regionalproba lambdaacc nwspeed game coll-cost roadLength gammaCDA gammaCDE betaDC relocationRate evolveNetwork evolveLanduse target-network setuptype conffile stoptype finalValue rnd-seed]
+val cmds = List(
+  "setup-experiment ${regionalProba} ${lambdaAcc} ${networkSpeed} ${game} ${collCost} ${roadLength} ${gammaCDA} ${gammaCDE} ${betaDC} ${relocationRate} ${evolveNetwork} ${evolveLanduse} ${targetNetwork} \"${setupType}\" \"${synthConfFile}\" \"time\" ${finalTime} ${replication}",
+  "run-experiment"
+)
+
+val model = NetLogo6Task(workDirectory / "HEADLESS_Lutecia.nlogo",cmds,embedWorkspace=true) set(
+  inputs += (regionalProba,lambdaAcc,networkSpeed,game,collCost,roadLength,gammaCDA,gammaCDE,betaDC,relocationRate,targetNetwork,finalTime,setupType,synthConfFile,replication,id),
+  outputs += (regionalProba,lambdaAcc,networkSpeed,game,collCost,roadLength,gammaCDA,gammaCDE,betaDC,relocationRate,targetNetwork,finalTime,setupType,synthConfFile,replication,id),
+  netLogoOutputs += ("total-nw-length",nwLength),
+  netLogoOutputs += ("mean-relative-speed",nwRelativeSpeed),
+  netLogoOutputs += ("mean-closeness-centrality",nwCloseness),
+  netLogoOutputs += ("mean-bw-centrality",nwBetweenness),
+  netLogoOutputs += ("mean-path-length",nwPathLength),
+  netLogoOutputs += ("nw-diameter",nwDiameter),
+  netLogoOutputs += ("game-type", gametype),
+  netLogoOutputs += ("expected-collaboration-rate", expcollab),
+  netLogoOutputs += ("wanted-collaboration-rate", wantedcollab),
+  netLogoOutputs += ("realized-collaboration-rate", realcollab),
+  netLogoOutputs += ("target-network-distance",targetDistance),
+  netLogoOutputs += ("failed", failed)
+)
+
+
+val purpose = "TEST"
+//val purpose = "CALIBRATIONLHS_GRID"
+
+val resfilename = ((new SimpleDateFormat("yyyyMMdd_HHmmss")).format(new Date()))+"_"+purpose+".csv"
+val indics_hook = CSVHook(workDirectory / "calibration" / resfilename,arrayOnRow=true)
+
+
+//val env = LocalEnvironment(5)
+val env = EGIEnvironment("vo.complex-systems.eu",openMOLEMemory = 4000 megabytes)
+
+
+val replications = Replication (
+   //evaluation = (model on env by 10 hook indics_hook),
+   evaluation = (model on env hook indics_hook),
+   seed = replication,
+   sample = 10
+)
+
+val exploration =
+  DirectSampling(
+    evaluation = replications,
+    sampling =
+      ((LHS (
+      1//5000
+      ,regionalproba in Range(0.0,1.0)
+      ,roadLength in Range(2.0,5.0)
+      ,game in Range(1.0,2.999)
+      ,collcost in Range(0.0,0.005)
+    )) withIndex id)
+    x (relocationRate is 0.1)
+    x (lambdaAcc is 0.001)
+    x (euclpace is 5.0)
+    x (gammaCDA is 0.9)
+    x (gammaCDE is 0.65)
+    x (betaDC is 1.8)
+    x (evolveNetwork is 1)
+    x (evolveLanduse is 0)
+    x (targetNetwork is 1)
+    x (setupType is "gis")
+    x (synthConfFile is "setup/conf/real_nonw.conf")
+    x (finalTime is 10)
+  )
+
+
+exploration
