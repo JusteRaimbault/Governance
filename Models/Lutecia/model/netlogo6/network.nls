@@ -233,7 +233,11 @@ to network:cache-nw-measures
       let c2 item j clist let path [] ask c1 [set path nw:weighted-path-to c2 "transportation-link:length"]
       ;show (word "c1 " c1 " ; c2 " c2 " ; path: " path)
       ; update link betweeness
-      let l 0 if path != false [foreach path [? -> ask ? [set l l + transportation-link:length set transportation-link:bw-centrality transportation-link:bw-centrality + 1]]]
+      let l 0 
+      if path = false [set path []]
+      ;if path != false [
+        foreach path [? -> ask ? [set l l + transportation-link:length set transportation-link:bw-centrality transportation-link:bw-centrality + 1]]
+      ;]
       ; if the network is not connected, some kind of infinite value
       if l = 0 [set l 100 * sqrt (world-width ^ 2 + world-height ^ 2)]
       ; update shortest path table
