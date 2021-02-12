@@ -23,10 +23,6 @@ to experiments:setup-experiment [regionalproba lambdaacc nwspeed game coll-cost 
     random-seed rnd-seed
   ]
   
-  
-  
-  setup:setup-headless-vars
-  
   set global:headless? true
   set global:failed 0
   
@@ -71,6 +67,8 @@ to experiments:setup-experiment [regionalproba lambdaacc nwspeed game coll-cost 
   if global:stopping-type = "time" [set global:total-time-steps finalValue]
   if global:stopping-type = "infrastructure-stock" [set global:total-infrastructure-stock finalValue]
   
+  setup:setup-headless-vars
+  
   if global:setup-from-world-file? = false [
     set global:world-size 15
     setup:setup
@@ -93,6 +91,11 @@ to experiments:run-experiment
   ; cache network measures first
   network:cache-nw-measures
   
+end
+
+to experiments:test-experiment
+  experiments:setup-experiment 0.2953407320932828 0.001 5.0 1.1155308236864352 4.0020992445035096E-4 4.876594421107817 0.9 0.65 1.8 0.1 1 0 1 "gis" "setup/conf/real_nonw.conf" "time" 10 (random 10000)
+  experiments:run-experiment
 end
 
 

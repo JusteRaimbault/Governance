@@ -8,12 +8,12 @@
 ; General setup
 to setup:setup
   
+   output-print (word "Setting up - global:headless? = " global:headless?)
+  
   ; if headless, no need to reset as all patch vars will be 0 and no agents (different model instances).
   if global:headless? = 0 [
     clear-all
   ]
-
-  output-print "Setting up"
   
   ; globals
   setup:setup-globals
@@ -104,6 +104,7 @@ to setup:setup-globals
   
   ;
   ;if is-string? global:conf-file [
+  output-print (word "    reading configuration from " global:conf-file)
   if length global:conf-file > 0 [
     let conf file:read-conf-file global:conf-file
     set global:gis-network-file table:get conf "gis-network-file"
@@ -758,7 +759,7 @@ to setup:setup-headless-vars
   
   ;set initial-nw? true
   
-  set global:conf-file ""
+  ;set global:conf-file ""
   
   
   
