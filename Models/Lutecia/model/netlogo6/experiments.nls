@@ -94,7 +94,10 @@ to experiments:run-experiment
 end
 
 to experiments:test-experiment
-  experiments:setup-experiment 0.2953407320932828 0.001 5.0 1.1155308236864352 4.0020992445035096E-4 4.876594421107817 0.9 0.65 1.8 0.1 1 0 1 "gis" "setup/conf/real_nonw.conf" "time" 10 (random 10000)
+  ;experiments:setup-experiment [regionalproba lambdaacc nwspeed game coll-cost roadLength gammaCDA gammaCDE betaDC relocationRate evolveNetwork evolveLanduse target-network setuptype conffile stoptype finalValue rnd-seed]
+  ;experiments:setup-experiment 0.2953407320932828 0.001 5.0 1.1155308236864352 4.0020992445035096E-4 4.876594421107817 0.9 0.65 1.8 0.1 1 0 1 "gis" "setup/conf/real_nonw.conf" "time" 10 (random 10000)
+  experiments:setup-experiment 0.8305652745274879 0.001 5.0 2.3337823180266035 0.004773827280784538 3.0281885355159117 0.9 0.65 1.8 0.1 1 0 1 "gis" "setup/conf/real_nonw.conf" "time" 10 -997884618
+  
   experiments:run-experiment
 end
 
