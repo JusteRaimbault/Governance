@@ -73,7 +73,8 @@ val indics_hook = CSVHook(workDirectory / "calibration" / resfilename,arrayOnRow
 
 
 //val env = LocalEnvironment(5)
-val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
+//val env = EGIEnvironment("vo.complex-systems.eu")//,openMOLEMemory = 4000 megabytes)
+val env = SGEEnvironment(memory = 2 gigabytes, localSubmission = true, wallTime = 60 minutes, workDirectory = "/home/uceejra/Scratch/.tmp")
 
 
 val replications = Replication (
