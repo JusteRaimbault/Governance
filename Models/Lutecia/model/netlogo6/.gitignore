@@ -1,2 +1,5 @@
 res
 
+# for run within model dir -> copy into ../openmole/calibration
+calibration
+
