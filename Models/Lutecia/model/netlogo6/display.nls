@@ -14,6 +14,7 @@
 to display:update-display
   display:color-patches
   display:update-nw-display
+  display:export-view
 end
 
 
@@ -80,6 +81,18 @@ to display:update-nw-display
     ;set color gradient:scale [[255 0 0] [255 255 0]] age 0 (ticks + 1) 
     set color palette:scale-gradient [[0 0 255] [255 0 255]] transportation-link:age 0 (ticks + 1)
     ask both-ends [set color [color] of myself]
+  ]
+end
+
+;;
+; optionally export world view
+to display:export-view
+  if global:export? [
+    if global:export-view-prefix != 0 [
+      if length global:export-view-prefix > 0 [
+        export-view (word global:export-view-prefix "_seed" global:seed "_t" ticks ".png")
+      ]
+    ]
   ]
 end
 

@@ -25,11 +25,12 @@ to-report network:new-infra [coords construct? validate?]
     ]
   
     
-    ;show e1 show e2
+    ;show (word e1 " - " e2)
     
-    ifelse e1 != nobody and e2 != nobody [
+    ifelse e1 != nobody and e2 != nobody and e1 != e2 [
       ask e2 [create-transportation-link-with e1 [network:new-transportation-link set new-link self]]
   
+      ifelse new-link != nobody [
       ; check if link is valid
       let valid? false
       if validate? = false [set valid? true]
@@ -46,6 +47,7 @@ to-report network:new-infra [coords construct? validate?]
         ask new-link [ask both-ends [die] die]
         report nobody
       ]
+    ][report nobody]
     ][report nobody]
   ][report nobody]
 end

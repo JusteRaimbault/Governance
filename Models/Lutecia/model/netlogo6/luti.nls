@@ -49,7 +49,7 @@ to luti:relocate
       set patch:employments ((1 - global:relocation-rate)* patch:employments) + (global:relocation-rate * employments-number * exp (global:beta-discrete-choices * patch:e-utility) / e-dc-norm-factor)
       set patch:delta-actives patch:actives - prev-a set patch:delta-employments patch:employments - prev-e
       set global:diff-actives global:diff-actives + abs (prev-a - patch:actives) set global:diff-employments global:diff-employments + abs (prev-e - patch:employments)
-      set global:rel-diff-actives global:rel-diff-actives + ((abs (prev-a - patch:actives)) / patch:actives) set global:rel-diff-employments global:rel-diff-employments + ((abs (prev-e - patch:employments))/ patch:employments)
+      set global:rel-diff-actives global:rel-diff-actives + ((abs (prev-a - patch:actives)) / (patch:actives + 1e-10)) set global:rel-diff-employments global:rel-diff-employments + ((abs (prev-e - patch:employments))/ (patch:employments + 1e-10))
       ; update global lists
       set global:patches-employments-list replace-item patch:number global:patches-employments-list patch:employments
       set global:patches-actives-list replace-item patch:number global:patches-actives-list patch:actives

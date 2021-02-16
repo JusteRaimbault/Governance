@@ -733,7 +733,7 @@ to setup:setup-headless-vars
   set global:actives-spatial-dispersion 1
   set global:employments-spatial-dispersion 0.8
   
-  
+  set global:export? false
   
   ; luti params
   ;set gamma-cobb-douglas-e 0.9

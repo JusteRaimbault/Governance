@@ -7,7 +7,7 @@
 
 to main:go
   
-  if main:stopping-condition? [stop]
+  if main:stopping-condition? [indicators:compute-indicators stop]
   
   ;; transportation : flux and congestion in nw
   ;;
@@ -24,7 +24,7 @@ to main:go
   indicators:update-indicators
   
   ;; display
-  display:color-patches
+  display:update-display
   
   tick
 end

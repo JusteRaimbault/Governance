@@ -242,6 +242,7 @@ globals[
   global:gis-sea-file
   global:gis-economic-areas-file
   global:gis-governed-patches-file
+  global:target-network-file
 
   ;conf-file
 
@@ -704,7 +705,7 @@ global:actives-max
 global:actives-max
 0
 1000
-500.0
+549.0
 1
 1
 NIL
@@ -827,7 +828,7 @@ global:regional-decision-proba
 global:regional-decision-proba
 0
 1
-0.0
+0.95
 0.05
 1
 NIL
@@ -927,7 +928,7 @@ global:road-length
 global:road-length
 1.0
 20
-3.0
+2.0
 1.0
 1
 NIL
@@ -942,7 +943,7 @@ global:#-explorations
 global:#-explorations
 0
 200
-50.0
+100.0
 1
 1
 NIL
@@ -964,10 +965,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-14
-776
-175
-809
+294
+835
+455
+868
 compute indicators
 indicators:compute-indicators
 NIL
@@ -989,7 +990,7 @@ global:total-time-steps
 global:total-time-steps
 0
 50
-8.0
+10.0
 1
 1
 NIL
@@ -1013,7 +1014,7 @@ CHOOSER
 global:game-type
 global:game-type
 "random" "simple-nash" "discrete-choices"
-2
+1
 
 TEXTBOX
 226
@@ -1123,10 +1124,10 @@ NIL
 1
 
 BUTTON
-15
-742
-175
-775
+295
+801
+455
+834
 construct infrastructure
 governance:manual-infrastructure-construction
 T
@@ -1173,7 +1174,7 @@ global:seed
 global:seed
 -100000
 100000
-0.0
+8.0
 1
 1
 NIL
@@ -1200,7 +1201,7 @@ INPUTBOX
 387
 70
 global:conf-file
-setup/conf/real_nonw.conf
+setup/conf/real_nonw_notarget.conf
 1
 0
 String
@@ -1263,17 +1264,6 @@ false
 PENS
 "default" 1.0 0 -16777216 true "" "plot indicators:mean-effective-distance"
 
-INPUTBOX
-481
-705
-605
-765
-global:target-network-file
-setup/target/network1.shp
-1
-0
-String
-
 TEXTBOX
 393
 556
@@ -1285,10 +1275,10 @@ Run
 1
 
 TEXTBOX
-11
-718
-161
-736
+291
+777
+441
+795
 Interactive
 11
 0.0
@@ -1303,7 +1293,7 @@ global:relocation-rate
 global:relocation-rate
 0
 1
-1.0
+0.1
 0.01
 1
 NIL
@@ -1328,7 +1318,7 @@ global:total-infrastructure-stock
 global:total-infrastructure-stock
 0
 100
-0.0
+5.0
 1
 1
 NIL
@@ -1559,6 +1549,39 @@ global:setup-file-prefix
 1
 0
 String
+
+INPUTBOX
+12
+744
+242
+804
+global:export-view-prefix
+../../../../Results/Lutecia/Examples/ex_PRD_optDist_relocRate0-1_bis
+1
+0
+String
+
+INPUTBOX
+12
+808
+241
+868
+global:export-tsindics-prefix
+../../../../Results/Lutecia/Examples/ex_PRD_optDist_relocRate0-1_bis
+1
+0
+String
+
+SWITCH
+14
+708
+160
+741
+global:export?
+global:export?
+0
+1
+-1000
 
 @#$#@#$#@
 ## Context

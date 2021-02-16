@@ -45,6 +45,19 @@ to indicators:compute-indicators
   output-print (word "alpha-bw-centrality = " indicators:network:alpha-bw-centrality)
   output-print (word "alpha-closeness-centrality = " indicators:network:alpha-closeness-centrality)
   output-print (word "indicators:relative-accessibility = " indicators:relative-accessibility)
+  
+  if global:export? [
+    ; export time series in csv
+   let exportfile (word global:export-tsindics-prefix "_seed" global:seed ".csv")
+   let header (list "indicators:overall-mean-accessibility" "indicators:mean-travel-distance" "indicators:overall-mean-employment-accessibility-per-capita" "global:rel-diff-actives" "global:rel-diff-employments")
+   let lists []
+   foreach (list:seq 0 (ticks - 1) 1) [t ->
+      let currentrow (list t)
+      foreach header [indic -> set currentrow lput (item t (table:get global:history-indicators indic)) currentrow]
+      set lists lput currentrow lists
+    ]
+   file:lists-csv-export lists (fput "time" header) ";" exportfile
+  ]
 end
 
 to indicators:compute-network-indicators
@@ -64,6 +77,7 @@ end
 to-report indicators:get-tracked-indicators
   report (list
     "indicators:overall-mean-accessibility"
+    "indicators:overall-mean-employment-accessibility-per-capita"
     "indicators:mean-travel-distance" 
     
     ; morphology actives
@@ -208,6 +222,10 @@ end
 ; mean accessibility for all patches
 to-report indicators:overall-mean-accessibility
   report accessibilities:mean-accessibility patches
+end
+
+to-report indicators:overall-mean-employment-accessibility-per-capita
+  report mean ([patch:a-to-e-accessibility / (patch:actives + 1e-10)] of patches)
 end
 
 

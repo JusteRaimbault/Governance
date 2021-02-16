@@ -2,12 +2,16 @@
 library(dplyr)
 library(ggplot2)
 
-setwd(paste0(Sys.getenv('CN_HOME'),'/Results/Governance/'))
+setwd(paste0(Sys.getenv('CS_HOME'),'/Governance/Models/Lutecia'))
+
+source('analysis/functions.R')
+
 
 #resdir = '20170508_lhs/'
-resdir = '20170528_real/'
 #res <- as.tbl(read.csv(file = '20170508_lhs/data/20170508_190418_lhs.csv',sep=',',header=T))
-res <- as.tbl(read.csv(file = '20170528_real/data/20170528_grid_real_full.csv',sep=',',header=F,stringsAsFactors = F,skip = 1))
+
+resdir = '20170528_real/'
+res <- as.tbl(read.csv(file = paste0(Sys.getenv('CN_HOME'),'/Results/Governance/20170528_real/data/20170528_grid_real_full.csv'),sep=',',header=F,stringsAsFactors = F,skip = 1))
 
 
 finalTime = 10
@@ -18,16 +22,44 @@ names(res)<-namesTS(c("accessibilityTS","betaDC","centreActivesPropTS","centreEm
                       "meanDistanceCentreActivesTS","meanDistanceCentreEmploymentsTS","meanDistanceEmploymentsTS",
                       "meanFlowTS","minFlowTS","moranActivesTS","moranEmploymentsTS","nwBetweenness",
                       "nwCloseness","nwDiameter","nwLength","nwPathLength","nwRelativeSpeed","realcollab",
-                      "regionalproba","replication","setupType","slopeActivesTS","slopeEmploymentsTS","slopeRsquaredActivesTS",
+                      "regionalProba","replication","setupType","slopeActivesTS","slopeEmploymentsTS","slopeRsquaredActivesTS",
                       "slopeRsquaredEmploymentsTS","stabilityTS","synthConfFile","targetDistance","targetNetwork",
                       "traveldistanceTS","wantedcollab"
 ),finalTime)
 
 
+params = c("collcost","regionalProba","game")
+
+##
+# added for reproduction by new simulations
+
+reprod <- as.tbl(rbind(
+  read.csv(file = 'openmole/calibration/20210212_160546_CALIBRATIONLHS_LANDUSE-RELOCRATE1_GRID.csv',sep=',',stringsAsFactors = F),
+  read.csv(file = 'openmole/calibration/20210213_131315_CALIBRATIONLHS_LANDUSE-RELOCRATE1_GRID.csv',sep=',',stringsAsFactors = F),
+  read.csv(file = 'openmole/calibration/r.csv',sep=',',stringsAsFactors = F)
+  )
+)
+reprodnolu <- as.tbl(read.csv(file = 'openmole/calibration/20210212_160409_CALIBRATIONLHS_NOLANDUSE_GRID.csv',sep=',',stringsAsFactors = F))
+# res = reprod
+# res = reprodnolu
+
 ####
 # TODO : 
 #   - specific calib on bridges ?
 #   - random network null model ?
+
+
+####
+# Minimal target dist value when aggreg on repetitions
+sres = res %>% group_by(id) %>% summarise(count=n())
+length(sres$id[sres$count>=4])/nrow(sres)
+ids = sres$id[sres$count>=4]
+
+dim(res[res$id%in%ids,] %>% group_by(id) %>% summarise(count=n()))
+sres = res[res$id%in%ids,] %>% group_by(collcost,regionalProba,game,constrcost) %>% summarise(distance=mean(targetDistance))
+sres[sres$distance==min(sres$distance),]
+# 0.00379         0.972  1.31    0.00888     79.2
+# note: l_r = 2 fixed in this experiment, with workd size 15
 
 ##
 # hist of obj
@@ -39,7 +71,7 @@ ggsave(filename = paste0(resdir,'hist_targetDistance.png'),width = 15,height=10,
 
 ## distance as function of collaboration
 
-g=ggplot(res,aes(x=regionalproba,y=targetDistance,color=realcollab))
+g=ggplot(res,aes(x=regionalProba,y=targetDistance,color=realcollab))
 g+geom_point()+stat_smooth()
 ggsave(filename = paste0(resdir,'regional-distance_colorrealcollab.png'),width = 15,height=10,units = 'cm')
 
@@ -65,7 +97,7 @@ g=ggplot(sres,aes(x=realcollab,y=targetDistance))
 g+geom_point(pch='.')+stat_smooth()
 
 sres = res%>%group_by(realcollab)%>%summarise(meanTargetDistance=mean(targetDistance),sdTargetDistance=sd(targetDistance))
-g=ggplot(res,aes(x=realcollab,y=targetDistance,color=regionalproba))
+g=ggplot(res,aes(x=realcollab,y=targetDistance,color=regionalProba))
 g+geom_point()+#stat_smooth(n = 10000)
   geom_point(data=sres,aes(x=realcollab,y=meanTargetDistance),col='red')+
   geom_line(data=sres,aes(x=realcollab,y=meanTargetDistance),col='red')+
